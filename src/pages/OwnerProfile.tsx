@@ -55,6 +55,7 @@ const OwnerProfile = () => {
                   "rounded-3xl bg-gradient-to-br from-[#EB4898] via-indigo-500 to-sky-400"
                )}
             >
+              <div
                 className={cn(
                    "w-full h-full overflow-hidden cursor-pointer flex items-center justify-center",
                    "rounded-[1.4rem] backdrop-blur-3xl border transition-all duration-500",
