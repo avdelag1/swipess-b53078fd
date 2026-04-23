@@ -22,8 +22,7 @@ import {
   Users2, ShieldCheck,
   Megaphone, PartyPopper, Scale,
   Zap, SlidersHorizontal, Sparkles,
-  Ticket, IdCard, BadgePercent, Radio,
-  ArrowLeftRight
+  Ticket, IdCard, BadgePercent, Radio
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadMessageCount } from '@/hooks/useUnreadMessageCount';
@@ -126,7 +125,6 @@ export const BottomNavigation = memo(({
     { id: 'events', icon: PartyPopper, label: 'Events', path: '/explore/eventos' },
     { id: 'perks', icon: BadgePercent, label: 'Perks', path: '/client/perks' },
     { id: 'legal', icon: Scale, label: 'Legal', path: '/client/legal' },
-    { id: 'switch', icon: ArrowLeftRight, label: 'Owner Mode', onClick: () => switchMode('owner') },
   ];
 
   // Owner nav items
@@ -138,9 +136,7 @@ export const BottomNavigation = memo(({
     { id: 'listings', icon: Building2, label: 'Listings', path: '/owner/properties' },
     { id: 'messages', icon: MessageCircle, label: 'Messages', path: '/messages' },
     { id: 'promote', icon: Megaphone, label: 'Promote', path: '/client/advertise' },
-    { id: 'legal', icon: Scale, label: 'Legal', path: '/owner/legal-services' },
     { id: 'filters', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
-    { id: 'switch', icon: ArrowLeftRight, label: 'Client Mode', onClick: () => switchMode('client') },
   ];
 
   // Admin nav items — admin panel + messaging

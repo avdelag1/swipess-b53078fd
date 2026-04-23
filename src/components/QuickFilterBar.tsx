@@ -105,6 +105,7 @@ function FilterDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const { isLight } = useAppTheme();
 
   useEffect(() => {
     const handleClickOutside = (event: Event) => {
@@ -132,21 +133,25 @@ function FilterDropdown({
         }}
         className={cn(
           smoothButtonClass,
-          'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold',
-          'border',
+          'flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest italic transition-all',
           isActive
-            ? 'bg-primary text-primary-foreground border-primary'
-            : 'bg-secondary text-secondary-foreground border-border hover:bg-muted/80'
+            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]'
+            : isLight 
+              ? 'bg-black text-white border-black hover:bg-black/80' 
+              : 'bg-white text-black border-white hover:bg-white/80'
         )}
       >
-        {icon}
+        {icon && <span className="opacity-80">{icon}</span>}
         <span>{selectedOption?.label || label}</span>
-        <ChevronDown className={cn('w-3 h-3', isOpen && 'rotate-180')} />
+        <ChevronDown className={cn('w-3 h-3 transition-transform duration-300', isOpen && 'rotate-180')} />
       </button>
 
       {isOpen && (
         <div
-          className="absolute top-full left-0 mt-1 z-[9999] min-w-[120px] bg-background border border-border rounded-lg overflow-hidden pointer-events-auto shadow-xl"
+          className={cn(
+            "absolute top-full left-0 mt-2 z-[9999] min-w-[160px] rounded-2xl overflow-hidden shadow-2xl border backdrop-blur-3xl animate-in fade-in zoom-in-95 duration-200",
+            isLight ? "bg-white/95 border-black/10" : "bg-black/95 border-white/10"
+          )}
         >
           {options.map((option) => (
             <button
@@ -157,15 +162,15 @@ function FilterDropdown({
                 setIsOpen(false);
               }}
               className={cn(
-                smoothButtonClass,
-                'w-full flex items-center gap-2 px-3 py-2.5 text-xs text-left',
+                'w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-left transition-colors',
                 value === option.id
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-foreground hover:bg-muted'
+                  ? (isLight ? 'bg-black text-white' : 'bg-white text-black')
+                  : (isLight ? 'text-black hover:bg-black/5' : 'text-white hover:bg-white/5')
               )}
             >
               {option.icon}
               <span>{option.label}</span>
+              {value === option.id && <Check className="w-3 h-3 ml-auto" />}
             </button>
           ))}
         </div>
@@ -295,24 +300,30 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                   )}
                   style={{ contain: 'paint', willChange: 'transform, opacity' }}
                 >
-                    <div className="absolute inset-0 bg-[var(--hud-text)]/10 z-10 group-hover:bg-[var(--hud-text)]/5 transition-colors" />
+                    {/* Unified Premium Overlay for better text contrast */}
+                    <div className={cn(
+                      "absolute inset-0 z-10 transition-colors duration-300",
+                      isActive 
+                        ? "bg-black/40" 
+                        : "bg-black/60 group-hover:bg-black/50"
+                    )} />
                 <QuickFilterImage 
                   src={option.image} 
                   alt={option.label}
                 />
-                  <div className={cn(
-                    "absolute inset-0 flex flex-col items-center justify-center z-20 transition-colors duration-200",
-                    isActive ? "text-white" : "text-[var(--hud-text)]"
-                  )}>
                     <div className={cn(
-                      "mb-1 transition-all duration-300", 
-                      isActive && (isGlobalAll ? "scale-105 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" : "scale-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]")
+                      "absolute inset-0 flex flex-col items-center justify-center z-20 transition-all duration-300",
+                      isActive ? "text-white" : "text-white/90"
                     )}>
-                      {option.icon}
+                      <div className={cn(
+                        "mb-1 transition-all duration-300", 
+                        isActive && (isGlobalAll ? "scale-110 drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]" : "scale-115 drop-shadow-[0_0_15px_rgba(255,255,255,0.9)]")
+                      )}>
+                        {option.icon}
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-90 mb-0.5 drop-shadow-md">{option.description}</span>
+                      <span className={cn("font-black whitespace-nowrap uppercase tracking-tighter drop-shadow-lg", isGlobalAll ? "text-2xl" : "text-sm")}>{option.label}</span>
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest">{option.description}</span>
-                    <span className={cn("font-black whitespace-nowrap uppercase drop-shadow-sm", isGlobalAll ? "text-xl" : "text-sm")}>{option.label}</span>
-                  </div>
                   {isActive && (
                     <div className="absolute top-2 right-2 z-30 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
                       <Check className="w-3 h-3 text-white" />
@@ -369,18 +380,23 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
             )}
             style={{ contain: 'paint', willChange: 'transform, opacity' }}
           >
-            <div className="absolute inset-0 bg-[var(--hud-text)]/10 z-10 group-hover:bg-[var(--hud-text)]/5 transition-colors" />
+            <div className={cn(
+              "absolute inset-0 z-10 transition-colors duration-300",
+              clientIsAllSelected 
+                ? "bg-black/40" 
+                : "bg-black/60 group-hover:bg-black/50"
+            )} />
             <QuickFilterImage 
               src={POKER_CARD_PHOTOS['all-clients'] || '/images/filters/all.png'} 
               alt="All"
             />
             <div className={cn(
-              "absolute inset-0 flex flex-col items-center justify-center z-20 transition-colors duration-200",
-              clientIsAllSelected ? "text-white" : "text-[var(--hud-text)]"
+              "absolute inset-0 flex flex-col items-center justify-center z-20 transition-all duration-300",
+              clientIsAllSelected ? "text-white" : "text-white/90"
             )}>
-              <Globe className={cn("w-7 h-7 mb-1 transition-all duration-300", clientIsAllSelected && "scale-105 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]")} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Global</span>
-              <span className="text-xl font-black">ALL</span>
+              <Globe className={cn("w-7 h-7 mb-1 transition-all duration-300", clientIsAllSelected && "scale-110 drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]")} />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-0.5">Global</span>
+              <span className="text-2xl font-black uppercase tracking-tighter drop-shadow-md">ALL</span>
             </div>
             {clientIsAllSelected && (
               <div className="absolute top-2 right-2 z-30 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
@@ -406,20 +422,25 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                 )}
                 style={{ contain: 'paint', willChange: 'transform, opacity' }}
               >
-                <div className="absolute inset-0 bg-[var(--hud-text)]/10 z-10 group-hover:bg-[var(--hud-text)]/5 transition-colors" />
+                <div className={cn(
+                  "absolute inset-0 z-10 transition-colors duration-300",
+                  isActive 
+                    ? "bg-black/40" 
+                    : "bg-black/60 group-hover:bg-black/50"
+                )} />
                 <QuickFilterImage 
                   src={photo} 
                   alt={category.label}
                 />
                 <div className={cn(
-                  "absolute inset-0 flex flex-col items-center justify-center z-20 transition-colors duration-200",
-                  isActive ? "text-white" : "text-[var(--hud-text)]"
+                  "absolute inset-0 flex flex-col items-center justify-center z-20 transition-all duration-300",
+                  isActive ? "text-white" : "text-white/90"
                 )}>
-                  <div className={cn("mb-1 transition-all duration-300", isActive && "scale-105 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]")}>
+                  <div className={cn("mb-1 transition-all duration-300", isActive && "scale-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.9)]")}>
                     {category.icon}
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest">Filter</span>
-                  <span className="text-sm font-black whitespace-nowrap uppercase drop-shadow-sm">{category.label}</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-0.5">Filter</span>
+                  <span className="text-sm font-black whitespace-nowrap uppercase tracking-tight drop-shadow-md">{category.label}</span>
                 </div>
                 {isActive && (
                   <div className="absolute top-2 right-2 z-30 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">

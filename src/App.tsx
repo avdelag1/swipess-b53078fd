@@ -31,10 +31,7 @@ if (typeof window !== 'undefined') {
 // after a redeploy get one automatic retry before surfacing to ChunkErrorBoundary.
 const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
 const ResetPassword = lazyWithRetry(() => import("./pages/ResetPassword"));
-const PrivacyPolicy = lazyWithRetry(() => import("./pages/PrivacyPolicy"));
-const TermsOfService = lazyWithRetry(() => import("./pages/TermsOfService"));
 const LegalHub = lazyWithRetry(() => import("./pages/LegalHub"));
-const AGLPage = lazyWithRetry(() => import("./pages/AGLPage"));
 const AboutPage = lazyWithRetry(() => import("./pages/AboutPage"));
 const FAQClientPage = lazyWithRetry(() => import("./pages/FAQClientPage"));
 const FAQOwnerPage = lazyWithRetry(() => import("./pages/FAQOwnerPage"));
@@ -191,9 +188,9 @@ const App = ({ authPromise }: { authPromise?: Promise<any> }) => {
             {/* Outside Layout */}
             <Route path="/payment/success" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback />}><AnimatedPage><PaymentSuccess /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
             <Route path="/payment/cancel" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback />}><AnimatedPage><PaymentCancel /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
-            <Route path="/privacy-policy" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><PrivacyPolicy /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
-            <Route path="/terms-of-service" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><TermsOfService /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
-            <Route path="/agl" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><AGLPage /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
+            <Route path="/privacy-policy" element={<Navigate to="/legal?doc=privacy" replace />} />
+            <Route path="/terms-of-service" element={<Navigate to="/legal?doc=terms" replace />} />
+            <Route path="/agl" element={<Navigate to="/legal?doc=agl" replace />} />
             <Route path="/legal" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><LegalHub /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
             <Route path="/dashboard" element={<DashboardRedirect />} />
             <Route path="/about" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><AboutPage /></AnimatedPage></Suspense></ChunkErrorBoundary>} />

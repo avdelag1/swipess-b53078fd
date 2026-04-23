@@ -33,42 +33,46 @@ function ModeSwitcherComponent({ className, size = 'sm' }: ModeSwitcherProps) {
 
   const isClient = activeMode === 'client';
 
-  const glassButtonStyle = {
-    background: 'var(--hud-bg)',
+  const glassButtonStyle = (isActive: boolean, color: string) => ({
+    background: isActive ? `${color}20` : 'var(--hud-bg)',
     backdropFilter: 'blur(32px) saturate(210%)',
     WebkitBackdropFilter: 'blur(32px) saturate(210%)',
     borderRadius: '1rem',
-    border: '1px solid var(--hud-border)',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-  };
+    border: isActive ? `1.5px solid ${color}` : '1px solid var(--hud-border)',
+    boxShadow: isActive ? `0 0 20px ${color}30` : '0 4px 12px rgba(0,0,0,0.05)',
+  });
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <button
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.9 }}
         onClick={() => handleModeSwitch('client')}
         disabled={!canSwitchMode || isSwitching}
         className={cn(
-          "w-11 h-11 flex items-center justify-center transition-all duration-300 relative rounded-2xl active:scale-90",
-          isClient ? "opacity-100 ring-1 ring-[#f43f5e]/30" : "opacity-40 hover:opacity-100"
+          "w-11 h-11 flex items-center justify-center transition-all duration-300 relative rounded-2xl",
+          isClient ? "opacity-100" : "opacity-40 hover:opacity-100"
         )}
-        style={glassButtonStyle}
+        style={glassButtonStyle(isClient, '#f43f5e')}
         title="Client Mode"
       >
-        <User className={cn("h-4.5 w-4.5", isClient ? "text-[#f43f5e]" : "text-[var(--hud-text)]")} strokeWidth={isClient ? 3 : 2} />
-      </button>
+        <User className={cn("h-5 w-5", isClient ? "text-[#f43f5e]" : "text-[var(--hud-text)]")} strokeWidth={isClient ? 2.5 : 1.5} />
+      </motion.button>
 
-      <button
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.9 }}
         onClick={() => handleModeSwitch('owner')}
         disabled={!canSwitchMode || isSwitching}
         className={cn(
-          "w-11 h-11 flex items-center justify-center transition-all duration-300 relative rounded-2xl active:scale-90",
-          !isClient ? "opacity-100 ring-1 ring-[#f97316]/30" : "opacity-40 hover:opacity-100"
+          "w-11 h-11 flex items-center justify-center transition-all duration-300 relative rounded-2xl",
+          !isClient ? "opacity-100" : "opacity-40 hover:opacity-100"
         )}
-        style={glassButtonStyle}
+        style={glassButtonStyle(!isClient, '#f97316')}
         title="Owner Mode"
       >
-        <UserCheck className={cn("h-4.5 w-4.5", !isClient ? "text-[#f97316]" : "text-[var(--hud-text)]")} strokeWidth={!isClient ? 3 : 2} />
-      </button>
+        <UserCheck className={cn("h-5 w-5", !isClient ? "text-[#f97316]" : "text-[var(--hud-text)]")} strokeWidth={!isClient ? 2.5 : 1.5} />
+      </motion.button>
     </div>
   );
 }
