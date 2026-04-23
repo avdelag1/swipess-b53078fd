@@ -139,7 +139,7 @@ function TopBarComponent({
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           {!minimal && (
             <>
-               <motion.button
+              <motion.button
                 whileTap={{ scale: 0.9 }}
                 onPointerDown={(e) => {
                   e.preventDefault(); e.stopPropagation();
@@ -151,7 +151,7 @@ function TopBarComponent({
                 title="Radio"
               >
                 <Radio 
-                  className="w-5 h-5 text-orange-500" 
+                  className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-orange-500" 
                   strokeWidth={2.5} 
                 />
               </motion.button>

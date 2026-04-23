@@ -246,8 +246,9 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
   };
   // Owner Quick Filters - Specialized for client intent
   if (userRole === 'owner') {
-    const ownerOptions = OWNER_INTENT_CARDS.filter(c => ['all-clients', 'buy', 'rent', 'hire'].includes(c.id)).map(c => ({
+    const ownerOptions = OWNER_INTENT_CARDS.map(c => ({
       id: c.clientType || 'all',
+      originalId: c.id,
       label: c.label,
       description: c.description,
       icon: <c.icon className="w-7 h-7 mb-1" />,
@@ -265,13 +266,14 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
         )}
       >
         <div className="max-w-screen-xl mx-auto pt-1">
-          <div className="flex items-center justify-center gap-4 overflow-x-auto scrollbar-hide pb-4 stagger-enter">
+          <div className="flex items-center justify-center gap-4 overflow-x-auto scrollbar-hide pb-4 stagger-enter" style={{ willChange: 'scroll-position' }}>
             {ownerOptions.map((option) => {
               const isActive = currentClientType === option.id;
+              const isGlobalAll = option.originalId === 'all-clients';
               
               return (
                 <button
-                  key={option.id}
+                  key={option.originalId}
                   onClick={() => {
                     if (onSelect) {
                       onSelect(option.id as any);
@@ -285,9 +287,10 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                   }}
                   className={cn(
                     smoothButtonClass, 
-                  'relative flex-shrink-0 w-28 h-40 rounded-[2.2rem] overflow-hidden border transition-all duration-200 group',
+                  'relative flex-shrink-0 overflow-hidden border transition-all duration-200 group',
+                  isGlobalAll ? 'w-32 h-52 rounded-[3.5rem]' : 'w-28 h-40 rounded-[2.2rem]',
                   isActive 
-                    ? 'border-primary ring-1 ring-primary ring-offset-2 scale-[1.03] shadow-lg' 
+                    ? 'border-primary ring-2 ring-primary ring-offset-2 scale-[1.03] shadow-lg' 
                     : 'border-border/60 opacity-90'
                   )}
                   style={{ contain: 'paint', willChange: 'transform, opacity' }}
@@ -303,12 +306,12 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                   )}>
                     <div className={cn(
                       "mb-1 transition-all duration-300", 
-                      isActive && "scale-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+                      isActive && (isGlobalAll ? "scale-105 drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]" : "scale-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]")
                     )}>
                       {option.icon}
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest">{option.description}</span>
-                    <span className="text-sm font-black whitespace-nowrap uppercase drop-shadow-sm">{option.label}</span>
+                    <span className={cn("font-black whitespace-nowrap uppercase drop-shadow-sm", isGlobalAll ? "text-xl" : "text-sm")}>{option.label}</span>
                   </div>
                   {isActive && (
                     <div className="absolute top-2 right-2 z-30 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
