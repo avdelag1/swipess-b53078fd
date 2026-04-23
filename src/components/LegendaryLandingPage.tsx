@@ -136,10 +136,10 @@ const AppleAuthButton = ({ onClick }: { onClick: () => void }) => (
   <button
     type="button"
     onClick={onClick}
-    className="group flex h-[64px] w-full items-center justify-center gap-3 rounded-[1.5rem] bg-black text-white active:scale-[0.97] transition-all shadow-[0_10px_25px_rgba(0,0,0,0.4)] border border-white/10 hover:bg-black/90"
+    className="group flex h-[48px] w-full items-center justify-center gap-3 rounded-xl bg-black text-white active:scale-[0.97] transition-all shadow-[0_10px_25px_rgba(0,0,0,0.4)] border border-white/10 hover:bg-black/90"
   >
     <AppleIcon />
-    <span className="text-[17px] font-semibold tracking-tight leading-none pt-0.5">
+    <span className="text-[14px] font-semibold tracking-tight leading-none pt-0.5">
       Sign in with Apple
     </span>
   </button>
@@ -149,10 +149,10 @@ const GoogleAuthButton = ({ onClick }: { onClick: () => void }) => (
   <button
     type="button"
     onClick={onClick}
-    className="group flex h-[64px] w-full items-center justify-center gap-3 rounded-[1.5rem] bg-black/40 backdrop-blur-xl border border-white/15 hover:border-white/30 active:scale-[0.97] transition-all shadow-[0_10px_25px_rgba(0,0,0,0.3)]"
+    className="group flex h-[48px] w-full items-center justify-center gap-3 rounded-xl bg-black/40 backdrop-blur-xl border border-white/15 hover:border-white/30 active:scale-[0.97] transition-all shadow-[0_10px_25px_rgba(0,0,0,0.3)]"
   >
     <GoogleIcon />
-    <span className="text-[17px] font-black uppercase tracking-widest text-white leading-none pt-0.5">
+    <span className="text-[14px] font-black uppercase tracking-widest text-white leading-none pt-0.5">
       Continue with Google
     </span>
   </button>
@@ -237,12 +237,12 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
   return (
     <motion.div
       key="auth"
-      className="absolute inset-0 flex flex-col items-center justify-center p-6 z-20 overflow-y-auto"
+      className="absolute inset-0 flex flex-col items-center justify-start sm:justify-center p-6 pt-32 pb-28 z-20 overflow-y-auto"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.1 }}
     >
-      <div className="w-full max-w-sm bg-[#0d0d0f]/85 backdrop-blur-[40px] border border-white/10 rounded-[2.8rem] p-8 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.8)] relative overflow-hidden my-auto">
+      <div className="w-full max-w-sm bg-[#0d0d0f]/85 backdrop-blur-[40px] border border-white/10 rounded-3xl p-6 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.8)] relative overflow-hidden my-auto shrink-0">
         {/* Cinematic Shimmer */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div 
@@ -260,7 +260,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="text-center mb-5 pt-4">
+        <div className="text-center mb-3 pt-4">
           {/* Logo removed from here to appear globally in the header */}
 
           {isForgotPassword ? (
@@ -274,7 +274,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
             </>
           ) : (
             <>
-              <div className="flex items-center justify-center gap-1.5 bg-black/40 backdrop-blur-md rounded-[1.8rem] p-1.5 mb-4 border border-white/5 relative">
+              <div className="flex items-center justify-center gap-1.5 bg-black/40 backdrop-blur-md rounded-[1.8rem] p-1.5 mb-2 border border-white/5 relative">
                 <button
                   type="button"
                   onClick={() => { triggerHaptic('light'); setIsLogin(true); setFieldErrors({}); }}
@@ -313,7 +313,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
         </div>
 
         {!isForgotPassword && (
-          <div className="mb-6 space-y-3">
+          <div className="mb-3 space-y-3">
             <div className="grid grid-cols-1 gap-2.5">
               <AppleAuthButton onClick={() => handleSocialLogin('apple')} />
               <GoogleAuthButton onClick={() => handleSocialLogin('google')} />
@@ -368,7 +368,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Full Name"
                   className={cn(
-                    "w-full h-[64px] bg-white/[0.03] border border-white/10 rounded-[1.25rem] pl-14 pr-6 text-[15px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
+                    "w-full h-[48px] bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-4 text-[13px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
                     fieldErrors.name && "border-red-500/50 bg-red-500/5"
                   )}
                 />
@@ -386,7 +386,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email Protocol"
                 className={cn(
-                  "w-full h-[64px] bg-white/[0.03] border border-white/10 rounded-[1.25rem] pl-14 pr-6 text-[15px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
+                  "w-full h-[48px] bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-4 text-[13px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
                   fieldErrors.email && "border-red-500/50 bg-red-500/5"
                 )}
               />
@@ -404,7 +404,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Alpha-Numeric Key"
                   className={cn(
-                    "w-full h-[64px] bg-white/[0.03] border border-white/10 rounded-[1.25rem] pl-14 pr-6 text-[15px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
+                    "w-full h-[48px] bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-4 text-[13px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
                     fieldErrors.password && "border-red-500/50 bg-red-500/5"
                   )}
                 />
@@ -430,7 +430,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Verify Security Key"
                   className={cn(
-                    "w-full h-[64px] bg-white/[0.03] border border-white/10 rounded-[1.25rem] pl-14 pr-6 text-[15px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
+                    "w-full h-[48px] bg-white/[0.03] border border-white/10 rounded-xl pl-12 pr-4 text-[13px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
                     fieldErrors.confirmPassword && "border-red-500/50 bg-red-500/5"
                   )}
                 />
@@ -489,7 +489,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-[62px] rounded-[1.5rem] bg-primary text-black font-bold uppercase tracking-[0.2em] text-[15px] shadow-[0_15px_35px_rgba(var(--color-brand-primary-rgb),0.35)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 border-none mt-4 disabled:opacity-60 disabled:pointer-events-none"
+            className="w-full h-[50px] rounded-xl bg-primary text-black font-bold uppercase tracking-[0.2em] text-[13px] shadow-[0_15px_35px_rgba(var(--color-brand-primary-rgb),0.35)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 border-none mt-4 disabled:opacity-60 disabled:pointer-events-none"
           >
             <Sparkles className="w-4 h-4 fill-current" />
             <span className="drop-shadow-md">
@@ -523,7 +523,7 @@ function LegendaryLandingPage() {
       </div>
 
       <div className="absolute top-8 left-1/2 -translate-x-1/2 z-40">
-        <SwipessLogo size="sm" variant="icon" />
+        <SwipessLogo size="md" variant="white" />
       </div>
 
       <AnimatePresence mode="wait">
