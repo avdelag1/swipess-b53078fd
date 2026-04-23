@@ -30,7 +30,7 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
   const setActiveCategory = useFilterStore(s => s.setActiveCategory);
   const getListingFilters = useFilterStore(s => s.getListingFilters);
   const updateFilters = useFilterStore(s => s.updateFilters);
-  const clearFilters = useFilterStore(s => s.clearFilters);
+  const resetClientFilters = useFilterStore(s => s.resetClientFilters);
 
   const [localFilters, setLocalFilters] = useState<Record<string, any>>(getListingFilters());
 
@@ -48,9 +48,9 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
 
   const handleReset = useCallback(() => {
     haptics.tap();
-    clearFilters();
+    resetClientFilters();
     setLocalFilters({});
-  }, [clearFilters]);
+  }, [resetClientFilters]);
 
   const categories = [
     { id: 'property', name: 'Properties', icon: Home },

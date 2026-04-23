@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -21,7 +21,7 @@ interface OwnerFiltersProps {
 export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps) {
   const navigate = useNavigate();
   const { theme, isLight } = useAppTheme();
-  const isDark = theme === 'dark' || theme === 'swipess-style';
+  const isDark = theme === 'dark' || theme === 'Swipess-style';
   
   const storeActiveCategory = useFilterStore(s => s.activeCategory);
   const [activeCategory, setActiveCategory] = useState<CategoryType>((storeActiveCategory as CategoryType) || 'property');
@@ -135,11 +135,11 @@ export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps)
           >
             {(() => {
               const mappedCategory = 
-                activeCategory === 'leads' ? 'property' :
-                activeCategory === 'motos' ? 'motorcycle' :
-                activeCategory === 'bikes' ? 'bicycle' :
-                activeCategory === 'jobs' ? 'service' :
-                activeCategory === 'services' ? 'service' :
+                (activeCategory as string) === 'leads' ? 'property' :
+                (activeCategory as string) === 'motos' ? 'motorcycle' :
+                (activeCategory as string) === 'bikes' ? 'bicycle' :
+                (activeCategory as string) === 'jobs' ? 'service' :
+                (activeCategory as string) === 'services' ? 'service' :
                 'property';
                 
               return (

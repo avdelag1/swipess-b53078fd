@@ -76,7 +76,7 @@ function applyThemeToDOM(theme: Theme) {
   root.classList.add(theme);
   if (theme === 'dark') root.classList.add('black-matte');
   else if (theme === 'light') root.classList.add('white-matte');
-  else if (theme !== 'light') root.classList.add('dark');
+  else root.classList.add('dark');
 
   let meta = document.querySelector('meta[name="theme-color"]');
   if (!meta) {

@@ -60,7 +60,7 @@ const OwnerProfile = () => {
                    "w-full h-full overflow-hidden cursor-pointer flex items-center justify-center",
                    "rounded-[1.4rem] bg-black/40 backdrop-blur-3xl border border-white/10"
                 )}
-                onClick={() => { triggerHaptic('selection'); setShowEditDialog(true); }}
+                onClick={() => { triggerHaptic('light'); setShowEditDialog(true); }}
               >
                 {ownerProfile?.profile_images?.[0] ? (
                   <img src={ownerProfile.profile_images[0]} alt="Brand" className="w-full h-full object-cover" />
@@ -70,7 +70,7 @@ const OwnerProfile = () => {
               </div>
             </motion.div>
              <button
-               onClick={() => { triggerHaptic('selection'); setShowEditDialog(true); }}
+               onClick={() => { triggerHaptic('light'); setShowEditDialog(true); }}
                className={cn(
                   "absolute -bottom-3 -right-3 w-14 h-14 flex items-center justify-center shadow-2xl transition-all active:scale-90 z-20",
                   "bg-white text-black rounded-2xl border border-black/10"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell, Check, Trash2, Heart, MessageCircle, Info, 
@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/button';
 import { useAppNavigate } from '@/hooks/useAppNavigate';
 
 const NotificationsPage = () => {
-  const { notifications, isLoading, markAsRead, deleteNotification, markAllAsRead } = useNotifications();
+  const { notifications, markNotificationAsRead, dismissNotification, markAllAsRead } = useNotificationSystem();
+  const isLoading = false; // Mock loading state since useNotificationSystem doesn't provide it
   const { isLight, isDark } = useAppTheme();
   const { navigate } = useAppNavigate();
 
@@ -91,7 +92,7 @@ const NotificationsPage = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                onClick={() => { triggerHaptic('light'); markAsRead(notif.id); }}
+                onClick={() => { triggerHaptic('light'); markNotificationAsRead(notif.id); }}
                 className={cn(
                   "group relative p-5 rounded-[2.5rem] border transition-all cursor-pointer active:scale-[0.98]",
                   notif.read_at 
@@ -127,14 +128,14 @@ const NotificationsPage = () => {
 
                   <div className="flex flex-col gap-2">
                     <button
-                      onClick={(e) => { e.stopPropagation(); triggerHaptic('medium'); deleteNotification(notif.id); }}
+                      onClick={(e) => { e.stopPropagation(); triggerHaptic('medium'); dismissNotification(notif.id); }}
                       className="p-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-rose-500 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                     {!notif.read_at && (
                        <button
-                        onClick={(e) => { e.stopPropagation(); triggerHaptic('success'); markAsRead(notif.id); }}
+                        onClick={(e) => { e.stopPropagation(); triggerHaptic('success'); markNotificationAsRead(notif.id); }}
                         className="p-2 rounded-xl bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary transition-colors"
                       >
                         <Check className="w-4 h-4" />

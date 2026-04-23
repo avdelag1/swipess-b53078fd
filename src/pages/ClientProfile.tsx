@@ -81,7 +81,7 @@ const ClientProfile = () => {
                    "w-full h-full overflow-hidden cursor-pointer flex items-center justify-center",
                    "rounded-[3.4rem] bg-background border border-white/10"
                 )}
-                onClick={() => { triggerHaptic('selection'); if (profile?.profile_images?.length) { handlePhotoClick(0); } else { setShowEditDialog(true); } }}
+                onClick={() => { triggerHaptic('light'); if (profile?.profile_images?.length) { handlePhotoClick(0); } else { setShowEditDialog(true); } }}
               >
                 {profile?.profile_images?.[0] ? (
                   <img src={profile.profile_images[0]} alt="Profile" className="w-full h-full object-cover" />
@@ -92,7 +92,7 @@ const ClientProfile = () => {
             </motion.div>
             
             <button
-              onClick={() => { triggerHaptic('selection'); setShowEditDialog(true); }}
+              onClick={() => { triggerHaptic('light'); setShowEditDialog(true); }}
               className={cn(
                 "absolute -bottom-3 -right-3 w-16 h-16 flex items-center justify-center shadow-2xl transition-all active:scale-90 z-20",
                 "bg-brand-primary text-white rounded-[1.8rem] shadow-xl border border-white/20"

@@ -203,7 +203,7 @@ const ClientProfileNew = () => {
           </motion.div>
 
           {/* About & Interests Section */}
-          {(profile?.bio || profile?.interests?.length > 0) && (
+          {(profile?.bio || (profile?.interests?.length ?? 0) > 0) && (
             <motion.div
               variants={childVariant}
               className="space-y-3"
@@ -217,7 +217,7 @@ const ClientProfileNew = () => {
                 </Card>
               )}
 
-              {profile?.interests?.length > 0 && (
+              {(profile?.interests?.length ?? 0) > 0 && (
                 <Card className="bg-card border-border">
                   <CardContent className="p-4">
                     <h3 className="text-sm font-medium text-muted-foreground mb-2">Interests</h3>

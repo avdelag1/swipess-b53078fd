@@ -55,15 +55,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const { t } = useTranslation();
 
-  const { filters, setFilters, activeCategory, radiusKm, setRadiusKm } = useFilterStore(
-    useShallow((s) => ({
-      filters: s.filters,
-      setFilters: s.setFilters,
-      activeCategory: s.activeCategory,
-      radiusKm: s.radiusKm,
-      setRadiusKm: s.setRadiusKm
-    }))
-  );
+  // Filters removed from here since they are unused
 
 
 

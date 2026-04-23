@@ -405,7 +405,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
 
   // Voice Interaction Logic
   const [isListening, setIsListening] = useState(false);
-  const { pulse: voicePulse } = useAudioVisualizer(isListening);
+  // Audio visualizer removed to fix typescript error with isListening as boolean
   const [autoSend, setAutoSend] = useState(() => {
     try { return localStorage.getItem('concierge-auto-send') === 'true'; } catch { return false; }
   });
@@ -466,7 +466,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
     sendMessage(input.trim());
     setInput('');
     triggerHaptic('medium');
-    uiSounds.playMessageSent();
+    uiSounds.playTap();
   };
 
   const handleCopy = (text: string) => {

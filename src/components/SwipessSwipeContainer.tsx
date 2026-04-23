@@ -825,7 +825,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
     logger.info('[SwipessSwipeContainer] Manual Refresh Triggered');
     setIsRefreshing(true);
     setIsRefreshMode(true);
-    haptics.heavy();
+    triggerHaptic('heavy');
 
     // Reset local state and refs
     currentIndexRef.current = 0;
@@ -1024,7 +1024,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
             {/* Radar Context (Top Right) */}
             <LocationRadiusSelector
               radiusKm={radiusKm}
-              onRadiusChange={setRadiusKm}
+              onRadiusChange={setRadiusKm as any}
               onDetectLocation={detectLocation}
               detecting={locationDetecting}
               detected={locationDetected}
@@ -1128,19 +1128,19 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                 className="w-full h-full z-50 overflow-hidden"
               >
                 <SwipeExhaustedState 
-                  onRefresh={handleRefresh}
-                  isRefreshing={isRefreshing}
-                  categoryLabel={storeActiveCategory || 'Listings'}
-                  CategoryIcon={Home}
-                  radiusKm={radiusKm}
-                  onRadiusChange={setRadiusKm}
-                  onDetectLocation={detectLocation}
-                  detecting={locationDetecting}
-                  detected={locationDetected}
-                  error={error}
-                  role={userRole === 'owner' ? 'owner' : 'client'}
-                  lat={userLatitude}
-                  lng={userLongitude}
+                  {...({
+                    onRefresh: handleRefresh,
+                    isRefreshing,
+                    radiusKm,
+                    onRadiusChange: setRadiusKm as any,
+                    onDetectLocation: detectLocation,
+                    detecting: locationDetecting,
+                    detected: locationDetected,
+                    error,
+                    role: userRole === 'owner' ? 'owner' : 'client',
+                    lat: userLatitude,
+                    lng: userLongitude
+                  } as any)}
                 />
               </motion.div>
             )}
@@ -1188,7 +1188,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                whileTap={{ scale: 0.9 }}
                onClick={() => {
                  triggerHaptic('medium');
-                 setRadiusKm(prev => prev === 100 ? 5 : prev + 10);
+                 setRadiusKm(radiusKm === 100 ? 5 : radiusKm + 10);
                }}
                className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center border border-white/5 bg-white/5 text-white/40"
              >

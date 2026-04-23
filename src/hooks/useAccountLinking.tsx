@@ -103,7 +103,7 @@ export function useAccountLinking() {
       logSupabaseError('auth.updateUser(link)', linkUpdateError);
 
       // Update existing profile with any new OAuth data if needed
-      const profileUpdate: Record<string, unknown> = {
+      const profileUpdate: Record<string, any> = {
         updated_at: new Date().toISOString()
       };
 
@@ -122,7 +122,7 @@ export function useAccountLinking() {
       if (Object.keys(profileUpdate).length > 1) {
         await supabase
           .from('profiles')
-          .update(profileUpdate)
+          .update(profileUpdate as any)
           .eq('user_id', existingProfile.id);
       }
 

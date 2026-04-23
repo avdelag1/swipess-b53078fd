@@ -22,7 +22,8 @@ import {
   Users2, ShieldCheck,
   Megaphone, PartyPopper, Scale,
   Zap, SlidersHorizontal, Sparkles,
-  Ticket, IdCard, BadgePercent, Radio
+  Ticket, IdCard, BadgePercent, Radio,
+  ArrowLeftRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadMessageCount } from '@/hooks/useUnreadMessageCount';
@@ -35,6 +36,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppNavigate } from '@/hooks/useAppNavigate';
 import { useFilterStore } from '@/state/filterStore';
 import { useModalStore } from '@/state/modalStore';
+import { useActiveMode } from '@/hooks/useActiveMode';
 
 const ICON_SIZE = 23;
 const ICON_SIZE_COMPACT = 20;
@@ -83,6 +85,7 @@ export const BottomNavigation = memo(({
   const { unreadCount: _unreadCount } = useUnreadMessageCount();
   const { unreadCount: _unreadNotifCount } = useUnreadNotifications();
   const { theme, isLight } = useAppTheme();
+  const { activeMode, switchMode, isSwitching } = useActiveMode();
 
   const { t } = useTranslation();
 
@@ -122,6 +125,8 @@ export const BottomNavigation = memo(({
     { id: 'search', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
     { id: 'events', icon: PartyPopper, label: 'Events', path: '/explore/eventos' },
     { id: 'perks', icon: BadgePercent, label: 'Perks', path: '/client/perks' },
+    { id: 'legal', icon: Scale, label: 'Legal', path: '/client/legal' },
+    { id: 'switch', icon: ArrowLeftRight, label: 'Owner Mode', onClick: () => switchMode('owner') },
   ];
 
   // Owner nav items
@@ -135,6 +140,7 @@ export const BottomNavigation = memo(({
     { id: 'promote', icon: Megaphone, label: 'Promote', path: '/client/advertise' },
     { id: 'legal', icon: Scale, label: 'Legal', path: '/owner/legal-services' },
     { id: 'filters', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
+    { id: 'switch', icon: ArrowLeftRight, label: 'Client Mode', onClick: () => switchMode('client') },
   ];
 
   // Admin nav items — admin panel + messaging

@@ -110,7 +110,7 @@ export const VirtualizedMessageList = memo(({
 }: VirtualizedMessageListProps) => {
   const parentRef = useRef<HTMLDivElement>(null);
   const { theme } = useAppTheme();
-  const isThemeLight = theme === 'light' || theme === 'ivanna-style';
+  const isThemeLight = theme === 'light' || theme === 'Swipess-style';
 
   const virtualizer = useVirtualizer({
     count: messages.length,

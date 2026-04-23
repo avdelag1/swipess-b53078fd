@@ -118,7 +118,7 @@ export function useSmartClientMatching(
                     .neq('user_id', userId); // self-exclusion
                 
                 if (isRoommateSection) {
-                    query = query.eq('roommate_available', true);
+                    query = (query as any).eq('roommate_available', true);
                 }
                 
                 if (_category) {

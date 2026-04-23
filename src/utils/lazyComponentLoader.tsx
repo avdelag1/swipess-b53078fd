@@ -108,9 +108,7 @@ export function createHoverPreloader(
  */
 export const lazyLoadedComponents = {
   // Charts - only load when Dashboard is accessed
-  EnhancedOwnerDashboard: lazy(() =>
-    import('../components/EnhancedOwnerDashboard')
-  ),
+
 
   // Date-based components - only load when needed
   ClientSavedSearches: lazy(() =>

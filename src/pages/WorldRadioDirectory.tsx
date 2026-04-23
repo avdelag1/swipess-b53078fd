@@ -25,7 +25,7 @@ export default function WorldRadioDirectory() {
   const filteredStations = useMemo(() => {
     return radioStations.filter(s => {
       const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          s.genre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (s.genre?.toLowerCase().includes(searchQuery.toLowerCase()) || false) ||
                           s.city.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCity = selectedCity === 'all' || s.city === selectedCity;
       return matchesSearch && matchesCity;

@@ -257,8 +257,8 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
       '/privacy-policy', '/terms-of-service', '/legal', '/agl',
       '/subscription/packages', '/notifications', '/explore/eventos'
     ].some(path => location.pathname === path || location.pathname === path + '/');
-    return isCameraRoute || isRadioRoute || isRoommatesPageLocal || isSpecialSubPage || modalStore.showMapFullscreen;
-  }, [location.pathname, isCameraRoute, isRadioRoute, modalStore.showMapFullscreen]);
+    return isCameraRoute || isRadioRoute || isRoommatesPageLocal || isSpecialSubPage || (modalStore as any).showMapFullscreen;
+  }, [location.pathname, isCameraRoute, isRadioRoute, (modalStore as any).showMapFullscreen]);
 
   const isZeroScrollDashboard = useMemo(() => {
     const path = location.pathname;

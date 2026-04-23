@@ -125,7 +125,7 @@ export function VapIdEditModal({ isOpen, onClose }: Props) {
     setSaving(true);
     try {
       const yearsNum = yearsInCity.trim() === '' ? null : Number(yearsInCity);
-      const payload: Record<string, any> = {
+      const payload: any = {
         user_id: user.id,
         bio: bio.trim() || null,
         occupation: occupation.trim() || null,

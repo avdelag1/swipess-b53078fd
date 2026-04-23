@@ -75,7 +75,7 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
   const savePreferencesMutation = useSaveClientFilterPreferences();
   const radiusKm = useFilterStore(s => s.radiusKm);
   const setRadiusKm = useFilterStore(s => s.setRadiusKm);
-  const { setServiceTypes: setStoreServiceTypes, setPropertyTypes: setStorePropertyTypes } = useFilterActions();
+  const { setServiceTypes: setStoreServiceTypes, setPropertyTypes: setStorePropertyTypes } = useFilterActions() as any;
 
   // SHARED STATE
   const [interestType, setInterestType] = useState(initialFilters.interest_type || 'both');

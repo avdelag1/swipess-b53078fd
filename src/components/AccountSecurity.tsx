@@ -46,11 +46,12 @@ export function AccountSecurity({ userRole }: AccountSecurityProps) {
 
   useEffect(() => {
     if (settings) {
+      const s = settings as any;
       setLocalSettings({
-        two_factor_enabled: settings.two_factor_enabled ?? false,
-        login_alerts: settings.login_alerts ?? true,
-        session_timeout: settings.session_timeout ?? true,
-        device_tracking: settings.device_tracking ?? true
+        two_factor_enabled: s.two_factor_enabled ?? false,
+        login_alerts: s.login_alerts ?? true,
+        session_timeout: s.session_timeout ?? true,
+        device_tracking: s.device_tracking ?? true
       });
     }
   }, [settings]);
