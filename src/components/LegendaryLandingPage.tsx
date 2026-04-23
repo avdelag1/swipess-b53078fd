@@ -81,23 +81,7 @@ const LandingView = memo(({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <motion.div
-        drag="x"
-        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-        dragElastic={{ left: 0.05, right: 0.95 }}
-        onDragEnd={handleDragEnd}
-        onTap={handleTap}
-        style={{ x, opacity: logoOpacity, scale: logoScale, filter: logoFilter }}
-        className="cursor-grab active:cursor-grabbing touch-none select-none relative w-full flex justify-center py-10"
-      >
-        <div className="relative w-48 h-2 rounded-full bg-white/10 overflow-hidden shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-          <motion.div
-            className="absolute inset-0 bg-white/40"
-            animate={{ x: ['-100%', '100%'] }}
-            transition={{ duration: 1.5, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1 }}
-          />
-        </div>
-      </motion.div>
+
 
       <motion.div
         className="mt-12 flex flex-col items-center gap-4 w-full max-w-[320px]"
@@ -119,13 +103,6 @@ const LandingView = memo(({
           <Sparkles className="w-5 h-5 text-[#EB4898]" />
           Create Account
         </button>
-        <motion.p
-          animate={{ opacity: [0.15, 0.4, 0.15] }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className="mt-2 text-[11px] uppercase tracking-[0.35em] font-bold text-white/30 italic"
-        >
-          or swipe bar to enter →
-        </motion.p>
       </motion.div>
     </motion.div>
   );
@@ -534,16 +511,25 @@ function LegendaryLandingPage() {
         )}
       </AnimatePresence>
 
-      <div className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-1.5 opacity-30 hover:opacity-80 transition-opacity">
-        <div className="flex items-center gap-5 text-[9px] font-black uppercase tracking-[0.3em] text-white italic">
-          <button onClick={() => setLegalModal('privacy')} className="hover:text-primary transition-colors">Privacy</button>
-          <div className="w-1 h-1 rounded-full bg-white/20" />
-          <button onClick={() => setLegalModal('terms')} className="hover:text-primary transition-colors">Terms</button>
-          <div className="w-1 h-1 rounded-full bg-white/20" />
-          <button onClick={() => setLegalModal('terms')} className="hover:text-primary transition-colors">Legal Hub</button>
-        </div>
-        <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 italic">© 2026 SWIPESS INDUSTRIES</p>
-      </div>
+      <AnimatePresence>
+        {view === 'landing' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-1.5 opacity-30 hover:opacity-80 transition-opacity"
+          >
+            <div className="flex items-center gap-5 text-[9px] font-black uppercase tracking-[0.3em] text-white italic">
+              <button onClick={() => setLegalModal('privacy')} className="hover:text-primary transition-colors">Privacy</button>
+              <div className="w-1 h-1 rounded-full bg-white/20" />
+              <button onClick={() => setLegalModal('terms')} className="hover:text-primary transition-colors">Terms</button>
+              <div className="w-1 h-1 rounded-full bg-white/20" />
+              <button onClick={() => setLegalModal('terms')} className="hover:text-primary transition-colors">Legal Hub</button>
+            </div>
+            <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 italic">© 2026 SWIPESS INDUSTRIES</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {legalModal && (
