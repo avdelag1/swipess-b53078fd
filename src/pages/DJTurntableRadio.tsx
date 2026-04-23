@@ -25,8 +25,7 @@ export default function DJTurntableRadio() {
     state, loading, play, togglePlayPause, togglePower, changeStation,
     setCity, setVolume, toggleShuffle, toggleFavorite, isStationFavorite,
   } = useRadio();
-  const { theme } = useAppTheme();
-  const isDark = theme === 'dark';
+  const { theme, isDark, isLight } = useAppTheme();
 
   const [showDrawer, setShowDrawer] = useState(false);
   const [showFavoritesDrawer, setShowFavoritesDrawer] = useState(false);
@@ -85,8 +84,7 @@ export default function DJTurntableRadio() {
     setShowFavoritesDrawer(false);
   }, [play]);
 
-  const isDark = theme === 'dark' || theme === 'black-matte' || theme === 'grey-matte';
-  const isLight = !isDark;
+
 
   const neumBtn = isDark
     ? 'bg-white/[0.08] border border-white/[0.1] shadow-[0_8px_30px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)]'
