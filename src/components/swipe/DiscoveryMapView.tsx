@@ -285,22 +285,21 @@ export const DiscoveryMapView = memo(({
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden bg-background">
       {/* 🛸 HUD OVERLAYS */}
-      {!isEmbedded && (
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={() => { triggerHaptic('light'); onBack(); }}
-          className={cn(
-            "absolute top-[calc(env(safe-area-inset-top,0px)+12px)] left-4 z-[2000] flex items-center justify-center w-12 h-12 rounded-2xl",
-            "transition-all active:scale-90",
-            isLight
-              ? "bg-white/80 backdrop-blur-3xl text-black shadow-lg"
-              : "bg-black/60 backdrop-blur-3xl text-white shadow-2xl"
-          )}
-        >
-          <ChevronLeft className="w-6 h-6" strokeWidth={3} />
-        </motion.button>
-      )}
+      <motion.button
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        onClick={() => { triggerHaptic('light'); onBack(); }}
+        className={cn(
+          "absolute top-[calc(env(safe-area-inset-top,0px)+12px)] left-4 z-[2000] flex items-center gap-3 px-4 h-12 rounded-2xl",
+          "transition-all active:scale-90 shadow-2xl border",
+          isLight
+            ? "bg-white/80 backdrop-blur-3xl text-black border-black/5"
+            : "bg-black/60 backdrop-blur-3xl text-white border-white/10"
+        )}
+      >
+        <ChevronLeft className="w-6 h-6" strokeWidth={3} />
+        <span className="text-[10px] font-black uppercase tracking-widest italic">Back to Cards</span>
+      </motion.button>
 
       <motion.div
         initial={{ opacity: 0, y: -20 }}

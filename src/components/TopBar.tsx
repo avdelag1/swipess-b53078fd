@@ -15,6 +15,7 @@ import { ThemeToggle } from './ThemeToggle';
 import { useModalStore } from '@/state/modalStore';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { AIListingTrigger } from './AIListingTrigger';
+import { SwipessLogo } from './SwipessLogo';
 
 interface TopBarProps {
   onNotificationsClick?: () => void;
@@ -113,14 +114,14 @@ function TopBarComponent({
                 className="flex shrink-0 items-center gap-2 px-3 py-2 rounded-full"
                 style={glassPillStyle}
               >
-                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shrink-0">
-                   <span className="text-orange-500 font-black text-lg italic drop-shadow-sm">S</span>
+                <div className="flex items-center gap-2">
+                  <SwipessLogo variant="icon" className="w-8 h-8" />
+                  {profile?.full_name && (
+                    <span className="text-[11px] font-black uppercase tracking-widest mr-1" style={{ color: 'var(--hud-text)' }}>
+                      {profile.full_name.split(' ')[0]}
+                    </span>
+                  )}
                 </div>
-                {profile?.full_name && (
-                  <span className="text-[11px] font-black uppercase tracking-widest mr-1" style={{ color: 'var(--hud-text)' }}>
-                    {profile.full_name.split(' ')[0]}
-                  </span>
-                )}
               </motion.button>
             )
           )}

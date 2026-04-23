@@ -243,7 +243,7 @@ export function LikedClients() {
             ))}
           </div>
         ) : (
-          <EmptyState icon={Users} title="Network Empty." description="Your matches will appear here. Start scanning to find talent." actionLabel="EXPLORE" onAction={() => navigate("/owner/discovery")} />
+          <EmptyState icon={Users} title="Network Empty." description="Your matches will appear here. Start scanning to find talent." actionLabel="EXPLORE" onAction={() => navigate("/owner/dashboard")} />
         )}
       </div>
 

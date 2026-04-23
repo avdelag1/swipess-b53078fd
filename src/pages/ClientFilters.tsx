@@ -37,7 +37,7 @@ export default function ClientFilters() {
     haptics.success();
     updateFilters(localFilters);
     queryClient.invalidateQueries({ queryKey: ['smart-listings'] });
-    navigate('/owner/discovery');
+    navigate('/owner/dashboard');
   }, [navigate, queryClient, updateFilters, localFilters]);
 
   const handleReset = useCallback(() => {
