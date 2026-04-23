@@ -285,20 +285,22 @@ export const DiscoveryMapView = memo(({
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden bg-background">
       {/* 🛸 HUD OVERLAYS */}
-      <motion.button
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        onClick={() => { triggerHaptic('light'); onBack(); }}
-        className={cn(
-          "absolute top-[calc(env(safe-area-inset-top,0px)+12px)] left-4 z-[2000] flex items-center justify-center w-12 h-12 rounded-2xl",
-          "transition-all active:scale-90",
-          isLight
-            ? "bg-white/80 backdrop-blur-3xl text-black shadow-lg"
-            : "bg-black/60 backdrop-blur-3xl text-white shadow-2xl"
-        )}
-      >
-        <ChevronLeft className="w-6 h-6" strokeWidth={3} />
-      </motion.button>
+      {!isEmbedded && (
+        <motion.button
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          onClick={() => { triggerHaptic('light'); onBack(); }}
+          className={cn(
+            "absolute top-[calc(env(safe-area-inset-top,0px)+12px)] left-4 z-[2000] flex items-center justify-center w-12 h-12 rounded-2xl",
+            "transition-all active:scale-90",
+            isLight
+              ? "bg-white/80 backdrop-blur-3xl text-black shadow-lg"
+              : "bg-black/60 backdrop-blur-3xl text-white shadow-2xl"
+          )}
+        >
+          <ChevronLeft className="w-6 h-6" strokeWidth={3} />
+        </motion.button>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -357,7 +359,8 @@ export const DiscoveryMapView = memo(({
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          "absolute bottom-0 inset-x-0 z-[2000] px-5 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] flex flex-col gap-6",
+          "absolute bottom-0 inset-x-0 z-[2000] px-5 pt-6 flex flex-col gap-6",
+          isEmbedded ? "pb-8" : "pb-[calc(6rem+env(safe-area-inset-bottom,0px))]",
           isLight
             ? "bg-white/95 backdrop-blur-2xl border-t border-black/5"
             : "bg-black/95 backdrop-blur-3xl border-t border-white/10 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"

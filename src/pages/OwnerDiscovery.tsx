@@ -198,14 +198,14 @@ function OwnerDiscovery() {
                   className={cn(
                     "h-14 px-8 rounded-[1.5rem] flex items-center gap-3 text-xs font-black uppercase tracking-widest border transition-all duration-300 active:scale-95 w-full sm:w-auto whitespace-nowrap shadow-lg",
                     showMapView 
-                      ? "bg-primary text-white border-primary shadow-[0_10px_30px_rgba(var(--brand-primary-rgb),0.3)] scale-[1.05] z-10 relative" 
+                      ? "bg-primary text-black border-primary shadow-[0_10px_30px_rgba(var(--brand-primary-rgb),0.3)]" 
                       : (isLight 
                         ? "bg-white border-slate-300 text-black font-black hover:bg-slate-50 shadow-sm" 
                         : "bg-black/40 border-white/10 text-white/60 hover:bg-white/5 hover:text-white font-black")
                   )}
                 >
                   <Sparkles className={cn("w-4 h-4", showMapView && "animate-pulse")} />
-                  {showMapView ? 'Deactivate Radar Map' : 'Activate Radar Map'}
+                  {showMapView ? 'Switch to Card View' : 'Explore on Radar Map'}
                 </button>
               </div>
             </div>
@@ -218,7 +218,16 @@ function OwnerDiscovery() {
           activeTab === 'saved' ? (<OwnerLikedClients />) : (
             <div className="w-full">
               {showMapView ? (
-                <div className="w-full h-[65vh] rounded-[3.5rem] overflow-hidden border border-white/10 shadow-2xl relative z-0 mb-12">
+                <div className="w-full h-[70vh] rounded-[3.5rem] overflow-hidden border border-white/10 shadow-2xl relative z-0 mb-12">
+                  <div className="absolute top-6 left-6 z-[100]">
+                    <button 
+                      onClick={() => setShowMapView(false)}
+                      className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/10 text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-2xl"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Back to Cards
+                    </button>
+                  </div>
                   <DiscoveryMapView
                     category={radarCategory === 'worker' ? 'services' : radarCategory}
                     onBack={() => setShowMapView(false)}
