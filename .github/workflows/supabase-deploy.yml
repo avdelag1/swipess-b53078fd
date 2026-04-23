@@ -1,0 +1,62 @@
+name: Deploy Supabase Edge Functions
+
+on:
+  # Manual trigger - you control when to deploy
+  workflow_dispatch:
+    inputs:
+      function:
+        description: 'Which function to deploy'
+        required: false
+        type: choice
+        options:
+          - all
+          - ai-concierge
+          - ai-orchestrator
+          - ai-assistant
+          - ai-conversation
+        default: 'ai-concierge'
+  
+  # Also deploy on push to main (optional - remove if you only want manual)
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/functions/**'
+
+jobs:
+  deploy-functions:
+    runs-on: ubuntu-latest
+    
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      
+      - name: Set Gemini Secret
+        run: |
+          echo "Syncing Gemini API Key to Supabase..."
+          supabase secrets set GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} --project-ref $PROJECT_REF
+      
+      - name: Deploy Edge Functions
+        run: |
+          if [ "${{ github.event.inputs.function }}" == "all" ]; then
+            echo "Deploying ALL functions..."
+            supabase functions deploy ai-concierge --project-ref $PROJECT_REF --no-verify-jwt
+            supabase functions deploy ai-orchestrator --project-ref $PROJECT_REF --no-verify-jwt
+            supabase functions deploy ai-assistant --project-ref $PROJECT_REF --no-verify-jwt
+            supabase functions deploy ai-conversation --project-ref $PROJECT_REF --no-verify-jwt
+          elif [ "${{ github.event.inputs.function }}" == "" ]; then
+            echo "Auto-deploying changed functions (triggered by push)..."
+            supabase functions deploy ai-concierge --project-ref $PROJECT_REF --no-verify-jwt
+          else
+            echo "Deploying ${{ github.event.inputs.function }}..."
+            supabase functions deploy ${{ github.event.inputs.function }} --project-ref $PROJECT_REF --no-verify-jwt
+          fi

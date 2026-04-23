@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#000000" id="theme-color-meta">
+  <meta name="msapplication-TileColor" content="#000000">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- System fonts — no external font loading needed -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+
+
+  <script>
+    /**
+     * 🚀 CONNECTION WARMUP & ROLE PREDICTION
+     * This script runs before the main app bundle to eliminate ~200ms of idle time.
+     */
+    (function() {
+      // 1. Warm up the API connection (pre-resolve SSL/TLS)
+
+
+      // 2. Predictive Chunk Loading
+      // We check the role from storage to pre-load the right dashboard JS immediately.
+      try {
+        const lastRole = localStorage.getItem('swipess_user_role') || 'client';
+        // We can't know the exact hash here without a complex build setup, 
+        // but we can signal the browser to prioritize the eventual fetch.
+        window.__PREDICTED_ROLE = lastRole;
+      } catch(e) {}
+      
+      const theme = 'dark'; // Force dark for initial paint
+      const root = document.documentElement;
+      root.classList.add(theme, 'black-matte');
+      root.style.backgroundColor = '#000000';
+      root.style.colorScheme = 'dark';
+      
+      // Passive touch patching deferred to requestIdleCallback
+      (window.requestIdleCallback || setTimeout)(function() {
+        var orig = window.EventTarget.prototype.addEventListener;
+        window.EventTarget.prototype.addEventListener = function(type, listener, options) {
+          var op = options;
+          if (type === 'touchstart' || type === 'touchmove') {
+            if (typeof options === 'boolean') op = { capture: options, passive: true };
+            else if (typeof options === 'object') op = { ...options, passive: true };
+            else op = { passive: true };
+          }
+          orig.call(this, type, listener, op);
+        };
+      });
+    })();
+  </script>
+
+  <!-- Fonts: using system font stack for instant LCP -->
+
+  <meta name="app-version" content="2026.04.21.FINAL-1.0">
+  <!-- FORCE RELOAD CACHE BUSTER: SWIPESS v1.0 -->
+  <title>Swipess</title>
+  <meta name="description" content="Swipess — Immersive discovery and target selection engine.">
+
+  <!-- Open Graph / Facebook / WhatsApp / Instagram -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.swipess.com/">
+  <meta property="og:title" content="Swipess">
+  <meta property="og:description" content="Immersive discovery and target selection engine.">
+  <meta property="og:image" content="https://www.swipess.com/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Swipess">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Swipess">
+  <meta name="twitter:description" content="Immersive discovery and target selection engine.">
+  <meta name="twitter:image" content="https://www.swipess.com/og-image.jpg">
+
+  <link rel="canonical" href="https://www.swipess.com/">
+  
+  <style id="splash-styles">
+    *{touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+    input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-select:text;touch-action:auto}
+    :root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+    html,body{margin:0;padding:0;overflow:hidden;background:#000;width:100%;height:100%;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+    #initial-loader{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      width:100vw;height:100dvh;background:#000;
+      position:fixed;top:0;left:0;z-index:9999;
+    }
+
+    /* Premium shimmer sweep across the logo */
+    .splash-logo-wrap{
+      position:relative;display:inline-block;overflow:hidden;
+    }
+    .splash-logo-wrap::after{
+      content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+      background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.25) 50%,transparent 70%);
+      animation:logo-shimmer 2.4s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes logo-shimmer{
+      0%{left:-100%}
+      60%{left:150%}
+      100%{left:150%}
+    }
+
+    @keyframes heartbeat{
+      0%,100%{transform:scale(1);opacity:1}
+      50%{transform:scale(1.02);opacity:0.85}
+    }
+
+    #root{opacity:1;background:#000;min-height:100dvh}
+  </style>
+
+  <link rel="preload" as="image" href="/icons/Swipess-wordmark-transparent-v2.png" fetchpriority="high">
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Swipess">
+  <meta name="application-name" content="Swipess">
+  <!-- Speculation rules removed — prefetching handled by routePrefetcher.ts -->
+</head>
+
+<body>
+  <div id="initial-loader">
+    <span class="splash-logo-wrap">
+      <img src="/icons/Swipess-wordmark-transparent-v2.png" alt="Swipess" style="width:min(260px, 70vw);height:auto;object-fit:contain;animation:heartbeat 2s ease-in-out infinite;" draggable="false" fetchpriority="high" />
+    </span>
+  </div>
+
+  <script>
+    window.__APP_INITIALIZED__ = false;
+    function removeSplash() {
+      var loader = document.getElementById('initial-loader');
+      var ss = document.getElementById('splash-styles');
+      if (loader && loader.parentNode) loader.remove();
+      if (ss && ss.parentNode) ss.remove();
+    }
+    var mountTimer = setTimeout(removeSplash, 900);
+    window.addEventListener('app-rendered', function() {
+      window.__APP_INITIALIZED__ = true;
+      clearTimeout(mountTimer);
+      removeSplash();
+    });
+    // Dynamic theme-color: sync status bar with app theme
+    (function(){
+      var meta = document.getElementById('theme-color-meta');
+      if (!meta) return;
+      function sync() {
+        var isDark = document.documentElement.classList.contains('dark');
+        meta.setAttribute('content', isDark ? '#000000' : '#ffffff');
+      }
+      sync();
+      new MutationObserver(sync).observe(document.documentElement, {attributes:true, attributeFilter:['class']});
+    })();
+  </script>
+
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx" fetchpriority="high"></script>
+</body>
+</html>

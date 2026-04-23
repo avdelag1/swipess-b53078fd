@@ -1,0 +1,183 @@
+import { memo, useCallback } from 'react';
+import { useAppNavigate } from "@/hooks/useAppNavigate";
+import { motion } from 'framer-motion';
+import { ChevronLeft, Radio, Ghost } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { haptics } from '@/utils/microPolish';
+import { ModeSwitcher } from './ModeSwitcher';
+import { NotificationPopover } from './NotificationPopover';
+import { ThemeToggle } from './ThemeToggle';
+import { useModalStore } from '@/state/modalStore';
+import { useFilterStore, useFilterActions } from '@/state/filterStore';
+import { AIListingTrigger } from './AIListingTrigger';
+
+interface TopBarProps {
+  onNotificationsClick?: () => void;
+  onMessageActivationsClick?: () => void;
+  onAISearchClick?: () => void;
+  onFilterClick?: (e?: React.PointerEvent | React.MouseEvent) => void;
+  onBack?: () => void;
+  className?: string;
+  showFilters?: boolean;
+  userRole?: 'client' | 'owner' | 'admin';
+  transparent?: boolean;
+  hideOnScroll?: boolean;
+  title?: string;
+  showBack?: boolean;
+  minimal?: boolean;
+}
+
+function TopBarComponent({
+  onFilterClick: _onFilterClick,
+  onBack: propOnBack,
+  className,
+  userRole,
+  transparent: _transparent = false,
+  minimal = false,
+}: TopBarProps) {
+  const { navigate } = useAppNavigate();
+  const { user } = useAuth();
+  const { isLight } = useAppTheme();
+  
+  const activeCategory = useFilterStore(s => s.activeCategory);
+  const { setActiveCategory } = useFilterActions();
+
+  const isOwner = userRole === 'owner';
+  
+  const onBack = propOnBack || (activeCategory ? () => setActiveCategory(null) : undefined);
+
+  const glassPillStyle: React.CSSProperties = {
+    background: 'var(--hud-bg)',
+    backdropFilter: 'blur(32px) saturate(210%)',
+    WebkitBackdropFilter: 'blur(32px) saturate(210%)',
+    borderRadius: '3rem',
+    border: isLight ? '1px solid rgba(0,0,0,0.1)' : '1px solid rgba(255,255,255,0.08)',
+    boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.03)' : '0 8px 32px rgba(0, 0, 0, 0.15)',
+    pointerEvents: 'auto',
+    color: 'var(--hud-text)',
+  };
+
+  const { data: profile } = useQuery({
+    queryKey: ['topbar-user-profile', user?.id],
+    enabled: !!user?.id,
+    staleTime: Infinity,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url, full_name')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  return (
+    <header 
+      className={cn(
+        "absolute top-0 left-0 right-0 z-[10005] transition-all duration-700 pointer-events-none",
+        _transparent ? "h-20" : "h-16",
+        className
+      )}
+      style={{
+        paddingTop: 'var(--safe-top)',
+        height: 'calc(var(--top-bar-height) + var(--safe-top))'
+      }}
+    >
+      <div className="h-full w-full max-w-screen-xl mx-auto px-4 flex items-center justify-between relative">
+        
+        <div className="flex items-center gap-2">
+          {onBack ? (
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); haptics.tap(); onBack(); }}
+              className="w-11 h-11 flex shrink-0 items-center justify-center rounded-full"
+              style={glassPillStyle}
+            >
+              <ChevronLeft className="w-5 h-5" style={{ color: 'var(--hud-text)' }} />
+            </motion.button>
+          ) : (
+            user && (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onPointerDown={(e) => {
+                  e.preventDefault(); e.stopPropagation();
+                  haptics.tap();
+                  navigate(isOwner ? '/owner/profile' : '/client/profile');
+                }}
+                className="flex shrink-0 items-center gap-2 px-2.5 py-1.5 rounded-full max-w-[120px]"
+                style={glassPillStyle}
+              >
+                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shrink-0">
+                   <span className="text-orange-500 font-black text-lg italic drop-shadow-sm">S</span>
+                </div>
+                {profile?.full_name && (
+                  <span className="text-[11px] font-black uppercase tracking-widest mr-1" style={{ color: 'var(--hud-text)' }}>
+                    {profile.full_name.split(' ')[0]}
+                  </span>
+                )}
+              </motion.button>
+            )
+          )}
+
+          {/* Mode Switcher Pill */}
+          {!minimal && (
+            <div className="h-11 flex shrink-0 items-center px-4 rounded-full" style={glassPillStyle}>
+              <ModeSwitcher variant="icon" size="sm" />
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1" />
+
+        {/* RIGHT CLUSTER: Individual Action Pills */}
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {!minimal && (
+            <>
+               <motion.button
+                whileTap={{ scale: 0.9 }}
+                onPointerDown={(e) => {
+                  e.preventDefault(); e.stopPropagation();
+                  haptics.tap();
+                  navigate('/radio');
+                }}
+                  className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
+                style={glassPillStyle}
+                title="Radio"
+              >
+                <Radio 
+                  className="w-5 h-5 text-orange-500" 
+                  strokeWidth={2.5} 
+                />
+              </motion.button>
+
+              <AIListingTrigger glassPillStyle={glassPillStyle} />
+
+              <ThemeToggle glassPillStyle={glassPillStyle} />
+              
+              <NotificationPopover glassPillStyle={glassPillStyle} />
+            </>
+          )}
+        </div>
+      </div>
+
+      <svg width="0" height="0" className="absolute" aria-hidden="true">
+        <defs>
+          <linearGradient id="nav-active-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop stopColor="var(--color-brand-accent)" offset="0%" />
+            <stop stopColor="var(--color-brand-primary)" offset="100%" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </header>
+  );
+}
+
+export const TopBar = memo(TopBarComponent);
+
+
