@@ -27,33 +27,44 @@ function SwipessLogoComponent({
 
   return (
     <div className={cn(
-      'relative inline-flex items-center justify-center transition-all duration-300',
+      'relative inline-flex items-center justify-center transition-all duration-300 group',
       className
     )}>
-        <div className={cn("flex items-center select-none", isIcon ? "justify-center" : "")}>
+        {/* Premium Aura Glow */}
+        {variant === 'gradient' && (
+          <div className="absolute inset-0 -z-1 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl bg-primary/20 rounded-full scale-150" />
+        )}
+        
+        <div className={cn("flex items-center select-none relative z-10", isIcon ? "justify-center" : "")}>
           {variant === 'white' || variant === 'black' ? (
             <span className={cn(
-              "font-black tracking-[-0.05em] italic uppercase", 
+              "font-black tracking-[-0.05em] italic uppercase drop-shadow-lg", 
               variant === 'white' ? 'text-white' : 'text-black',
               isIcon ? "text-xl" : size === 'xs' ? 'text-sm' : size === 'sm' ? 'text-base' : size === 'md' ? 'text-2xl' : size === 'lg' ? 'text-3xl' : 'text-5xl'
             )}>
               Swipess
             </span>
           ) : (
-            <img
-              src={isIcon ? "/icons/Swipess-logo-transparent.png" : "/icons/Swipess-wordmark-transparent-v2.png"}
-              alt="Swipess"
-              draggable={false}
-              fetchPriority="high"
-              decoding={isIcon ? "async" : "sync"}
-              className={cn(
-                'select-none transition-all duration-300',
-                isIcon ? 'w-full h-full object-contain' : cn('w-auto max-w-full', sizeMap[size])
+            <div className="relative">
+              <img
+                src={isIcon ? "/icons/Swipess-logo-transparent.png" : "/icons/Swipess-wordmark-transparent-v2.png"}
+                alt="Swipess"
+                draggable={false}
+                fetchPriority="high"
+                decoding={isIcon ? "async" : "sync"}
+                className={cn(
+                  'select-none transition-all duration-300 relative z-10',
+                  isIcon ? 'w-full h-full object-contain' : cn('w-auto max-w-full', sizeMap[size]),
+                  'drop-shadow-[0_5px_15px_rgba(0,0,0,0.4)]'
+                )}
+                style={{
+                  imageRendering: 'auto',
+                }}
+              />
+              {variant === 'gradient' && !isIcon && (
+                <div className="absolute -inset-4 bg-primary/5 blur-xl rounded-full opacity-50 pointer-events-none -z-1" />
               )}
-              style={{
-                imageRendering: 'auto',
-              }}
-            />
+            </div>
           )}
         </div>
     </div>

@@ -37,24 +37,13 @@ import { Home, RefreshCw, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 import { SwipeLoadingSkeleton } from './swipe/SwipeLoadingSkeleton';
-import { LocationRadiusSelector } from './swipe/LocationRadiusSelector';
 
 // FIX: Lazy-load modals via portal 
 const ShareDialog = lazy(() => import('./ShareDialog').then(m => ({ default: m.ShareDialog })));
 const MessageConfirmationDialog = lazy(() => import('./MessageConfirmationDialog').then(m => ({ default: m.MessageConfirmationDialog })));
-const DiscoveryMapView = lazy(() => import('./swipe/DiscoveryMapView').then(m => ({ default: m.DiscoveryMapView })));
 import { POKER_CARDS, OWNER_INTENT_CARDS } from './swipe/SwipeConstants';
 
-// ── Distance Slider Component ─────────────────────────────────────────────────
-interface _DistanceSliderProps {
-  radiusKm: number;
-  onRadiusChange: (km: number) => void;
-  onDetectLocation: () => void;
-  detecting: boolean;
-  detected: boolean;
-}
 
-// Local _DistanceSlider removed in favor of shared component from ./swipe/DistanceSlider
 
 interface ClientSwipeContainerProps {
   onClientTap: (clientId: string) => void;
@@ -99,38 +88,11 @@ const ClientSwipeContainerComponent = ({
   };
 
   const labels = getCategoryLabel();
-
-  // ── Distance filter state ─────────────────────────────────────────────────
-  const radiusKm = useFilterStore((s) => s.radiusKm);
-  const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
-  const setUserLocation = useFilterStore((s) => s.setUserLocation);
-  const userLatitude = useFilterStore((s) => s.userLatitude);
-  const userLongitude = useFilterStore((s) => s.userLongitude);
   const setActiveCategory = useFilterStore((s) => s.setActiveCategory);
-  const [locationDetecting, setLocationDetecting] = useState(false);
-  const [locationDetected, setLocationDetected] = useState(false);
-
-  const detectLocation = useCallback(() => {
-    if (!navigator.geolocation) return;
-    setLocationDetecting(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLocation(pos.coords.latitude, pos.coords.longitude);
-        setLocationDetected(true);
-        setLocationDetecting(false);
-      },
-      () => {
-        setLocationDetecting(false);
-      },
-      { timeout: 8000, maximumAge: 60000 }
-    );
-  }, [setUserLocation]);
 
   const handleMapCategorySelect = useCallback((nextCategory: 'property' | 'motorcycle' | 'bicycle' | 'services') => {
     setActiveCategory(nextCategory);
   }, [setActiveCategory]);
-  
-  const [showMap, setShowMap] = useState(false);
 
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
@@ -884,37 +846,10 @@ const ClientSwipeContainerComponent = ({
                   <ChevronLeft className="w-5 h-5" />
                 </motion.button>
 
-                <div className="flex items-center gap-2">
-                  {/* Radar Toggle (New) */}
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => { triggerHaptic('medium'); setShowMap(true); }}
-                    className={cn(
-                      "h-10 px-4 flex items-center gap-2 transition-all rounded-full backdrop-blur-md border",
-                      isLight ? "bg-white/10 border-black/5 text-black/60 hover:text-black" : "bg-black/20 border-white/5 text-white/40 hover:text-white"
-                    )}
-                  >
-                    <MapPin className="w-4 h-4 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Radar</span>
-                  </motion.button>
-
-                  {/* Radar HUD (Top Right) */}
-                  <LocationRadiusSelector
-                    radiusKm={radiusKm}
-                    onRadiusChange={setRadiusKm}
-                    onDetectLocation={detectLocation}
-                    detecting={locationDetecting}
-                    detected={locationDetected}
-                    onCategorySelect={handleMapCategorySelect}
-                    lat={userLatitude}
-                    lng={userLongitude}
-                  />
-                </div>
+                <div className="flex items-center gap-2" />
               </div>
           </div>
         )}
-
-        {/* Card area — flex-1 fills remaining space */}
         <div className="flex-1 relative flex flex-col items-center justify-center px-1.5 pt-1 z-10 min-h-0">
         <div className="w-full h-full flex items-center justify-center pointer-events-auto">
           <AnimatePresence mode="popLayout" initial={false}>
@@ -973,20 +908,9 @@ const ClientSwipeContainerComponent = ({
                  className="w-full h-full z-50 overflow-hidden"
                >
                 <SwipeExhaustedState
-                  categoryLabel={labels.plural}
-                  CategoryIcon={labels.Icon}
-                  iconColor={labels.color}
                   isRefreshing={isRefreshing}
                   onRefresh={handleRefresh}
-                  radiusKm={radiusKm}
-                  onRadiusChange={setRadiusKm}
-                  onDetectLocation={detectLocation}
-                  detecting={locationDetecting}
-                  detected={locationDetected}
-                  lat={userLatitude}
-                  lng={userLongitude}
                   error={externalError}
-                  role="owner"
                 />
                </motion.div>
             ) : (
@@ -1071,29 +995,6 @@ const ClientSwipeContainerComponent = ({
               description={`Budget: $${topCard.budget_max?.toLocaleString() || 'N/A'} - Looking for: ${Array.isArray(topCard.preferred_listing_types) ? topCard.preferred_listing_types.join(', ') : 'Various properties'}`}
             />
           )}
-          
-          <AnimatePresence>
-            {showMap && (
-              <motion.div
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="fixed inset-0 z-[10006] bg-black"
-              >
-                <Suspense fallback={<div className="w-full h-full bg-black flex items-center justify-center text-white/20">Initializing Radar...</div>}>
-                  <DiscoveryMapView
-                    category={category as any}
-                    onBack={() => setShowMap(false)}
-                    onStartSwiping={() => setShowMap(false)}
-                    onCategoryChange={(cat) => handleMapCategorySelect(cat as any)}
-                    isEmbedded={true}
-                    mode={userRole === 'owner' ? 'owner' : 'client'}
-                  />
-                </Suspense>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </Suspense>,
         document.body
       )}

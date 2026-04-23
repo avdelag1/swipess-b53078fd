@@ -344,21 +344,11 @@ export const MessagingInterface = memo(({ conversationId, otherUser, listing, cu
                   onChange={(e) => { setNewMessage(e.target.value); if (e.target.value.trim()) startTyping(); else stopTyping(); }}
                   placeholder={isAtLimit ? "LIMIT REACHED" : "TRANSMIT LOGS..."}
                   className={cn(
-                      "w-full h-14 pl-6 pr-14 rounded-2xl text-[14px] font-bold outline-none transition-all border",
+                      "w-full h-14 pl-6 pr-6 rounded-2xl text-[14px] font-bold outline-none transition-all border",
                       isThemeLight ? "bg-black/5 border-black/5 text-black" : "bg-white/[0.05] border-white/5 text-white placeholder:text-white/20"
                   )}
                   disabled={sendMessage.isPending || isAtLimit}
                 />
-                <button
-                    type="submit"
-                    disabled={!newMessage.trim() || sendMessage.isPending || isAtLimit}
-                    className={cn(
-                        "absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center transition-all",
-                        newMessage.trim() ? "bg-[#EB4898] text-white shadow-xl" : "bg-white/5 text-white/20"
-                    )}
-                >
-                    <Send className={cn("w-4 h-4", newMessage.trim() && "animate-pulse")} />
-                </button>
             </div>
 
             <motion.button

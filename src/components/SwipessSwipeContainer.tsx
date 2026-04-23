@@ -107,7 +107,7 @@ interface SwipessSwipeContainerProps {
   filters?: ListingFilters;
 }
 
-const SwipessSwipeContainerComponent = ({ onListingTap: _onListingTap, onInsights: _onInsights, onMessageClick: _onMessageClick, locationFilter: _locationFilter, filters }: SwipessSwipeContainerProps) => {
+const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights, onMessageClick, locationFilter: _locationFilter, filters }: SwipessSwipeContainerProps) => {
   const navigate = useNavigate();
   const { theme, isLight } = useAppTheme();
   const [page, setPage] = useState(0);
@@ -657,7 +657,6 @@ const SwipessSwipeContainerComponent = ({ onListingTap: _onListingTap, onInsight
     // Record for undo (only left swipes are saved for undo)
     recordSwipe(listing.id, 'listing', direction);
 
-    // Save swipe to DB with optimistic UI
     // Save swipe to DB with match detection and notifications
     swipeMutation.mutate({
       targetId: listing.id,
@@ -671,19 +670,6 @@ const SwipessSwipeContainerComponent = ({ onListingTap: _onListingTap, onInsight
         // Non-critical error - already logged in hook
       });
     }
-
-    // Track dismissal on left swipe (dislike)
-    if (direction === 'left') {
-      dismissTarget(listing.id).catch(() => {
-        // Non-critical error - already logged in hook
-      });
-    }
-
-    // Zustand update - DEFERRED until animation complete
-    markClientSwiped(listing.id);
-
-    // Record for undo (only left swipes are saved for undo)
-    recordSwipe(listing.id, 'listing', direction);
 
     // FIX #2: DEFERRED PERSISTENCE - use requestIdleCallback
     // This prevents sessionStorage from blocking the main thread
@@ -930,6 +916,8 @@ const SwipessSwipeContainerComponent = ({ onListingTap: _onListingTap, onInsight
     setSelectedListing(listing);
     setMessageDialogOpen(true);
     triggerHaptic('light');
+
+    if (onMessageClick) onMessageClick();
   };
 
   const handleSendMessage = async (message: string) => {
@@ -1071,7 +1059,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap: _onListingTap, onInsight
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 className="w-full h-full flex flex-col items-center justify-center max-w-[700px] mx-auto"
               >
-                <SwipeAllDashboard setCategories={(ids) => setActiveCategory(Array.isArray(ids) ? ids[0] : ids)} />
+                <SwipeAllDashboard setCategories={setActiveCategory} />
               </motion.div>
             ) : deckQueue.length > 0 && currentIndex < deckQueue.length ? (
               <motion.div 
@@ -1107,7 +1095,10 @@ const SwipessSwipeContainerComponent = ({ onListingTap: _onListingTap, onInsight
                   ref={cardRef}
                   listing={topCard}
                   onSwipe={handleSwipe}
-                  onInsights={handleInsights}
+                  onInsights={() => {
+                    handleInsights();
+                    if (onListingTap) onListingTap(topCard.id);
+                  }}
                   onMessage={handleMessage}
                   onShare={handleShare}
                   onReport={handleReport}
@@ -1215,7 +1206,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap: _onListingTap, onInsight
           <span className={cn(
             "text-[8px] font-black uppercase tracking-[0.4em]",
             isLight ? "text-black" : "text-white"
-          )}>FLAGSHIP BUILD v1.0.95</span>
+          )}>FLAGSHIP BUILD v1.0.96-rc4</span>
       </div>
     </div>
 

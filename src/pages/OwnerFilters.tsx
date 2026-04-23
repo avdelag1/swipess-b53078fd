@@ -13,7 +13,12 @@ import { MotorcycleIcon } from '@/components/icons/MotorcycleIcon';
 
 type CategoryType = 'property' | 'motorcycle' | 'bicycle' | 'services';
 
-export default function OwnerFilters() {
+interface OwnerFiltersProps {
+  isEmbedded?: boolean;
+  onClose?: () => void;
+}
+
+export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps) {
   const navigate = useNavigate();
   const { theme, isLight } = useAppTheme();
   const isDark = theme === 'dark' || theme === 'swipess-style';
@@ -23,12 +28,16 @@ export default function OwnerFilters() {
 
   const handleApply = useCallback(() => {
     haptics.success();
-    navigate('/owner/discovery');
-  }, [navigate]);
+    if (isEmbedded && onClose) {
+      onClose();
+    } else {
+      navigate('/owner/dashboard');
+    }
+  }, [isEmbedded, onClose, navigate]);
 
   const handleReset = useCallback(() => {
     haptics.tap();
-    // Reset filters logic here if needed
+    // Implementation for reset if needed
   }, []);
 
   const categories = [
@@ -38,18 +47,37 @@ export default function OwnerFilters() {
     { id: 'services', name: 'Jobs', icon: Briefcase },
   ];
 
-  return (
+  const content = (
     <div className={cn(
-      "min-h-screen flex flex-col transition-colors duration-500",
-      isLight ? "bg-[#F8FAFC] text-slate-900" : "bg-black text-white"
+      "flex flex-col h-full",
+      !isEmbedded && (isLight ? "bg-[#F8FAFC] text-slate-900" : "bg-black text-white")
     )}>
-      {/* 🛸 CINEMATIC HEADER (REPLACED BY TOPBAR) */}
-      <div className="pt-24" />
+      {/* HEADER - Only in standalone */}
+      {!isEmbedded && (
+        <div className="pt-24 px-6 flex items-center justify-between">
+           <button 
+             onClick={() => navigate(-1)}
+             className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/10"
+           >
+             <ChevronLeft className="w-6 h-6" />
+           </button>
+           <h1 className="text-xl font-black uppercase italic tracking-widest">Filter Matrix</h1>
+           <button 
+             onClick={handleReset}
+             className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-xl border border-white/10"
+           >
+             <RotateCcw className="w-5 h-5" />
+           </button>
+        </div>
+      )}
 
       {/* 🛸 SECTOR NAVIGATION */}
-      <nav className="container mx-auto px-6 py-8 max-w-4xl">
+      <nav className={cn(
+        "container mx-auto px-6 py-6 max-w-4xl",
+        isEmbedded ? "px-0" : ""
+      )}>
         <div className={cn(
-          "grid grid-cols-4 gap-3 p-2 rounded-[2.5rem] border",
+          "grid grid-cols-4 gap-2 p-1.5 rounded-[2.5rem] border",
           isLight ? "bg-white border-slate-200 shadow-sm" : "bg-white/[0.03] border-white/5"
         )}>
           {categories.map((cat) => {
@@ -60,14 +88,14 @@ export default function OwnerFilters() {
                 key={cat.id}
                 onClick={() => { haptics.tap(); setActiveCategory(cat.id as CategoryType); }}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-2 py-5 rounded-[2rem] transition-all duration-300 relative overflow-hidden group",
+                  "flex flex-col items-center justify-center gap-1.5 py-4 rounded-[2rem] transition-all duration-300 relative overflow-hidden group",
                   active 
-                    ? (isLight ? "bg-slate-900 text-white shadow-xl scale-[1.03] translate-y-[-2px]" : "bg-white text-black shadow-2xl scale-[1.03] translate-y-[-2px]") 
+                    ? (isLight ? "bg-slate-900 text-white shadow-xl scale-[1.03]" : "bg-white text-black shadow-2xl scale-[1.03]") 
                     : (isLight ? "text-slate-500 hover:bg-slate-100" : "text-white/40 hover:bg-white/5")
                 )}
               >
-                <Icon className={cn("w-6 h-6", active ? (isLight ? "text-white" : "text-primary") : "opacity-60")} />
-                <span className="text-[10px] font-black uppercase tracking-tighter">{cat.name}</span>
+                <Icon className={cn("w-5 h-5", active ? (isLight ? "text-white" : "text-primary") : "opacity-60")} />
+                <span className="text-[9px] font-black uppercase tracking-tighter">{cat.name}</span>
                 {active && !isLight && (
                   <motion.div 
                     layoutId="active-owner-highlight"
@@ -81,7 +109,10 @@ export default function OwnerFilters() {
       </nav>
 
       {/* 🛸 RADAR CALIBRATION GRID */}
-      <main className="container mx-auto px-6 pb-48 max-w-4xl flex-1">
+      <main className={cn(
+        "container mx-auto px-6 max-w-4xl flex-1 overflow-y-auto pb-32",
+        isEmbedded ? "px-0" : ""
+      )}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCategory}
@@ -90,7 +121,7 @@ export default function OwnerFilters() {
             exit={{ opacity: 0, scale: 0.98, y: -10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className={cn(
-              "p-10 rounded-[3.5rem] border backdrop-blur-3xl min-h-[50vh]",
+              "p-6 md:p-10 rounded-[3rem] border backdrop-blur-3xl",
               isLight ? "bg-white border-slate-200 shadow-xl" : "bg-white/[0.02] border-white/5"
             )}
           >
@@ -105,23 +136,29 @@ export default function OwnerFilters() {
       </main>
 
       {/* 🛸 ENGAGEMENT FOOTER */}
-      <div className="fixed bottom-12 left-0 right-0 px-6 z-50">
+      <div className={cn(
+        "fixed bottom-8 left-0 right-0 px-6 z-50",
+        isEmbedded ? "relative bottom-auto px-0 mt-8" : ""
+      )}>
         <div className="max-w-md mx-auto">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleApply}
             className={cn(
-              "w-full h-20 rounded-[2.5rem] font-black uppercase italic tracking-[0.2em] text-xl shadow-[0_30px_70px_rgba(0,0,0,0.5)] flex items-center justify-center gap-4 group transition-all",
+              "w-full h-16 md:h-20 rounded-[2.5rem] font-black uppercase italic tracking-[0.2em] text-lg md:text-xl shadow-[0_30px_70px_rgba(0,0,0,0.5)] flex items-center justify-center gap-4 group transition-all",
               isLight ? "bg-slate-900 text-white" : "bg-white text-black",
               "hover:bg-primary hover:text-white"
             )}
           >
-            <Sparkles className="w-7 h-7 animate-pulse group-hover:scale-110 transition-transform" />
+            <Sparkles className="w-6 h-6 md:w-7 md:h-7 animate-pulse group-hover:scale-110 transition-transform" />
             Initiate Radar Scan
           </motion.button>
         </div>
       </div>
     </div>
   );
+
+  return isEmbedded ? content : <div className="min-h-screen">{content}</div>;
 }
+

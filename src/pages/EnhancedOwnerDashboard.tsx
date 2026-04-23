@@ -1,27 +1,24 @@
-import { useState, useEffect, useRef, memo, useMemo, lazy, useCallback, Suspense } from 'react';
+import { useState, useEffect, useRef, memo, useMemo, lazy, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
-const _ClientInsightsDialog = lazy(() =>
-  import('@/components/ClientInsightsDialog').then(m => ({ default: m.ClientInsightsDialog }))
-);
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useOwnerClientPreferences } from '@/hooks/useOwnerClientPreferences';
-import { Cpu, Activity, RefreshCw } from 'lucide-react';
-import { useModalStore } from '@/state/modalStore';
+import { Cpu, Activity, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useAppNavigate } from '@/hooks/useAppNavigate';
 import { OwnerInsightsDashboard } from '@/components/OwnerInsightsDashboard';
 import { OwnerAllDashboard } from '@/components/swipe/OwnerAllDashboard';
-const _DiscoveryMapView = null;
 import { triggerHaptic } from '@/utils/haptics';
 import type { QuickFilterCategory } from '@/types/filters';
 import useAppTheme from '@/hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
 import type { ClientFilters } from '@/hooks/smartMatching/types';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import OwnerFilters from './OwnerFilters';
+import { AtmosphericLayer } from '@/components/AtmosphericLayer';
 
 interface EnhancedOwnerDashboardProps {
   onClientInsights?: (clientId: string) => void;
@@ -30,18 +27,26 @@ interface EnhancedOwnerDashboardProps {
 }
 
 const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: EnhancedOwnerDashboardProps) => {
-  const { t } = useTranslation();
   const { theme } = useAppTheme();
   const isLight = theme === 'light';
   const [viewMode] = useState<'discovery' | 'insights'>('discovery');
+  const [filterOpen, setFilterOpen] = useState(false);
   
   const activeCategory = useFilterStore(s => s.activeCategory);
   const { setCategories, setClientType, setListingType, setActiveCategory } = useFilterActions();
 
+  // 🛰️ PHASE SYNC: Automatic bi-directional synchronization
   const [phase, setPhase] = useState<'cards' | 'swipe'>(activeCategory ? 'swipe' : 'cards');
 
+  useEffect(() => {
+    if (activeCategory && phase === 'cards') {
+      setPhase('swipe');
+    } else if (!activeCategory && phase === 'swipe') {
+      setPhase('cards');
+    }
+  }, [activeCategory, phase]);
+
   const { user, loading: isAuthLoading } = useAuth();
-  const { navigate } = useAppNavigate();
 
   // Hydrate owner filter store from DB on mount
   const { preferences: ownerPrefs, isLoading: isPrefsLoading } = useOwnerClientPreferences();
@@ -55,13 +60,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     }))
   );
   const hydratedRef = useRef(false);
-
-  // 🛰️ DISCOVERY SYNC: Revert phase to 'cards' if category is cleared
-  useEffect(() => {
-    if (!activeCategory && phase === 'swipe') {
-      setPhase('cards');
-    }
-  }, [activeCategory, phase]);
 
   useEffect(() => {
     if (!ownerPrefs || hydratedRef.current) return;
@@ -117,20 +115,10 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     
     setCategories([cat]);
     setActiveCategory(cat);
-    setPhase('swipe'); 
     
     if (card.clientType) setClientType(card.clientType as any);
     if (card.listingType) setListingType(card.listingType as any);
   }, [setClientType, setListingType, setActiveCategory, setCategories]);
-
-  const handleDiscoveryBack = useCallback(() => {
-    setPhase('cards');
-    setActiveCategory(null);
-  }, [setActiveCategory]);
-
-  const handleStartSwiping = useCallback(() => {
-    setPhase('swipe');
-  }, []);
 
   if (isAuthLoading || isPrefsLoading) {
     return (
@@ -166,18 +154,33 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     );
   }
 
-  const showCards = !activeCategory && phase === 'cards';
-  const showSwipe = (!!activeCategory || phase === 'swipe') && (phase === 'swipe' || (phase === 'cards' && !!activeCategory)); 
-
   return (
     <div className={cn("flex flex-col h-full w-full relative transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
-      
-      {/* 🛸 CINEMATIC ATMOSPHERE */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-900/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] bg-primary/5 blur-[100px] rounded-full" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--color-brand-primary-rgb),0.02)_0%,transparent_70%)]" />
-      </div>
+      <AtmosphericLayer />
+
+      {/* 🚀 QUICK FILTERS SHEET */}
+      <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+        <SheetTrigger asChild>
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            className={cn(
+              "absolute top-10 right-6 z-[70] w-12 h-12 flex items-center justify-center rounded-full backdrop-blur-xl border transition-all",
+              isLight ? "bg-white/40 border-slate-200 text-slate-900" : "bg-black/40 border-white/10 text-white"
+            )}
+          >
+            <SlidersHorizontal className="w-5 h-5" />
+          </motion.button>
+        </SheetTrigger>
+        <SheetContent side="bottom" className="h-[85vh] p-0 rounded-t-[3rem] border-t-primary/20 overflow-hidden bg-transparent backdrop-blur-3xl">
+          <div className="absolute inset-0 bg-black/60 -z-10" />
+          <SheetHeader className="px-8 pt-8 pb-4">
+            <SheetTitle className="text-2xl font-black uppercase italic tracking-widest text-white text-center">Lead Refinement</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-6 pb-12">
+            <OwnerFilters isEmbedded onClose={() => setFilterOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <AnimatePresence mode="wait">
         {viewMode === 'insights' ? (
@@ -191,7 +194,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
           >
             <OwnerInsightsDashboard />
           </motion.div>
-        ) : showCards ? (
+        ) : phase === 'cards' ? (
           <motion.div 
             key="owner-dash-fan"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -209,8 +212,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               <OwnerAllDashboard onCardSelect={handleCardSelect} />
             </div>
           </motion.div>
-
-        ) : showSwipe ? (
+        ) : (
           <motion.div 
             key="owner-dash-swipe"
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
@@ -232,10 +234,10 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               filters={mergedFilters}
             />
           </motion.div>
-        ) : null}
+        )}
       </AnimatePresence>
 
-      <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess Admin Dashboard Protocol</p>
+      <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
     </div>
   );
 };

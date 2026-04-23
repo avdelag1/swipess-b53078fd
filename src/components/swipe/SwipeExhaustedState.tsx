@@ -1,35 +1,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, RotateCcw, Zap, Home, Bike, Briefcase, SlidersHorizontal, ChevronLeft } from 'lucide-react';
-import { MotorcycleIcon } from '@/components/icons/MotorcycleIcon';
-import { Button } from '@/components/ui/button';
-import { RadarNode, LocationRadiusSelector } from './LocationRadiusSelector';
-import { useSmartListingMatching } from '@/hooks/useSmartMatching';
 import { deckFadeVariants } from '@/utils/modernAnimations';
 import { cn } from '@/lib/utils';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { triggerHaptic } from '@/utils/haptics';
 import useAppTheme from '@/hooks/useAppTheme';
+import { RefreshCw, RotateCcw, Zap, SlidersHorizontal, ChevronLeft, Home, Bike, Briefcase } from 'lucide-react';
+import { MotorcycleIcon } from '@/components/icons/MotorcycleIcon';
+import { Button } from '@/components/ui/button';
 import { useCardReset } from '@/hooks/useCardReset';
-import { useAuth } from '@/hooks/useAuth';
 
 interface SwipeExhaustedStateProps {
-  categoryLabel: string;
-  CategoryIcon: React.ReactNode | React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
-  iconColor?: string;
   isRefreshing: boolean;
   onRefresh: () => void;
-  radiusKm: number;
-  onRadiusChange: (val: number) => void;
-  onDetectLocation?: () => void;
-  detecting?: boolean;
-  detected?: boolean;
   error?: any;
   isInitialLoad?: boolean;
-  role?: 'client' | 'owner';
-  lat?: number | null;
-  lng?: number | null;
-  onGoToMap?: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, { icon: any; label: string; color: string }> = {
@@ -42,19 +27,10 @@ const CATEGORY_ICONS: Record<string, { icon: any; label: string; color: string }
 };
 
 export const SwipeExhaustedState = ({
-  categoryLabel: _categoryLabel,
-  CategoryIcon: _CategoryIcon,
   isRefreshing,
   onRefresh,
-  radiusKm,
-  onRadiusChange,
-  onDetectLocation,
-  detecting,
-  detected,
   error,
   isInitialLoad = false,
-  lat,
-  lng,
 }: SwipeExhaustedStateProps) => {
   const { theme } = useAppTheme();
   const { setCategories } = useFilterActions();
@@ -63,31 +39,6 @@ export const SwipeExhaustedState = ({
   const resetMutation = useCardReset();
   const [scanIteration, setScanIteration] = useState(0);
   const [isScanBurstActive, setIsScanBurstActive] = useState(false);
-
-  // FETCH DATA FOR THE RADAR NODES
-  const { user } = useAuth();
-  const { data: smartListings } = useSmartListingMatching(
-    user?.id,
-    [],
-    {
-      categories: activeCategory ? [activeCategory as any] : undefined,
-      radiusKm: radiusKm,
-      userLatitude: lat || undefined,
-      userLongitude: lng || undefined,
-    },
-    0,
-    40
-  );
-
-  const radarNodes: RadarNode[] = useMemo(() => {
-    return (smartListings || []).map(l => ({
-      id: l.id,
-      lat: l.latitude || 0,
-      lng: l.longitude || 0,
-      label: l.title || 'Discovery',
-      price: l.price ? `$${l.price.toLocaleString()}` : undefined
-    }));
-  }, [smartListings]);
 
   useEffect(() => {
     if (scanIteration === 0) return;
@@ -146,16 +97,16 @@ export const SwipeExhaustedState = ({
   return (
     <AnimatePresence mode="wait">
       <motion.div 
-        key="searching" 
+        key="exhausted" 
         variants={deckFadeVariants} 
         initial="initial" 
         animate="animate" 
         exit="exit" 
-        className="relative z-50 h-full w-full overflow-hidden flex flex-col pt-2 bg-transparent"
+        className="relative z-50 h-full w-full overflow-hidden flex flex-col items-center justify-center bg-transparent px-6"
       >
         <div className="absolute inset-0 pointer-events-none z-0">
           <div 
-            className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[150px] opacity-20"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[120px] opacity-20"
             style={{ background: activeCatInfo?.color || '#ec4899' }}
           />
         </div>
@@ -175,117 +126,78 @@ export const SwipeExhaustedState = ({
            </button>
         </div>
 
-        {/* 🚀 BOUNDLESS Swipess RADAR — Edge-to-edge immersive technical design */}
-        <div className="flex-1 min-h-0 relative flex flex-col items-center justify-center">
-          <div className="absolute top-[12%] flex flex-col items-center gap-2 pointer-events-none z-[100]">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="px-5 py-2 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/5 bg-black/80 backdrop-blur-3xl"
-            >
-              <div className="flex flex-col items-center gap-1">
-                 <span className="text-[10px] font-black uppercase tracking-[0.30em] text-primary animate-pulse">
-                  {isRefreshing || isScanBurstActive ? 'Recalibrating Array' : 'Swipess Radar Initialized'}
-                </span>
-                <span className="text-[8px] font-bold uppercase tracking-[0.1em] text-white/40">
-                  {radarNodes.length > 0 ? `Tracking ${radarNodes.length} Nodes in Vicinity` : 'No signals detected. Increase range.'}
-                </span>
-              </div>
-            </motion.div>
-          </div>
-
-          <div className="w-full h-full relative overflow-hidden">
-            <LocationRadiusSelector
-              radiusKm={radiusKm}
-              onRadiusChange={onRadiusChange}
-              onDetectLocation={onDetectLocation || (() => {})}
-              detecting={detecting ?? false}
-              detected={detected ?? false}
-              lat={lat}
-              lng={lng}
-              nodes={radarNodes}
-            />
-          </div>
-        </div>
-
-        <div className="shrink-0 pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] pt-3 px-4 flex flex-col items-center gap-4 bg-gradient-to-t from-black via-black/80 to-transparent">
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex w-full justify-center"
+        <div className="relative flex flex-col items-center text-center max-w-sm z-10">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', damping: 15 }}
+            className="mb-10 relative"
           >
-            <div className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/5 backdrop-blur-3xl shadow-2xl">
-              {Object.entries(CATEGORY_ICONS).filter(([k]) => k !== 'worker').map(([catId, info]) => {
-                const Icon = info.icon;
-                const isActive = activeCategory === catId;
-                return (
-                  <button
-                    key={catId}
-                    onClick={() => handleCategorySwitch(catId)}
-                    title={info.label}
-                    className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 active:scale-90",
-                      isActive
-                        ? "bg-white/15 shadow-xl border border-white/10"
-                        : "hover:bg-white/5"
-                    )}
-                    style={isActive ? { boxShadow: `0 0 30px ${info.color}30, inset 0 1px 0 rgba(255,255,255,0.1)` } : undefined}
-                  >
-                    <Icon
-                      className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110"
-                      strokeWidth={isActive ? 2 : 1.5}
-                      style={{ color: isActive ? info.color : 'var(--muted-foreground)', opacity: isActive ? 1 : 0.6 }}
-                    />
-                    <span
-                      className={cn(
-                        "text-[10px] font-black uppercase tracking-[0.15em] whitespace-nowrap overflow-hidden transition-all",
-                        isActive ? "w-auto opacity-100" : "w-0 opacity-0 hidden sm:block sm:w-auto sm:opacity-50"
-                      )}
-                      style={{ color: isActive ? info.color : undefined }}
-                    >
-                      {info.label}
-                    </span>
-                  </button>
-                );
-              })}
+            <div 
+              className="w-28 h-28 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl relative overflow-hidden group"
+              style={{ boxShadow: `0 20px 50px -10px ${activeCatInfo?.color || '#ec4899'}40` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              {activeCatInfo ? (
+                <activeCatInfo.icon className="w-12 h-12 text-white" strokeWidth={1.5} />
+              ) : (
+                <Zap className="w-12 h-12 text-white" strokeWidth={1.5} />
+              )}
             </div>
+            <motion.div 
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="absolute -inset-4 border border-white/10 rounded-[3rem] -z-1" 
+            />
           </motion.div>
 
-          <div className="flex items-center gap-3 w-full max-w-sm">
+          <h3 className="text-3xl font-black italic tracking-tighter uppercase text-white mb-4 leading-none">
+            Discovery Complete
+          </h3>
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40 mb-10 leading-relaxed px-4">
+            You've analyzed all signals in this sector. Recalibrate your range or switch protocols to find new matches.
+          </p>
+
+          <div className="flex flex-col gap-3 w-full">
             <Button
               onClick={handleRefreshClick}
               disabled={isRefreshing}
-              className="flex-1 relative h-14 overflow-hidden shadow-2xl transition-all active:scale-95 group rounded-2xl bg-white/5 hover:bg-white/10 text-white border border-white/5"
+              className="h-16 w-full rounded-[1.8rem] bg-primary text-black font-black uppercase italic tracking-widest shadow-[0_15px_35px_rgba(var(--color-brand-primary-rgb),0.3)] active:scale-95 transition-all flex items-center justify-center gap-3 border-none"
             >
-              {isRefreshing && <div className="absolute inset-0 bg-primary/10 animate-pulse" />}
-              <RefreshCw className={cn("mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-700", isRefreshing && "animate-spin", "text-primary")} />
+              <RefreshCw className={cn("w-5 h-5", isRefreshing && "animate-spin")} />
               {isRefreshing ? 'Tuning Intelligence...' : 'Relaunch Scan'}
             </Button>
             
-            <Button
-              variant="outline"
-              disabled={resetMutation.isPending}
-              onClick={() => {
-                triggerHaptic('heavy');
-                resetMutation.mutate(activeCategory as any || 'all');
-              }}
-              className="h-14 w-14 rounded-2xl bg-white/5 hover:bg-white/10 flex items-center justify-center p-0 shadow-2xl transition-all active:scale-95 border border-white/5 group"
-            >
-              <RotateCcw className={cn("h-5 w-5 text-orange-400 transition-transform group-hover:-rotate-90", resetMutation.isPending && "animate-spin")} />
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => {
-                triggerHaptic('medium');
-                (window as any).dispatchEvent(new CustomEvent('open-filters'));
-              }}
-              className="h-14 w-14 rounded-2xl bg-white/5 hover:bg-white/10 flex items-center justify-center p-0 shadow-2xl transition-all active:scale-95 border border-white/5"
-            >
-              <SlidersHorizontal className="h-5 w-5 text-primary" />
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                disabled={resetMutation.isPending}
+                onClick={() => {
+                  triggerHaptic('heavy');
+                  resetMutation.mutate(activeCategory as any || 'all');
+                }}
+                className="flex-1 h-16 rounded-[1.8rem] bg-white/5 hover:bg-white/10 border-white/10 text-white font-black uppercase italic tracking-widest transition-all active:scale-95"
+              >
+                <RotateCcw className={cn("mr-2 w-5 h-5 text-orange-400", resetMutation.isPending && "animate-spin")} />
+                Reset
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  triggerHaptic('medium');
+                  (window as any).dispatchEvent(new CustomEvent('open-filters'));
+                }}
+                className="w-16 h-16 rounded-[1.8rem] bg-white/5 hover:bg-white/10 border-white/10 flex items-center justify-center p-0 shadow-2xl transition-all active:scale-95"
+              >
+                <SlidersHorizontal className="h-5 w-5 text-primary" />
+              </Button>
+            </div>
           </div>
+        </div>
+
+        <div className="absolute bottom-12 left-0 right-0 flex justify-center opacity-20 pointer-events-none">
+          <p className="text-[8px] font-black uppercase tracking-[0.6em] italic">Sector Scan Logic Verified</p>
         </div>
       </motion.div>
     </AnimatePresence>

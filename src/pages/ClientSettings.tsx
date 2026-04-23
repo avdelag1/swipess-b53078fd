@@ -20,12 +20,13 @@ import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { SwipessLogo } from "@/components/SwipessLogo";
 import useAppTheme from "@/hooks/useAppTheme";
 import { cn } from "@/lib/utils";
+import { AtmosphericLayer } from "@/components/AtmosphericLayer";
 
 const fastSpring = { type: "spring" as const, stiffness: 500, damping: 30, mass: 0.8 };
 const stagger = { staggerChildren: 0.04 };
 const itemVariant = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: fastSpring },
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: fastSpring },
 };
 
 type SettingsItem = {
@@ -139,19 +140,20 @@ const ClientSettings = () => {
 
   if (activeSection === 'security') {
     return (
-      <div className="w-full relative px-4 pt-24 pb-32 bg-background">
-        <div className="max-w-3xl mx-auto">
+      <div className="w-full relative px-4 pt-24 pb-32 bg-background min-h-screen">
+        <AtmosphericLayer variant="primary" />
+        <div className="max-w-3xl mx-auto relative z-10">
           <PageHeader title={t('settings.security')} subtitle={t('settings.securityDesc')} showBack={true} onBack={() => setActiveSection(null)} />
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6">
-            <div className="rounded-2xl overflow-hidden bg-card border border-border">
-              <CardContent className="p-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6 pt-10">
+            <div className="rounded-[2.5rem] overflow-hidden bg-card/40 backdrop-blur-2xl border border-border shadow-2xl">
+              <CardContent className="p-8">
                 <AccountSecurity userRole="client" />
               </CardContent>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 px-2">
               <div className="space-y-1">
-                <h3 className="text-sm font-medium text-destructive">{t('settings.security')}</h3>
-                <p className="text-xs text-muted-foreground">{t('settings.securityDesc')}</p>
+                <h3 className="text-sm font-black uppercase tracking-widest text-destructive">Destructive Actions</h3>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">Proceed with absolute caution</p>
               </div>
               <DeleteAccountSection />
             </div>
@@ -163,10 +165,11 @@ const ClientSettings = () => {
 
   if (activeSection === 'verification') {
     return (
-      <div className="w-full relative px-4 pt-24 pb-32 bg-background">
-        <div className="max-w-3xl mx-auto">
+      <div className="w-full relative px-4 pt-24 pb-32 bg-background min-h-screen">
+        <AtmosphericLayer variant="rose" />
+        <div className="max-w-3xl mx-auto relative z-10">
           <PageHeader title={t('settings.verification')} subtitle={t('settings.verificationDesc')} showBack={true} onBack={() => setActiveSection(null)} />
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6 pt-10">
             <ClientVerificationFlow onComplete={() => setActiveSection(null)} />
           </motion.div>
         </div>
@@ -176,10 +179,11 @@ const ClientSettings = () => {
 
   if (activeSection === 'language') {
     return (
-      <div className="w-full relative px-4 pt-24 pb-32 bg-background">
-        <div className="max-w-3xl mx-auto">
+      <div className="w-full relative px-4 pt-24 pb-32 bg-background min-h-screen">
+        <AtmosphericLayer variant="indigo" />
+        <div className="max-w-3xl mx-auto relative z-10">
           <PageHeader title={t('settings.language')} subtitle={t('settings.languageDesc')} showBack={true} onBack={() => setActiveSection(null)} />
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6 pt-10 flex justify-center">
             <LanguageToggle />
           </motion.div>
         </div>
@@ -189,10 +193,11 @@ const ClientSettings = () => {
 
   if (activeSection === 'preferences') {
     return (
-      <div className="w-full relative px-4 pt-24 pb-32 bg-background">
-        <div className="max-w-3xl mx-auto">
+      <div className="w-full relative px-4 pt-24 pb-32 bg-background min-h-screen">
+        <AtmosphericLayer variant="default" />
+        <div className="max-w-3xl mx-auto relative z-10">
           <PageHeader title={t('settings.preferences')} subtitle={t('settings.preferencesDesc')} showBack={true} onBack={() => setActiveSection(null)} />
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-8 pt-10">
             <BackgroundThemeSettings />
             <SwipeSoundSettings />
           </motion.div>
@@ -202,10 +207,12 @@ const ClientSettings = () => {
   }
 
   return (
-    <div className="w-full relative px-6 pb-40 bg-background">
-      <div className="max-w-3xl mx-auto space-y-10">
+    <div className="w-full relative px-6 pb-40 bg-background min-h-screen overflow-hidden">
+      <AtmosphericLayer variant="primary" />
+      
+      <div className="max-w-3xl mx-auto space-y-12 pt-24 relative z-10">
         
-        <div className="space-y-3 pt-10">
+        <div className="space-y-3">
            <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-[#EB4898] animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#EB4898] italic">Identity Config</span>

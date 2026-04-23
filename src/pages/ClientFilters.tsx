@@ -16,15 +16,16 @@ import useAppTheme from '@/hooks/useAppTheme';
 import { haptics } from '@/utils/microPolish';
 import { useCardReset } from '@/hooks/useCardReset';
 
-type CategoryType = 'property' | 'motorcycle' | 'bicycle' | 'services';
+interface ClientFiltersProps {
+  isEmbedded?: boolean;
+  onClose?: () => void;
+}
 
-export default function ClientFilters() {
+export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { theme, isLight } = useAppTheme();
-  const isDark = theme === 'dark' || theme === 'swipess-style';
-  const resetMutation = useCardReset();
-
+  const { isLight } = useAppTheme();
+  
   const activeCategory = useFilterStore(s => s.activeCategory) || 'property';
   const setActiveCategory = useFilterStore(s => s.setActiveCategory);
   const getListingFilters = useFilterStore(s => s.getListingFilters);
@@ -37,8 +38,13 @@ export default function ClientFilters() {
     haptics.success();
     updateFilters(localFilters);
     queryClient.invalidateQueries({ queryKey: ['smart-listings'] });
-    navigate('/owner/dashboard');
-  }, [navigate, queryClient, updateFilters, localFilters]);
+    
+    if (isEmbedded && onClose) {
+      onClose();
+    } else {
+      navigate('/client/dashboard');
+    }
+  }, [navigate, queryClient, updateFilters, localFilters, isEmbedded, onClose]);
 
   const handleReset = useCallback(() => {
     haptics.tap();
@@ -55,13 +61,18 @@ export default function ClientFilters() {
 
   return (
     <div className={cn(
-      "min-h-screen flex flex-col transition-colors duration-500",
-      isLight ? "bg-[#F8FAFC] text-slate-900" : "bg-black text-white"
+      "flex flex-col transition-colors duration-500",
+      !isEmbedded && "min-h-screen",
+      isLight ? (isEmbedded ? "bg-transparent" : "bg-[#F8FAFC]") : (isEmbedded ? "bg-transparent" : "bg-black"),
+      isLight ? "text-slate-900" : "text-white"
     )}>
-      <div className="pt-24" />
+      {!isEmbedded && <div className="pt-24" />}
 
       {/* 🛸 SECTOR NAVIGATION */}
-      <nav className="container mx-auto px-6 py-8 max-w-4xl">
+      <nav className={cn(
+        "container mx-auto px-6 py-8 max-w-4xl",
+        isEmbedded && "py-4 px-2"
+      )}>
         <div className={cn(
           "grid grid-cols-4 gap-3 p-2 rounded-[2.5rem] border",
           isLight ? "bg-white border-slate-200 shadow-sm" : "bg-white/[0.03] border-white/5"
@@ -95,7 +106,10 @@ export default function ClientFilters() {
       </nav>
 
       {/* 🛸 FILTER GRID */}
-      <main className="container mx-auto px-6 pb-48 max-w-4xl flex-1">
+      <main className={cn(
+        "container mx-auto px-6 max-w-4xl flex-1",
+        isEmbedded ? "pb-4" : "pb-48"
+      )}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCategory}
@@ -104,7 +118,7 @@ export default function ClientFilters() {
             exit={{ opacity: 0, scale: 0.98, y: -10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className={cn(
-              "p-10 rounded-[3.5rem] border backdrop-blur-3xl min-h-[50vh]",
+              "p-6 sm:p-10 rounded-[3.5rem] border backdrop-blur-3xl min-h-[40vh]",
               isLight ? "bg-white border-slate-200 shadow-xl" : "bg-white/[0.02] border-white/5"
             )}
           >
@@ -117,7 +131,10 @@ export default function ClientFilters() {
       </main>
 
       {/* 🛸 ENGAGEMENT FOOTER */}
-      <div className="fixed bottom-12 left-0 right-0 px-6 z-50">
+      <div className={cn(
+        "px-6 z-50",
+        isEmbedded ? "mt-8 pb-12" : "fixed bottom-12 left-0 right-0"
+      )}>
         <div className="max-w-md mx-auto">
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -132,6 +149,17 @@ export default function ClientFilters() {
             <Sparkles className="w-7 h-7 animate-pulse group-hover:scale-110 transition-transform" />
             Engage Intelligence
           </motion.button>
+          
+          <button 
+            onClick={handleReset}
+            className={cn(
+              "w-full mt-4 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity",
+              isLight ? "text-black" : "text-white"
+            )}
+          >
+            <RotateCcw className="w-3 h-3" />
+            Reset Filters
+          </button>
         </div>
       </div>
     </div>

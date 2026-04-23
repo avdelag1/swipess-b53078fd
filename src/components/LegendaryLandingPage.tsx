@@ -9,7 +9,6 @@ import {
   Mail, Lock, User, ArrowLeft, Sparkles, ChevronRight, Check, LogIn, X, Eye, EyeOff, ShieldCheck, ShieldAlert, BadgeCheck
 } from 'lucide-react';
 import { SwipessLogo } from './SwipessLogo';
-import { MainLogoPage } from './MainLogoPage';
 import LandingBackgroundEffects from './LandingBackgroundEffects';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,7 +19,7 @@ import { TERMS_PROTOCOL, PRIVACY_PROTOCOL } from './legal/LegalProtocols';
 import { Button } from '@/components/ui/button';
 
 /* ─── Types ─────────────────────────────────────────────── */
-type View = 'main-logo' | 'landing' | 'auth';
+type View = 'landing' | 'auth';
 
 /* ─── Brand SVG Icons (Apple HIG–compliant) ──────────────── */
 const AppleIcon = () => (
@@ -94,7 +93,7 @@ const LandingView = memo(({
         <div className="relative">
           <SwipessLogo 
             size="3xl" 
-            variant="white"
+            variant="gradient"
             className="w-[85vw] max-w-[320px] sm:max-w-[400px] md:max-w-[500px]" 
           />
           <motion.div
@@ -251,7 +250,15 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.1 }}
     >
-      <div className="w-full max-w-sm bg-[#0d0d0f]/80 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-7 shadow-2xl relative overflow-hidden my-auto">
+      <div className="w-full max-w-sm bg-[#0d0d0f]/85 backdrop-blur-[40px] border border-white/10 rounded-[2.8rem] p-8 shadow-[0_30px_70px_-15px_rgba(0,0,0,0.8)] relative overflow-hidden my-auto">
+        {/* Cinematic Shimmer */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <motion.div 
+            animate={{ x: ['-100%', '200%'] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'linear', repeatDelay: 2 }}
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12"
+          />
+        </div>
         
         <button
           onClick={() => { triggerHaptic('light'); isForgotPassword ? setIsForgotPassword(false) : onBack(); }}
@@ -263,7 +270,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
 
         <div className="text-center mb-5 pt-4">
           <div className="flex justify-center mb-4">
-            <SwipessLogo size="md" variant="white" />
+            <SwipessLogo size="md" variant="gradient" />
           </div>
 
           {isForgotPassword ? (
@@ -314,6 +321,21 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
             </>
           )}
         </div>
+
+        {!isForgotPassword && (
+          <div className="mb-6 space-y-3">
+            <div className="grid grid-cols-1 gap-2.5">
+              <AppleAuthButton onClick={() => handleSocialLogin('apple')} />
+              <GoogleAuthButton onClick={() => handleSocialLogin('google')} />
+            </div>
+            
+            <div className="flex items-center gap-4 pt-2">
+               <div className="flex-1 h-[1px] bg-white/5" />
+               <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">or use neural link</span>
+               <div className="flex-1 h-[1px] bg-white/5" />
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-3" noValidate>
           {!isLogin && !isForgotPassword && (
@@ -485,21 +507,6 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
             </span>
           </button>
         </form>
-
-        {!isForgotPassword && (
-          <div className="mt-5 space-y-3">
-            <div className="flex items-center gap-4">
-               <div className="flex-1 h-[1px] bg-white/5" />
-               <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">or continue with</span>
-               <div className="flex-1 h-[1px] bg-white/5" />
-            </div>
-            
-            <div className="grid grid-cols-1 gap-2.5">
-              <AppleAuthButton onClick={() => handleSocialLogin('apple')} />
-              <GoogleAuthButton onClick={() => handleSocialLogin('google')} />
-            </div>
-          </div>
-        )}
       </div>
     </motion.div>
   );
@@ -508,7 +515,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
 /* ─── Root component ─────────────────────────────────────── */
 function LegendaryLandingPage() {
   const { navigate } = useAppNavigate();
-  const [view, setView] = useState<View>('main-logo');
+  const [view, setView] = useState<View>('landing');
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [legalModal, setLegalModal] = useState<'privacy' | 'terms' | null>(null);
 
@@ -526,9 +533,7 @@ function LegendaryLandingPage() {
       </div>
 
       <AnimatePresence mode="wait">
-        {view === 'main-logo' ? (
-          <MainLogoPage key="main-logo" onEnter={() => setView('landing')} />
-        ) : view === 'landing' ? (
+        {view === 'landing' ? (
           <LandingView key="landing" onEnterAuth={(mode) => { setAuthMode(mode); setView('auth'); }} />
         ) : (
           <AuthView key="auth" onBack={() => setView('landing')} initialMode={authMode} />

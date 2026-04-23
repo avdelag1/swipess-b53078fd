@@ -12,31 +12,27 @@ import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 import { useSmartListingMatching } from '@/hooks/smartMatching/useSmartListingMatching';
 import { useAuth } from '@/hooks/useAuth';
-
-const DiscoveryMapLoading = lazy(() => import('@/components/swipe/DiscoveryMapLoading'));
+import { AtmosphericLayer } from '@/components/AtmosphericLayer';
 
 interface ClientDashboardProps {
   onMessageClick?: () => void;
 }
 
-// Client Dashboard (v1.0.96-rc3) — 3-phase UX flow:
+// Client Dashboard (v1.0.96-rc5) — 2-phase UX flow:
 // 1. Poker Cards (Dash Fan)
-// 2. Discovery Map (Radar)
-// 3. Swipe Deck (Container)
+// 2. Swipe Deck (Container)
 export default function ClientDashboard({ onMessageClick }: ClientDashboardProps) {
-  const { theme, isLight } = useAppTheme();
+  const { isLight } = useAppTheme();
   const activeCategory = useFilterStore(s => s.activeCategory);
   const { user } = useAuth();
   const { setActiveCategory } = useFilterActions();
 
   // Phase state: 'cards' | 'swipe'
   const [phase, setPhase] = useState<'cards' | 'swipe'>(activeCategory ? 'swipe' : 'cards');
-  const [selectedCategory, setSelectedCategory] = useState<QuickFilterCategory | null>(activeCategory as QuickFilterCategory);
   const [showFilters, setShowFilters] = useState(false);
 
   // 🚀 PERFORMANCE HYDRATION: Pre-fetch listing data while user is on map phase
   // so the swipe deck is ready instantly when they tap "Start Swiping".
-  // We use filterVersion to track changes instead of useShallow on a function that creates new object references.
   const filterVersion = useFilterStore(s => s.filterVersion);
   const dashboardFilters = useMemo(() => useFilterStore.getState().getListingFilters(), [filterVersion]);
   
@@ -46,7 +42,7 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
     dashboardFilters,
     0,
     20, // pageSize
-    false // isRefreshMode (match container's initial state)
+    false // isRefreshMode
   );
 
   // ─── Actions ─────────────────────────────────────────────────────────────
@@ -57,37 +53,23 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
     return () => window.removeEventListener('open-client-filters', handleOpenFilters);
   }, []);
 
-  // 🛰️ DISCOVERY SYNC: If active category is cleared elsewhere
+  // 🛰️ DISCOVERY SYNC: Bidirectional sync between activeCategory and phase
   useEffect(() => {
     if (!activeCategory && phase === 'swipe') {
       setPhase('cards');
-      setSelectedCategory(null);
+    } else if (activeCategory && phase === 'cards') {
+      setPhase('swipe');
     }
   }, [activeCategory, phase]);
 
   const handleLaunch = useCallback((category: QuickFilterCategory) => {
-    setSelectedCategory(category);
     setActiveCategory(category);
-    setPhase('swipe'); // Go directly to swiping, bypassing the map
+    // Phase will transition automatically via the useEffect above
   }, [setActiveCategory]);
-
-  const handleMapBack = useCallback(() => {
-    setPhase('cards');
-    setSelectedCategory(null);
-    setActiveCategory(null);
-  }, [setActiveCategory]);
-
-  const handleStartSwiping = useCallback(() => {
-    if (selectedCategory) {
-      setActiveCategory(selectedCategory);
-      setPhase('swipe');
-    }
-  }, [selectedCategory, setActiveCategory]);
 
   const handleListingTap = useCallback(() => {
-    // In v1.0, tapping the mini-card on map takes you to swipe phase
-    handleStartSwiping();
-  }, [handleStartSwiping]);
+    // Already in swipe phase if we can tap a listing
+  }, []);
 
   // Determine what to show based on phase + store state. 
   const showCards = phase === 'cards' && !activeCategory;
@@ -98,14 +80,8 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
       "flex-1 flex flex-col items-center justify-center p-0 overflow-hidden relative",
       isLight ? "bg-white" : "bg-[#020202]"
     )}>
-      {/* 🛸 Swipess ATMOSPHERIC LAYER (Forced for Discovery Phase) */}
-      {!isLight && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-indigo-900/20 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[-5%] right-[-5%] w-[50%] h-[50%] bg-cyan-900/10 blur-[100px] rounded-full" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_0%,transparent_70%)]" />
-        </div>
-      )}
+      {/* 🛸 Swipess ATMOSPHERIC LAYER (Unified Discovery Phase) */}
+      <AtmosphericLayer variant="rose" />
 
       <AnimatePresence mode="wait">
         {showCards && (
@@ -123,12 +99,10 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
             }}
           >
             <div className="flex-1 flex items-center justify-center w-full min-h-0">
-              <SwipeAllDashboard setCategories={(ids: any) => handleLaunch((Array.isArray(ids) ? ids[0] : ids) as QuickFilterCategory)} />
+              <SwipeAllDashboard setCategories={handleLaunch} />
             </div>
           </motion.div>
         )}
-
-
 
         {showSwipe && (
           <motion.div
@@ -162,7 +136,7 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
                   <ClientFilters isEmbedded={true} onClose={() => setShowFilters(false)} />
                </div>
             </div>
-         </SheetContent>
+          </SheetContent>
       </Sheet>
     </div>
   );

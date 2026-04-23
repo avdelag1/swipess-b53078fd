@@ -17,6 +17,7 @@ import { triggerHaptic } from "@/utils/haptics";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { cn } from "@/lib/utils";
 import { useMessagingQuota } from "@/hooks/useMessagingQuota";
+import { AtmosphericLayer } from "@/components/AtmosphericLayer";
 
 const OwnerProfile = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -25,8 +26,7 @@ const OwnerProfile = () => {
   const { data: ownerProfile, isLoading: profileLoading } = useOwnerProfile();
   const { tokenBalance } = useMessagingQuota();
   const navigate = useNavigate();
-  const { theme } = useAppTheme();
-  const isLight = theme === 'light';
+  const { theme, isLight } = useAppTheme();
 
   const isLoading = statsLoading || profileLoading;
 
@@ -36,42 +36,28 @@ const OwnerProfile = () => {
 
   return (
     <div className={cn(
-      "min-h-full w-full transition-colors duration-500",
+      "min-h-full w-full transition-colors duration-500 relative overflow-hidden",
       "bg-background text-foreground"
     )}>
-      {/* 🛸 CINEMATIC ATMOSPHERE */}
-      <AnimatePresence>
-        <div className="fixed inset-0 pointer-events-none">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className={cn("absolute top-[-15%] left-[-10%] w-[70%] h-[50%] blur-[130px] rounded-full", isLight ? "bg-[#EB4898]/10" : "bg-[#EB4898]/10")} 
-          />
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className={cn("absolute top-[20%] right-[-10%] w-[40%] h-[40%] blur-[110px] rounded-full", isLight ? "bg-indigo-500/10" : "bg-indigo-500/5")} 
-          />
-        </div>
-      </AnimatePresence>
+      <AtmosphericLayer variant="indigo" />
 
-      <div className="w-full max-w-7xl mx-auto p-6 pt-16 pb-12 space-y-8 relative z-10">
+      <div className="w-full max-w-7xl mx-auto p-6 pt-24 pb-12 space-y-12 relative z-10">
         
         {/* 🛸 OWNER HEADER: BRAND GLASS */}
-        <div className="flex flex-col items-center text-center gap-6">
+        <div className="flex flex-col items-center text-center gap-8">
           <div className="relative">
              <motion.div 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={cn(
-                 "w-44 h-44 transition-all duration-500",
-                 "rounded-[3.2rem] p-[4px] bg-gradient-to-br from-[#EB4898] via-indigo-500 to-sky-400 shadow-2xl"
-              )}
+               whileHover={{ scale: 1.05 }}
+               whileTap={{ scale: 0.95 }}
+               className={cn(
+                  "w-48 h-48 transition-all duration-500 p-[4px] shadow-3xl",
+                  "rounded-[3.5rem] bg-gradient-to-br from-[#EB4898] via-indigo-500 to-sky-400"
+               )}
             >
               <div
                 className={cn(
                    "w-full h-full overflow-hidden cursor-pointer flex items-center justify-center",
-                   "rounded-[3.1rem] bg-background border border-white/10"
+                   "rounded-[3.4rem] bg-background border border-white/10"
                 )}
                 onClick={() => { triggerHaptic('selection'); setShowEditDialog(true); }}
               >
@@ -83,34 +69,34 @@ const OwnerProfile = () => {
               </div>
             </motion.div>
              <button
-              onClick={() => { triggerHaptic('selection'); setShowEditDialog(true); }}
-              className={cn(
-                 "absolute -bottom-2 -right-2 w-14 h-14 flex items-center justify-center shadow-2xl transition-all active:scale-90 z-20",
-                 "bg-black text-white rounded-3xl"
-              )}
+               onClick={() => { triggerHaptic('selection'); setShowEditDialog(true); }}
+               className={cn(
+                  "absolute -bottom-3 -right-3 w-16 h-16 flex items-center justify-center shadow-2xl transition-all active:scale-90 z-20",
+                  "bg-black text-white rounded-[1.8rem] border border-white/20"
+               )}
             >
-              <Camera className="w-6 h-6" />
+              <Camera className="w-7 h-7" />
             </button>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h1 className={cn(
-              "text-5xl font-black uppercase italic tracking-tighter leading-none transition-all",
+              "text-6xl font-black uppercase italic tracking-tighter leading-none transition-all",
               isLight ? "text-black" : "text-white"
             )}>
               {ownerProfile?.business_name || 'Brand'}
             </h1>
             <div className="flex items-center justify-center gap-3">
                <div className={cn(
-                 "px-4 py-1 rounded-full border transition-all",
-                 "bg-[#EB4898]/10 border-[#EB4898]/20"
+                 "px-4 py-1.5 rounded-full transition-all",
+                 "bg-[#EB4898]/10 border border-[#EB4898]/20"
                )}>
                   <span className={cn(
-                    "text-[10px] font-black uppercase tracking-[0.2em] italic",
+                    "text-[10px] font-black uppercase tracking-[0.3em] italic",
                     "text-[#EB4898]"
-                  )}>Owner Profile</span>
+                  )}>Owner Elite</span>
                </div>
-               <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+               <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
                <span className={cn("text-[10px] font-black uppercase tracking-[0.2em] italic", isLight ? "text-black/30" : "text-white/30")}>{user?.email}</span>
             </div>
           </div>

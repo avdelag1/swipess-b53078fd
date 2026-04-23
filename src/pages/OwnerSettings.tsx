@@ -19,6 +19,7 @@ import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { SwipessLogo } from "@/components/SwipessLogo";
 import useAppTheme from "@/hooks/useAppTheme";
 import { cn } from "@/lib/utils";
+import { AtmosphericLayer } from "@/components/AtmosphericLayer";
 
 const fastSpring = { type: "spring" as const, stiffness: 500, damping: 30, mass: 0.8 };
 const stagger = { staggerChildren: 0.04 };
@@ -137,8 +138,9 @@ const OwnerSettings = () => {
 
   if (activeSection === 'security') {
     return (
-      <div className="w-full relative px-4 pt-24 pb-32 bg-background">
-        <div className="max-w-3xl mx-auto">
+      <div className="w-full relative px-4 pt-24 pb-32 bg-background min-h-screen">
+        <AtmosphericLayer variant="indigo" />
+        <div className="max-w-3xl mx-auto relative z-10">
           <PageHeader title={t('settings.security')} subtitle={t('settings.securityDesc')} showBack={true} onBack={() => setActiveSection(null)} />
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6 pt-10">
             <div className="rounded-[2.5rem] overflow-hidden bg-card/40 backdrop-blur-2xl border border-border shadow-2xl">
@@ -161,8 +163,9 @@ const OwnerSettings = () => {
 
   if (activeSection === 'language') {
     return (
-      <div className="w-full relative px-4 pt-24 pb-32 bg-background">
-        <div className="max-w-3xl mx-auto">
+      <div className="w-full relative px-4 pt-24 pb-32 bg-background min-h-screen">
+        <AtmosphericLayer variant="indigo" />
+        <div className="max-w-3xl mx-auto relative z-10">
           <PageHeader title={t('settings.language')} subtitle={t('settings.languageDesc')} showBack={true} onBack={() => setActiveSection(null)} />
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6 pt-10 flex justify-center">
             <LanguageToggle />
@@ -174,8 +177,9 @@ const OwnerSettings = () => {
 
   if (activeSection === 'preferences') {
     return (
-      <div className="w-full relative px-4 pt-24 pb-32 bg-background">
-        <div className="max-w-3xl mx-auto">
+      <div className="w-full relative px-4 pt-24 pb-32 bg-background min-h-screen">
+        <AtmosphericLayer variant="default" />
+        <div className="max-w-3xl mx-auto relative z-10">
           <PageHeader title={t('settings.preferences')} subtitle={t('settings.preferencesDesc')} showBack={true} onBack={() => setActiveSection(null)} />
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-8 pt-10">
             <BackgroundThemeSettings />
@@ -187,13 +191,8 @@ const OwnerSettings = () => {
   }
 
   return (
-    <div className="w-full relative px-6 pb-40 bg-background">
-      
-      {/* 🛸 BACKGROUND GLOWS */}
-      <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
-         <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] bg-indigo-500/30 blur-[130px] rounded-full" />
-         <div className="absolute bottom-[20%] right-[-5%] w-[40%] h-[30%] bg-purple-500/20 blur-[100px] rounded-full" />
-      </div>
+    <div className="w-full relative px-6 pb-40 bg-background min-h-screen overflow-hidden">
+      <AtmosphericLayer variant="indigo" />
 
       <div className="max-w-3xl mx-auto space-y-12 pt-24 relative z-10">
         

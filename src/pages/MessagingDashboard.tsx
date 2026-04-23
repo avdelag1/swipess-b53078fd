@@ -40,6 +40,8 @@ import {
 import { triggerHaptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
+import { AtmosphericLayer } from '@/components/AtmosphericLayer';
+import { X } from 'lucide-react';
 
 export function MessagingDashboard() {
   const { user } = useAuth();
@@ -174,7 +176,7 @@ export function MessagingDashboard() {
     const listing = conversation?.listing;
 
     return (
-      <div className={cn("w-full flex flex-col transition-colors duration-500", isLight ? "bg-white" : "bg-black")} style={{ height: 'calc(100dvh - 52px - 68px - var(--safe-top, 0px) - var(--safe-bottom, 0px))' }}>
+      <div className={cn("w-full flex flex-col transition-colors duration-500 overflow-hidden", isLight ? "bg-white" : "bg-black")} style={{ height: 'calc(100dvh - 52px - 68px)' }}>
         <AnimatePresence mode="wait">
           <motion.div 
             key="interface" 
@@ -192,7 +194,7 @@ export function MessagingDashboard() {
                 otherUser={otherUser as any}
                 listing={listing}
                 currentUserRole={userRole}
-                onBack={() => { triggerHaptic('medium'); setSelectedConversationId(null); setDirectlyFetchedConversation(null); }}
+                onBack={() => { triggerHaptic('medium'); setSelectedConversationId(null); setDirectlyFetchedConversation(null); setSearchParams({}); }}
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-full gap-4 text-[#EB4898]/40 uppercase font-black italic">
@@ -207,11 +209,8 @@ export function MessagingDashboard() {
   }
 
   return (
-    <div className={cn("min-h-screen w-full transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
-      <div className="fixed inset-0 pointer-events-none opacity-10">
-        <div className="absolute top-[10%] left-[-15%] w-[80%] h-[40%] bg-indigo-500/30 blur-[130px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[-10%] w-[60%] h-[50%] bg-[#EB4898]/30 blur-[140px] rounded-full" />
-      </div>
+    <div className={cn("min-h-screen w-full transition-colors duration-500 relative overflow-hidden", isLight ? "bg-white" : "bg-black")}>
+      <AtmosphericLayer variant="rose" />
 
       <MessageActivationBanner isVisible={showActivationBanner} onClose={() => setShowActivationBanner(false)} userRole={userRole} variant="conversation-limit" />
       
@@ -233,12 +232,20 @@ export function MessagingDashboard() {
             <input 
               placeholder="SEARCH NAMES..." 
               className={cn(
-                "w-full pl-14 pr-8 h-16 rounded-[2.2rem] text-[14px] outline-none transition-all font-black uppercase tracking-widest border",
+                "w-full pl-14 pr-14 h-16 rounded-[2.2rem] text-[14px] outline-none transition-all font-black uppercase tracking-widest border",
                 isLight ? "bg-black/5 border-black/5 text-black placeholder:text-black/20" : "bg-white/[0.04] border-white/5 text-white placeholder:text-white/20 focus:border-white/10"
               )}
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)} 
             />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 text-[#EB4898] transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar px-1">

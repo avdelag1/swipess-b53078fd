@@ -156,39 +156,45 @@ export function SharedProfileSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
     >
-      <Card className={cn("backdrop-blur-md rounded-3xl shadow-xl border", isDark ? "bg-zinc-900/50 border-white/5" : "bg-white/80 border-gray-200")}>
-        <CardContent className="p-5">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--color-brand-accent-2)]/20 to-[var(--color-brand-accent-2)]/5 border border-[var(--color-brand-accent-2)]/20 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(228,0,124,0.1)]">
-              <Gift className="w-6 h-6 text-[var(--color-brand-accent-2)]" />
+      <Card className={cn("backdrop-blur-3xl rounded-[2.5rem] shadow-3xl border", isDark ? "bg-white/[0.03] border-white/5" : "bg-black/5 border-black/5")}>
+        <CardContent className="p-7">
+          <div className="flex items-center gap-5 mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#EB4898]/20 to-[#EB4898]/5 border border-[#EB4898]/20 flex items-center justify-center flex-shrink-0 shadow-2xl">
+              <Gift className="w-7 h-7 text-[#EB4898]" />
             </div>
             <div className="min-w-0">
-              <h3 className={cn("font-black tracking-tight text-base", isDark ? "text-white" : "text-gray-900")}>Share & Earn</h3>
-              <p className={cn("text-sm font-bold truncate mt-0.5", isDark ? "text-zinc-500" : "text-gray-500")}>
+              <h3 className={cn("font-black uppercase italic tracking-tight text-lg", isDark ? "text-white" : "text-gray-900")}>Share & Earn</h3>
+              <p className={cn("text-[10px] font-black uppercase tracking-widest opacity-40 mt-1", isDark ? "text-white" : "text-gray-900")}>
                 Get free messages for referrals
               </p>
             </div>
           </div>
 
           {/* Copy Link */}
-          <div className="flex gap-2 mb-4">
-            <div className={cn("flex-1 px-4 py-3 border rounded-2xl text-xs font-medium truncate flex items-center", isDark ? "bg-zinc-900/80 border-white/5 text-zinc-400 shadow-inner" : "bg-gray-50 border-gray-200 text-gray-600 shadow-sm")}>
+          <div className="flex gap-3 mb-6">
+            <div className={cn(
+              "flex-1 px-5 py-4 border rounded-[1.5rem] text-[11px] font-black uppercase tracking-wider truncate flex items-center shadow-inner", 
+              isDark ? "bg-black/40 border-white/5 text-white/40" : "bg-black/5 border-black/5 text-black/40"
+            )}>
               {shareUrl}
             </div>
             <Button
               onClick={handleCopyLink}
               variant="outline"
               size="icon"
-              className={cn("shrink-0 h-[42px] w-[42px] rounded-2xl transition-all active:scale-95", isDark ? "border-white/10 bg-zinc-800/50 hover:bg-zinc-700 hover:text-white" : "border-gray-200 bg-white hover:bg-gray-100/80 hover:text-gray-900 shadow-sm")}
+              className={cn(
+                "shrink-0 h-14 w-14 rounded-[1.5rem] transition-all active:scale-90 border-none shadow-xl", 
+                isDark ? "bg-white text-black hover:bg-white/90" : "bg-black text-white hover:bg-black/90"
+              )}
             >
               <AnimatePresence mode="wait">
                 {copied ? (
                   <motion.div key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                    <Check className="w-5 h-5 text-rose-500" />
+                    <Check className="w-6 h-6 text-emerald-500" />
                   </motion.div>
                 ) : (
                   <motion.div key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                    <Copy className={cn("w-4 h-4", isDark ? "text-zinc-300" : "text-gray-500")} />
+                    <Copy className="w-6 h-6" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -196,23 +202,22 @@ export function SharedProfileSection({
           </div>
 
           {/* Social Share Icons */}
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-between px-2">
             {socialButtons.map((btn, i) => (
               <button
                 key={i}
                 onClick={btn.onClick}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all active:scale-90",
-                  btn.hoverBg
+                  "flex flex-col items-center gap-2 group transition-all active:scale-90"
                 )}
               >
                 <div className={cn(
-                  "w-11 h-11 rounded-full flex items-center justify-center border transition-colors",
-                  isDark ? "bg-zinc-800/80 border-white/[0.06]" : "bg-gray-50 border-gray-200 shadow-sm"
+                  "w-14 h-14 rounded-2xl flex items-center justify-center border transition-all shadow-lg",
+                  isDark ? "bg-white/5 border-white/10 group-hover:bg-white/10" : "bg-black/5 border-black/5 group-hover:bg-black/10"
                 )}>
                   {btn.icon}
                 </div>
-                <span className={cn("text-[10px] font-bold", isDark ? "text-zinc-500" : "text-gray-500")}>{btn.label}</span>
+                <span className={cn("text-[9px] font-black uppercase tracking-widest opacity-30 group-hover:opacity-100", isDark ? "text-white" : "text-black")}>{btn.label}</span>
               </button>
             ))}
           </div>
