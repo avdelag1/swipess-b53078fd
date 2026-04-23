@@ -299,7 +299,7 @@ export default function DJTurntableRadio() {
         onStationSelect={handleStationSelect}
         onToggleFavorite={toggleFavorite}
       />
-    </div>
+    </main>
   );
 }
 
