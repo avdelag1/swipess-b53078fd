@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useAppNavigate } from "@/hooks/useAppNavigate";
 import { motion } from 'framer-motion';
-import { ChevronLeft, Radio, User } from 'lucide-react';
+import { ChevronLeft, Radio, UserCircle } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -113,29 +113,29 @@ function TopBarComponent({
                 haptics.tap();
                 navigate(isOwner ? '/owner/profile' : '/client/profile');
               }}
-              className="flex shrink-0 items-center gap-2 px-2 py-2 pr-3 rounded-full"
+              className="flex shrink-0 items-center gap-3 px-2.5 py-2 pr-4 rounded-2xl"
               style={glassPillStyle}
             >
-              {/* Circular avatar — photo or person-icon placeholder */}
-              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 flex items-center justify-center"
+              {/* Rounded Square avatar — 'window' style */}
+              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center"
                 style={{
-                  background: profile?.avatar_url ? 'transparent' : (isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)'),
-                  border: isLight ? '1.5px solid rgba(0,0,0,0.12)' : '1.5px solid rgba(255,255,255,0.15)',
+                  background: profile?.avatar_url ? 'transparent' : (isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)'),
+                  border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.12)',
                 }}
               >
                 {profile?.avatar_url ? (
                   <img
                     src={profile.avatar_url}
                     alt="Profile"
-                    className="w-full h-full object-cover rounded-full"
+                    className="w-full h-full object-cover rounded-lg"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 ) : (
-                  <User className="w-4 h-4" style={{ color: 'var(--hud-text)', opacity: 0.5 }} strokeWidth={2} />
+                  <UserCircle className="w-5 h-5" style={{ color: 'var(--hud-text)', opacity: 0.4 }} strokeWidth={1.5} />
                 )}
               </div>
               {profile?.full_name && (
-                <span className="text-[11px] font-black uppercase tracking-widest mr-1" style={{ color: 'var(--hud-text)' }}>
+                <span className="text-[10px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: 'var(--hud-text)' }}>
                   {profile.full_name.split(' ')[0]}
                 </span>
               )}
@@ -143,12 +143,6 @@ function TopBarComponent({
           )
         )}
 
-          {/* Mode Switcher Pill */}
-          {!minimal && (
-            <div className="h-11 flex shrink-0 items-center px-4 rounded-full" style={glassPillStyle}>
-              <ModeSwitcher variant="icon" size="sm" />
-            </div>
-          )}
         </div>
 
         <div className="flex-1" />
