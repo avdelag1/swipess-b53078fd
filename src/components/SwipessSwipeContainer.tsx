@@ -1158,7 +1158,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap: _onListingTap, onInsight
       {/* BUILD VERSION STAMP - VISUAL PROOF OF UPDATE */}
       {/* 🚀 QUICK FILTERS: REPOSITIONED BY USER REQUEST (Split on Both Sides) */}
       {(!isLoading || deckQueue.length > 0) && !(storeActiveCategory && deckQueue.length === 0 && !isLoading) && (
-        <div className="absolute bottom-[40px] left-0 right-0 z-[60] w-full flex justify-between px-6 pointer-events-none">
+        <div className="absolute bottom-[40px] left-0 right-0 z-[60] w-full md:max-w-[440px] md:mx-auto flex justify-between px-6 pointer-events-none">
           
           {/* LEFT SIDE: SECTOR ACQUISITION (Quick Categories) */}
           <div className="flex gap-3 p-2 rounded-[2rem] backdrop-blur-3xl border border-white/10 bg-black/40 pointer-events-auto shadow-2xl">

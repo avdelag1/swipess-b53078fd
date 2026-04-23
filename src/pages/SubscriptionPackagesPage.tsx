@@ -349,8 +349,8 @@ export default function SubscriptionPackagesPage() {
               Payment will be charged to your Apple ID account at the confirmation of purchase. Subscription automatically renews unless it is canceled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions by going to your account settings on the App Store after purchase.
             </p>
             <div className="flex items-center justify-center gap-8">
-              <button onClick={() => navigate('/client/privacy')} className="text-[9px] font-black uppercase tracking-[0.3em] text-[#EB4898]/60 hover:text-[#EB4898]">Privacy Policy</button>
-              <button onClick={() => navigate('/client/terms')} className="text-[9px] font-black uppercase tracking-[0.3em] text-[#EB4898]/60 hover:text-[#EB4898]">Terms of Service</button>
+              <button onClick={() => navigate('/privacy-policy')} className="text-[9px] font-black uppercase tracking-[0.3em] text-[#EB4898]/60 hover:text-[#EB4898]">Privacy Policy</button>
+              <button onClick={() => navigate('/terms-of-service')} className="text-[9px] font-black uppercase tracking-[0.3em] text-[#EB4898]/60 hover:text-[#EB4898]">Terms of Service</button>
             </div>
           </div>
 

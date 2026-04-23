@@ -89,7 +89,7 @@ function TopBarComponent({
         height: 'calc(var(--top-bar-height) + var(--safe-top))'
       }}
     >
-      <div className="h-full w-full max-w-screen-xl mx-auto px-4 flex items-center justify-between relative">
+      <div className="h-full w-full max-w-[440px] mx-auto px-4 flex items-center justify-between relative">
         
         <div className="flex items-center gap-2">
           {onBack ? (
