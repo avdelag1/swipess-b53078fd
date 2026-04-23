@@ -16,6 +16,8 @@ import { useModalStore } from '@/state/modalStore';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { AIListingTrigger } from './AIListingTrigger';
 import { SwipessLogo } from './SwipessLogo';
+import { LogOut, LayoutGrid } from 'lucide-react';
+import { appToast } from '@/utils/appNotification';
 
 interface TopBarProps {
   onNotificationsClick?: () => void;
@@ -47,6 +49,19 @@ function TopBarComponent({
   
   const activeCategory = useFilterStore(s => s.activeCategory);
   const { setActiveCategory } = useFilterActions();
+
+  const handleSignOut = useCallback(async () => {
+    try {
+      haptics.impact('medium');
+      await supabase.auth.signOut();
+      // Reset navigation flags in session storage if they exist
+      sessionStorage.removeItem('swipess_nav_complete');
+      appToast.success('Logged Out', 'See you soon at the stars');
+      window.location.href = '/'; // Force reload to landing
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  }, []);
 
   const isOwner = userRole === 'owner';
   
@@ -131,6 +146,21 @@ function TopBarComponent({
             <div className="h-11 flex shrink-0 items-center px-4 rounded-full" style={glassPillStyle}>
               <ModeSwitcher variant="icon" size="sm" />
             </div>
+          )}
+
+          {/* Home/Landing Button */}
+          {user && !onBack && (
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onPointerDown={(e) => {
+                e.preventDefault(); e.stopPropagation();
+                handleSignOut();
+              }}
+              className="w-11 h-11 flex shrink-0 items-center justify-center rounded-full bg-black/20 border border-white/10"
+              title="Return to Entry"
+            >
+              <LogOut className="w-5 h-5 text-white/60" />
+            </motion.button>
           )}
         </div>
 

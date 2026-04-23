@@ -917,14 +917,14 @@ const ClientSwipeContainerComponent = ({
         {/* Card area — flex-1 fills remaining space */}
         <div className="flex-1 relative flex flex-col items-center justify-center px-1.5 pt-1 z-10 min-h-0">
         <div className="w-full h-full flex items-center justify-center pointer-events-auto">
-          <AnimatePresence mode="sync" initial={false}>
+          <AnimatePresence mode="popLayout" initial={false}>
             {topCard ? (
               <motion.div 
-                key={`deck-${category}`}
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                key={`deck-${category}-${topCard.user_id}`}
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 1.1, y: -20 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="relative w-full h-[calc(100%-20px)] max-w-xl mx-auto"
               >
                 {/* Back card (Peek) */}
@@ -1004,10 +1004,14 @@ const ClientSwipeContainerComponent = ({
         </div>
         </div>
 
-        {/* 🚀 QUICK FILTERS: REPOSITIONED BY USER REQUEST (Bottom Near Nav) */}
+        {/* 🚀 PREMIUM QUICK FILTERS: REPOSITIONED BY USER REQUEST (Bottom Near Nav) */}
         {(!isLoading || deckQueue.length > 0) && (
           <div className="absolute bottom-[calc(7.5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-[60] w-full flex justify-center px-4 pointer-events-none">
-            <div className="flex gap-4 p-2 rounded-full backdrop-blur-3xl border border-white/10 bg-black/20 pointer-events-auto shadow-2xl">
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="flex gap-4 p-2.5 rounded-[2.5rem] backdrop-blur-[40px] border border-white/20 bg-black/40 pointer-events-auto shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]"
+            >
               {(userRole === 'owner' ? OWNER_INTENT_CARDS : POKER_CARDS).filter(c => 
                 userRole === 'owner' 
                   ? ['all-clients', 'buyers', 'renters', 'hire'].includes(c.id) 
@@ -1018,23 +1022,32 @@ const ClientSwipeContainerComponent = ({
                 return (
                   <motion.button
                     key={cat.id}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => {
-                      triggerHaptic('light');
+                      triggerHaptic('medium');
                       handleMapCategorySelect(cat.id as any);
                     }}
                     className={cn(
-                      "w-12 h-12 rounded-full flex items-center justify-center transition-all relative overflow-hidden border",
+                      "w-14 h-14 rounded-full flex items-center justify-center transition-all relative overflow-hidden border-2",
                       isActive 
-                        ? (isLight ? "text-black border-black/20 bg-white shadow-lg scale-110" : "text-primary border-primary bg-black/60 shadow-[0_0_20px_rgba(255,107,53,0.4)] scale-110")
-                        : (isLight ? "text-black/30 border-black/5 hover:text-black/60" : "text-white/30 border-white/10 hover:text-white/60 bg-black/20")
+                        ? "text-primary border-primary bg-black/80 shadow-[0_0_25px_rgba(255,107,53,0.5)] scale-110 z-10"
+                        : "text-white/40 border-white/5 hover:text-white/80 bg-white/5 hover:bg-white/10"
                     )}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className={cn("w-6 h-6", isActive ? "stroke-[3px]" : "stroke-[2px]")} />
+                    {isActive && (
+                      <motion.div 
+                        layoutId="active-pill"
+                        className="absolute inset-0 bg-primary/5 -z-1"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      />
+                    )}
                   </motion.button>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         )}
       </div>
