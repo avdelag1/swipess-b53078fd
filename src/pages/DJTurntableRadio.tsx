@@ -10,7 +10,7 @@ import { triggerHaptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 import {
-  ArrowLeft, Globe, Star, Heart, Shuffle,
+  ArrowLeft, Globe, Star, Heart, Shuffle, Radio,
   SkipBack, SkipForward, Play, Pause, Volume2, ListMusic
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -90,30 +90,28 @@ export default function DJTurntableRadio() {
 
   return (
     <div 
-      className="relative w-full h-full flex flex-col bg-[#0A0A0A] overflow-hidden"
+      className={cn("relative w-full h-full flex flex-col overflow-hidden transition-colors duration-500", isDark ? "bg-[#0A0A0A]" : "bg-white")}
       id="main-radio-content"
     >
       <AtmosphericLayer variant={isDark ? 'indigo' : 'default'} />
 
       {/* ── Top Bar ── */}
-      <div className="flex items-center justify-between px-5 pt-[calc(var(--safe-top,0px)+12px)] pb-3 z-20 relative">
-        <button 
-          onClick={() => { triggerHaptic('light'); navigate(-1); }}
-          className={cn('w-10 h-10 flex items-center justify-center rounded-full', neumBtn, neumBtnActive)}
-        >
-          <ArrowLeft className={cn("w-5 h-5", isDark ? "text-white" : "text-black")} />
-        </button>
-
-        <div className="flex-1 flex justify-center items-center gap-2">
-          <Radio className={cn("w-4 h-4", isDark ? "text-blue-400" : "text-primary")} strokeWidth={3} />
-          <SwipessLogo size="sm" variant="transparent" />
+      {/* ── Radio Info & List Toggle ── */}
+      <div className="flex items-center justify-between px-6 pt-4 pb-2 z-20 relative">
+        <div className="flex flex-col">
+          <p className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
+            {state.currentStation?.frequency || '93.1'} FM
+          </p>
+          <h2 className={cn("text-xl font-black truncate tracking-tighter", isDark ? "text-white" : "text-black")}>
+            {state.currentStation?.name || 'Radio'}
+          </h2>
         </div>
 
         <button 
-          onClick={() => setShowDrawer(true)}
-          className={cn('w-10 h-10 flex items-center justify-center rounded-full', neumBtn, neumBtnActive)}
+          onClick={() => { triggerHaptic('medium'); setShowDrawer(true); }}
+          className={cn('w-12 h-12 flex items-center justify-center rounded-2xl', neumBtn, neumBtnActive)}
         >
-          <ListMusic className={cn("w-5 h-5", isDark ? "text-white" : "text-black")} />
+          <ListMusic className={cn("w-6 h-6", isDark ? "text-white" : "text-black")} />
         </button>
       </div>
 
@@ -121,21 +119,33 @@ export default function DJTurntableRadio() {
       <div className="flex-1 flex flex-col items-center justify-between px-4">
         
         {/* Info cluster */}
-        <div className="flex flex-col items-center mt-2 text-center">
-          <p className={cn("text-xs font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
-            {state.currentStation?.frequency || '93.1'}
-          </p>
-          <h2 className={cn("text-2xl font-black truncate tracking-tighter mt-1", isDark ? "text-white" : "text-black")}>
-            {state.currentStation?.name || 'Radio'}
-          </h2>
-          <p className={cn("text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mt-2 flex items-center gap-2", isDark ? "text-white" : "text-black")}>
+        <div className="flex flex-col items-center text-center">
+          <p className={cn("text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 flex items-center gap-2", isDark ? "text-white" : "text-black")}>
             <span className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isDark ? "bg-blue-400" : "bg-primary")} />
             Live from {state.currentCity || 'Mars'}
           </p>
         </div>
 
         {/* Large Frequency Display */}
-        <div className="flex-1 flex flex-col items-center justify-center w-full min-h-[250px]">
+        <div className="flex-1 flex flex-col items-center justify-center w-full min-h-[250px] relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={state.currentStation?.id || 'none'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden"
+            >
+              <div className="absolute inset-0 opacity-[0.08] blur-3xl scale-125">
+                <img 
+                  src={state.currentStation?.albumArt || "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800"} 
+                  className="w-full h-full object-cover"
+                  alt=""
+                />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={state.currentStation?.id || 'none'}
@@ -143,7 +153,7 @@ export default function DJTurntableRadio() {
               animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               exit={{ opacity: 0, scale: 0.95, filter: 'blur(8px)' }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="text-center"
+              className="text-center relative z-10"
             >
               <div className={cn('text-[72px] sm:text-[88px] font-black leading-none tracking-tight', isDark ? 'text-white' : 'text-black')}>
                 {state.currentStation?.frequency || '93.1'}
@@ -151,7 +161,7 @@ export default function DJTurntableRadio() {
               <div className={cn('text-lg font-black tracking-[0.3em] uppercase mt-1', isDark ? 'text-blue-400' : 'text-primary')}>
                 FM
               </div>
-              <div className={cn('text-sm font-black mt-4 tracking-widest uppercase', isDark ? 'text-white' : 'text-slate-900')}>
+              <div className={cn('text-sm font-black mt-4 tracking-widest uppercase', isDark ? 'text-white' : 'text-black')}>
                 {state.currentStation?.name || 'Radio'}
               </div>
             </motion.div>
@@ -169,7 +179,7 @@ export default function DJTurntableRadio() {
         </div>
 
         {/* ── Playback Controls ── */}
-        <div className="flex flex-col items-center gap-5 w-full pb-8">
+        <div className="flex flex-col items-center gap-5 w-full pb-32">
           
           <div className="flex items-center gap-5">
             <button
@@ -177,7 +187,7 @@ export default function DJTurntableRadio() {
               className={cn('w-12 h-12 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
             >
               <Heart
-                className={cn('w-5 h-5', isStationFavorite(state.currentStation?.id || '') ? 'text-red-500' : (isDark ? 'text-white/35' : 'text-black/30'))}
+                className={cn('w-5 h-5', isStationFavorite(state.currentStation?.id || '') ? 'text-red-500' : (isDark ? 'text-white/35' : 'text-black/50'))}
                 fill={isStationFavorite(state.currentStation?.id || '') ? 'currentColor' : 'none'}
               />
             </button>
@@ -186,20 +196,21 @@ export default function DJTurntableRadio() {
               onClick={() => { changeStation('prev'); triggerHaptic('medium'); }}
               className={cn('w-14 h-14 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
             >
-              <SkipBack className={cn('w-6 h-6', isDark ? 'text-white/50' : 'text-black/40')} fill="currentColor" />
+              <SkipBack className={cn('w-6 h-6', isDark ? 'text-white' : 'text-black')} fill="currentColor" />
             </button>
 
             <button
               onClick={() => { togglePlayPause(); triggerHaptic('heavy'); }}
               className={cn(
-                'w-20 h-20 rounded-full flex items-center justify-center relative',
+                'w-20 h-20 rounded-full flex items-center justify-center relative transition-all duration-300',
                 neumBtnActive,
-                'bg-black shadow-[0_8px_30px_rgba(0,0,0,0.5)] border border-white/10'
+                'bg-white border transition-all duration-300',
+                isDark ? 'shadow-[0_15px_45px_rgba(255,255,255,0.25)] border-white/20' : 'shadow-[0_15px_45px_rgba(0,0,0,0.12)] border-slate-200'
               )}
             >
               {state.isPlaying
-                ? <Pause className="w-8 h-8 text-white" fill="currentColor" />
-                : <Play className="w-8 h-8 ml-1 text-white" fill="currentColor" />
+                ? <Pause className="w-8 h-8 text-black" fill="currentColor" />
+                : <Play className="w-8 h-8 ml-1 text-black" fill="currentColor" />
               }
             </button>
 
@@ -207,14 +218,14 @@ export default function DJTurntableRadio() {
               onClick={() => { changeStation('next'); triggerHaptic('medium'); }}
               className={cn('w-14 h-14 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
             >
-              <SkipForward className={cn('w-6 h-6', isDark ? 'text-white' : 'text-slate-900')} fill="currentColor" />
+              <SkipForward className={cn('w-6 h-6', isDark ? 'text-white' : 'text-black')} fill="currentColor" />
             </button>
 
             <button
               onClick={() => { setShowFavoritesDrawer(true); triggerHaptic('medium'); }}
               className={cn('w-12 h-12 rounded-full flex items-center justify-center relative', neumBtn, neumBtnActive)}
             >
-              <Star className={cn('w-5 h-5', isDark ? 'text-white/35' : 'text-black/30')} />
+              <Star className={cn('w-5 h-5', isDark ? 'text-white/35' : 'text-black/50')} />
               {state.favorites.length > 0 && (
                 <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500" />
               )}
