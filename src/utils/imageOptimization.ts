@@ -88,7 +88,7 @@ export function getThumbnailUrl(url: string): string {
   return optimizeImageUrl(url, {
     width: 400,
     height: 400,
-    quality: 75,
+    quality: 70,
     format: 'avif'
   });
 }
@@ -101,7 +101,7 @@ export function getCardImageUrl(url: string): string {
   return optimizeImageUrl(url, {
     width: 800,
     height: 1200,
-    quality: 85,
+    quality: 80,
     format: 'avif'
   });
 }
@@ -207,7 +207,7 @@ export async function preloadImages(urls: string[]): Promise<void> {
 class ImagePreloadQueue {
   private queue: Array<{ url: string; priority: number; resolve: () => void }> = [];
   private loading = 0;
-  private readonly maxConcurrent = 4;
+  private readonly maxConcurrent = 8;
 
   add(url: string, priority: number = 0): Promise<void> {
     return new Promise((resolve) => {
@@ -328,8 +328,8 @@ export const priorityImageProps = {
 export class PWAImagePreloader {
   private decodedCache = new Map<string, HTMLImageElement>();
   private decoding = new Set<string>();
-  // Scale cache based on device memory: 25 images on 4GB+ devices, 10 on lower-end
-  private maxCached = (navigator as Navigator & { deviceMemory?: number }).deviceMemory && (navigator as Navigator & { deviceMemory?: number }).deviceMemory! >= 4 ? 25 : 10;
+  // Scale cache based on device memory: 40 images on 4GB+ devices, 15 on lower-end
+  private maxCached = (navigator as Navigator & { deviceMemory?: number }).deviceMemory && (navigator as Navigator & { deviceMemory?: number }).deviceMemory! >= 4 ? 40 : 15;
 
   /**
    * Aggressively preload and decode image for PWA mode

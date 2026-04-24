@@ -72,11 +72,11 @@ function AuthReadySignal() {
   const { initialized } = useAuth();
 
   useEffect(() => {
-    // 🚀 SPEED OF LIGHT: Force splash removal after 800ms regardless of Auth status
+    // 🚀 SPEED OF LIGHT: Force splash removal after 150ms regardless of Auth status
     // This ensures the user sees the "Searching" UI immediately while Auth hydrates.
     const safetyTimer = setTimeout(() => {
       window.dispatchEvent(new CustomEvent('app-rendered'));
-    }, 400);
+    }, 150);
 
     if (initialized) {
       (window as any).__APP_INITIALIZED__ = true;
@@ -94,8 +94,8 @@ function AppLifecycleManager({ children }: { children: React.ReactNode }) {
   const [active, setActive] = useState(false);
 
   useEffect(() => {
-    // Reduce initial quiet period to 500ms for faster background hydration
-    const timer = setTimeout(() => setActive(true), 500);
+    // Reduce initial quiet period to 100ms for faster background hydration
+    const timer = setTimeout(() => setActive(true), 100);
     return () => clearTimeout(timer);
   }, []);
 

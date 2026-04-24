@@ -138,6 +138,23 @@ body::-webkit-scrollbar {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
+/* ─── GPU & Layout Optimizations ─── */
+.perf-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+.perf-heavy-scroll {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1000px;
+}
+
+.perf-static {
+  contain: content;
+}
+
 *::-webkit-scrollbar {
   display: none !important;
 }
