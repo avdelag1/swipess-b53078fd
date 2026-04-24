@@ -52,19 +52,19 @@ const LandingView = memo(({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <div className="flex-1 flex flex-col items-center justify-center w-full">
+      <div className="flex flex-col items-center justify-center w-full mt-12 mb-10">
         <motion.div
           className="flex flex-col items-center"
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
-          <SwipessLogo size="8xl" variant="gradient" />
+          <SwipessLogo size="7xl" variant="gradient" />
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.4 }}
             transition={{ delay: 1 }}
-            className="text-[11px] font-black uppercase tracking-[0.8em] mt-8 text-white italic"
+            className="text-[10px] font-black uppercase tracking-[0.6em] mt-6 text-white italic"
           >
             Flagship Matrix
           </motion.p>
@@ -72,23 +72,23 @@ const LandingView = memo(({
       </div>
 
       <motion.div
-        className="flex flex-col items-center gap-4 w-full max-w-sm mt-auto"
+        className="flex flex-col items-center gap-3 w-full max-w-[280px]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.6 }}
       >
         <button
           onClick={() => { triggerHaptic('medium'); onEnterAuth('login'); }}
-          className="w-full h-[68px] rounded-[2rem] bg-gradient-to-tr from-white to-white/90 text-black font-black uppercase tracking-[0.2em] text-[17px] shadow-[0_20px_50px_rgba(255,255,255,0.2)] active:scale-[0.97] transition-all flex items-center justify-center gap-3 border border-white/50"
+          className="w-full h-[52px] rounded-2xl bg-white text-black font-black uppercase tracking-[0.15em] text-[14px] shadow-[0_15px_30px_rgba(255,255,255,0.15)] active:scale-[0.97] transition-all flex items-center justify-center gap-2.5 border-none"
         >
-          <LogIn className="w-5 h-5" />
+          <LogIn className="w-4 h-4" />
           Sign In
         </button>
         <button
           onClick={() => { triggerHaptic('medium'); onEnterAuth('signup'); }}
-          className="w-full h-[68px] rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/20 text-white font-black uppercase tracking-[0.2em] text-[17px] active:scale-[0.97] transition-all flex items-center justify-center gap-3 hover:bg-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
+          className="w-full h-[52px] rounded-2xl bg-white/5 backdrop-blur-3xl border border-white/10 text-white font-black uppercase tracking-[0.15em] text-[14px] active:scale-[0.97] transition-all flex items-center justify-center gap-2.5 hover:bg-white/10 shadow-[0_10px_20px_rgba(0,0,0,0.2)]"
         >
-          <Sparkles className="w-5 h-5 text-[#EB4898]" />
+          <Sparkles className="w-4 h-4 text-primary" />
           Create Account
         </button>
       </motion.div>
@@ -101,10 +101,10 @@ const AppleAuthButton = ({ onClick }: { onClick: () => void }) => (
   <button
     type="button"
     onClick={onClick}
-    className="group flex h-[48px] w-full items-center justify-center gap-3 rounded-xl bg-black text-white active:scale-[0.97] transition-all shadow-[0_10px_25px_rgba(0,0,0,0.4)] border border-white/10 hover:bg-black/90"
+    className="group flex h-[44px] w-full items-center justify-center gap-3 rounded-xl bg-white text-black active:scale-[0.97] transition-all shadow-[0_8px_20px_rgba(0,0,0,0.1)] border border-white/20 hover:bg-white/90"
   >
     <AppleIcon />
-    <span className="text-[14px] font-semibold tracking-tight leading-none pt-0.5">
+    <span className="text-[13px] font-black uppercase tracking-widest leading-none pt-0.5">
       Sign in with Apple
     </span>
   </button>
@@ -114,10 +114,10 @@ const GoogleAuthButton = ({ onClick }: { onClick: () => void }) => (
   <button
     type="button"
     onClick={onClick}
-    className="group flex h-[48px] w-full items-center justify-center gap-3 rounded-xl bg-black/40 backdrop-blur-xl border border-white/15 hover:border-white/30 active:scale-[0.97] transition-all shadow-[0_10px_25px_rgba(0,0,0,0.3)]"
+    className="group flex h-[44px] w-full items-center justify-center gap-3 rounded-xl bg-white text-black active:scale-[0.97] transition-all shadow-[0_8px_20px_rgba(0,0,0,0.1)] border border-white/20 hover:bg-white/90"
   >
     <GoogleIcon />
-    <span className="text-[14px] font-black uppercase tracking-widest text-white leading-none pt-0.5">
+    <span className="text-[13px] font-black uppercase tracking-widest leading-none pt-0.5">
       Continue with Google
     </span>
   </button>
@@ -218,15 +218,15 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="text-center mb-6 pt-6 flex flex-col items-center">
-          <SwipessLogo size="2xl" variant="gradient" className="mb-6 shrink-0 mx-auto" />
+        <div className="text-center mb-4 pt-2 flex flex-col items-center">
+          <SwipessLogo size="xl" variant="gradient" className="mb-4 shrink-0 mx-auto" />
 
           {isForgotPassword ? (
             <>
               <h1 className="text-xl font-black italic tracking-tighter text-white uppercase leading-none mb-1.5">
                 Reset Password
               </h1>
-              <p className="text-[9px] font-bold tracking-[0.2em] text-white/35 uppercase">
+              <p className="text-[8px] font-black tracking-[0.2em] text-white/30 uppercase">
                 Enter your email link
               </p>
             </>
@@ -263,15 +263,15 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                 />
               </div>
-              <p className="text-[9px] font-bold tracking-[0.2em] text-white/35 uppercase">
-                {isLogin ? 'Welcome back' : 'Create your account'}
+              <p className="text-[8px] font-black tracking-[0.25em] text-white/40 uppercase">
+                {isLogin ? 'Welcome back' : 'Join the matrix'}
               </p>
             </>
           )}
         </div>
 
         {!isForgotPassword && (
-          <div className="mb-2 space-y-2">
+          <div className="mb-4 space-y-2">
             <div className="grid grid-cols-1 gap-2">
               <AppleAuthButton onClick={() => handleSocialLogin('apple')} />
               <GoogleAuthButton onClick={() => handleSocialLogin('google')} />
@@ -287,31 +287,31 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
 
         <form onSubmit={handleSubmit} className="space-y-2.5" noValidate>
           {!isLogin && !isForgotPassword && (
-            <div className="flex flex-col gap-1.5 mb-1.5">
-               <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 ml-1">Identity Protocol</p>
-               <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => { triggerHaptic('light'); setSelectedRole('client'); }}
-                    className={cn(
-                      "py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all border",
-                      selectedRole === 'client' ? "bg-white text-black border-white shadow-lg" : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
-                    )}
-                  >
-                    Seeker
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { triggerHaptic('light'); setSelectedRole('owner'); }}
-                    className={cn(
-                      "py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all border",
-                      selectedRole === 'owner' ? "bg-white text-black border-white shadow-lg" : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
-                    )}
-                  >
-                    Authority
-                  </button>
-               </div>
-            </div>
+             <div className="flex flex-col gap-1 mb-1">
+                <p className="text-[7px] font-black uppercase tracking-[0.4em] text-white/20 ml-1">Identity Protocol</p>
+                <div className="grid grid-cols-2 gap-2">
+                   <button
+                     type="button"
+                     onClick={() => { triggerHaptic('light'); setSelectedRole('client'); }}
+                     className={cn(
+                       "py-1.5 rounded-lg text-[7px] font-black uppercase tracking-widest transition-all border",
+                       selectedRole === 'client' ? "bg-white text-black border-white shadow-lg" : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
+                     )}
+                   >
+                     Seeker
+                   </button>
+                   <button
+                     type="button"
+                     onClick={() => { triggerHaptic('light'); setSelectedRole('owner'); }}
+                     className={cn(
+                       "py-1.5 rounded-lg text-[7px] font-black uppercase tracking-widest transition-all border",
+                       selectedRole === 'owner' ? "bg-white text-black border-white shadow-lg" : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
+                     )}
+                   >
+                     Authority
+                   </button>
+                </div>
+             </div>
           )}
 
           <div className="space-y-3.5">
@@ -326,7 +326,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Full Name"
                   className={cn(
-                    "w-full h-[44px] bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 text-[12px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
+                    "w-full h-[40px] bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 text-[12px] font-bold text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
                     fieldErrors.name && "border-red-500/50 bg-red-500/5"
                   )}
                 />
@@ -344,7 +344,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email Protocol"
                 className={cn(
-                  "w-full h-[44px] bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 text-[12px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
+                  "w-full h-[40px] bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 text-[12px] font-bold text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
                   fieldErrors.email && "border-red-500/50 bg-red-500/5"
                 )}
               />
@@ -362,7 +362,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Alpha-Numeric Key"
                   className={cn(
-                    "w-full h-[44px] bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 text-[12px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
+                    "w-full h-[40px] bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 text-[12px] font-bold text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
                     fieldErrors.password && "border-red-500/50 bg-red-500/5"
                   )}
                 />
@@ -388,7 +388,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Verify Security Key"
                   className={cn(
-                    "w-full h-[44px] bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 text-[12px] font-bold text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
+                    "w-full h-[40px] bg-white/[0.03] border border-white/10 rounded-xl pl-10 pr-4 text-[12px] font-bold text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 focus:bg-white/[0.06] transition-all",
                     fieldErrors.confirmPassword && "border-red-500/50 bg-red-500/5"
                   )}
                 />
@@ -447,12 +447,18 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-[48px] rounded-xl bg-primary text-black font-bold uppercase tracking-[0.2em] text-[12px] shadow-[0_15px_35px_rgba(var(--color-brand-primary-rgb),0.35)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 border-none mt-2 disabled:opacity-60 disabled:pointer-events-none"
+            className="w-full h-[48px] rounded-2xl bg-white text-black font-black uppercase tracking-[0.25em] text-[12px] shadow-[0_15px_30px_rgba(255,255,255,0.15)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 border-none mt-2 disabled:opacity-60 disabled:pointer-events-none"
           >
-            <Sparkles className="w-3.5 h-3.5 fill-current" />
-            <span className="drop-shadow-md">
-              {isLoading ? 'Processing...' : isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In' : 'Create Account'}
-            </span>
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-black/20 border-t-black animate-spin rounded-full" />
+            ) : (
+              <>
+                <LogIn className="w-4 h-4" />
+                <span>
+                  {isForgotPassword ? 'Reset Terminal' : isLogin ? 'Enter Matrix' : 'Create Account'}
+                </span>
+              </>
+            )}
           </button>
         </form>
       </div>
