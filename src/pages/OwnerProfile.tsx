@@ -16,6 +16,7 @@ import { triggerHaptic } from "@/utils/haptics";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { cn } from "@/lib/utils";
 import { useMessagingQuota } from "@/hooks/useMessagingQuota";
+import { useModalStore } from "@/state/modalStore";
 
 const OwnerProfile = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -23,6 +24,7 @@ const OwnerProfile = () => {
   const { data: stats, isLoading: statsLoading } = useOwnerStats();
   const { data: ownerProfile, isLoading: profileLoading } = useOwnerProfile();
   const { tokenBalance } = useMessagingQuota();
+  const { setModal } = useModalStore();
   const navigate = useNavigate();
 
   const isLoading = statsLoading || profileLoading;
@@ -157,6 +159,21 @@ const OwnerProfile = () => {
 
         {/* PRIMARY ACTIONS */}
         <div className="space-y-3">
+          <Button
+            onClick={() => { triggerHaptic('heavy'); setModal('showAIListing', true); }}
+            className="w-full h-24 rounded-3xl relative overflow-hidden transition-all active:scale-95 border-none shadow-2xl"
+            style={{ background: 'linear-gradient(135deg, #6366F1, #7C3AED, #EC4899)' }}
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.35),transparent_70%)] pointer-events-none" />
+            <div className="relative z-10 flex items-center justify-center gap-4">
+              <Sparkles className="w-8 h-8 animate-pulse text-white" />
+              <div className="text-left">
+                <span className="block text-[18px] font-black uppercase italic tracking-[0.2em] leading-none text-white">Magic AI Listing</span>
+                <span className="block text-[9px] font-black uppercase tracking-[0.3em] text-white/60 mt-1">Flagship Intelligence v4</span>
+              </div>
+            </div>
+          </Button>
+
           <Button
             onClick={() => { triggerHaptic('medium'); setShowEditDialog(true); }}
             className="w-full h-16 rounded-2xl font-black uppercase italic tracking-[0.2em] text-[15px] transition-all border-none text-white"
