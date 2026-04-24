@@ -99,7 +99,7 @@ function TopBarComponent({
           {onBack ? (
             <motion.button
               whileTap={{ scale: 0.9 }}
-              onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); haptics.tap(); onBack(); }}
+               onClick={() => { haptics.tap(); onBack(); }}
               className="w-11 h-11 flex shrink-0 items-center justify-center rounded-full"
               style={glassPillStyle}
             >
@@ -109,11 +109,10 @@ function TopBarComponent({
             user && (
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onPointerDown={(e) => {
-                e.preventDefault(); e.stopPropagation();
-                haptics.tap();
-                navigate(isOwner ? '/owner/profile' : '/client/profile');
-              }}
+                onClick={() => {
+                  haptics.tap();
+                  navigate(isOwner ? '/owner/profile' : '/client/profile');
+                }}
               className="flex shrink-0 items-center gap-3 px-2.5 py-2 pr-4 rounded-2xl"
               style={glassPillStyle}
             >
@@ -172,7 +171,7 @@ function TopBarComponent({
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); haptics.impact('light'); navigate('/radio'); }}
+                onClick={() => { haptics.impact('light'); navigate('/radio'); }}
                 className={cn(
                   "p-2 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300",
                   "text-white/80 hover:text-white"

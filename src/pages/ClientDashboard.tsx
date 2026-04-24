@@ -72,8 +72,7 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
       "flex-1 flex flex-col items-center justify-center p-0 overflow-hidden relative",
       isLight ? "bg-white" : "bg-[#020202]"
     )}>
-      {/* 🛸 Swipess ATMOSPHERIC LAYER (Unified Discovery Phase) */}
-      <AtmosphericLayer variant="rose" />
+      {/* 🛸 Swipess ATMOSPHERIC LAYER (Global sync via PersistentDashboardLayout) */}
 
       <AnimatePresence mode="wait">
         {showCards && (

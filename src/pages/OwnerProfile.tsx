@@ -42,7 +42,7 @@ const OwnerProfile = () => {
       isLight ? "bg-white" : "bg-black",
       "text-foreground"
     )}>
-      <AtmosphericLayer variant="primary" />
+      {/* 🛸 Global AtmosphericLayer handled by PersistentDashboardLayout */}
 
       <div className="w-full max-w-7xl mx-auto p-6 pt-24 pb-12 space-y-16 relative z-10">
         

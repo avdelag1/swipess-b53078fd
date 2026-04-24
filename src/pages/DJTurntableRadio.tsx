@@ -93,11 +93,10 @@ export default function DJTurntableRadio() {
       className={cn("relative w-full h-full flex flex-col overflow-hidden transition-colors duration-500", isDark ? "bg-[#0A0A0A]" : "bg-white")}
       id="main-radio-content"
     >
-      <AtmosphericLayer variant={isDark ? 'indigo' : 'default'} />
+      {/* 🛸 Global AtmosphericLayer is handled by PersistentDashboardLayout */}
 
-      {/* ── Top Bar ── */}
       {/* ── Radio Info & List Toggle ── */}
-      <div className="flex items-center justify-between px-6 pt-4 pb-2 z-20 relative">
+      <div className="flex items-center justify-between px-6 pt-24 pb-2 z-20 relative">
         <div className="flex flex-col">
           <p className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
             {state.currentStation?.frequency || '93.1'} FM
@@ -204,8 +203,8 @@ export default function DJTurntableRadio() {
               className={cn(
                 'w-20 h-20 rounded-full flex items-center justify-center relative transition-all duration-300',
                 neumBtnActive,
-                'bg-white border transition-all duration-300',
-                isDark ? 'shadow-[0_15px_45px_rgba(255,255,255,0.25)] border-white/20' : 'shadow-[0_15px_45px_rgba(0,0,0,0.12)] border-slate-200'
+                'bg-white border-2 transition-all duration-300',
+                isDark ? 'shadow-[0_0_50px_rgba(255,255,255,0.4)] border-white' : 'shadow-[0_15px_45px_rgba(0,0,0,0.12)] border-slate-200'
               )}
             >
               {state.isPlaying
