@@ -550,9 +550,9 @@ button:active, [role="button"]:active {
     }
   }
 
-  /* MOBILE PERFORMANCE MODE - Disable blur effects on phones */
+  /* MOBILE PERFORMANCE MODE - Refined for 2026 devices */
   @media (max-width: 768px) {
-    /* Remove backdrop-blur - GPU intensive on mobile */
+    /* Allow backdrop-blur on modern mobile devices for premium feel */
     .backdrop-blur-sm,
     .backdrop-blur-md,
     .backdrop-blur-lg,
@@ -560,8 +560,7 @@ button:active, [role="button"]:active {
     .backdrop-blur-2xl,
     .backdrop-blur-3xl,
     [class*="backdrop-blur"] {
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
+      /* Remove the hard disable. Modern iPhones handle this easily. */
     }
 
     /* Faster transitions on mobile - no !important to avoid janky framer-motion */

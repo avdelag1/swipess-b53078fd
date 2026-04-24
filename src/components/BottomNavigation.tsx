@@ -345,7 +345,7 @@ export const BottomNavigation = memo(({
                         animate={{ scale: 1 }}
                         exit={{ scale: 0 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                        className="absolute -top-1 -right-1 rounded-full px-1.5 h-[16px] z-20 shadow-[0_2px_8px_rgba(255,140,0,0.4)] border-2 border-[var(--hud-bg)] flex items-center justify-center text-[10px] font-black text-white"
+                        className="absolute -top-1 -right-1 rounded-full px-1.5 h-[16px] z-20 shadow-[0_2px_8px_rgba(255,140,0,0.4)] border-2 border-[var(--hud-bg)] flex items-center justify-center text-[11px] font-black text-white"
                         style={{ background: 'linear-gradient(135deg,#ff4d00,#ff8c00)' }}
                       >
                         {item.badge}
@@ -376,7 +376,7 @@ export const BottomNavigation = memo(({
                     <span
                       className={cn(
                         'tracking-tight transition-all duration-300 relative font-black uppercase italic truncate max-w-[56px]',
-                        isTablet ? 'text-[10px]' : 'text-[8.5px]',
+                        isTablet ? 'text-[11px]' : 'text-[10px]',
                       )}
                       style={{
                         color: 'var(--hud-text)',

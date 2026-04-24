@@ -144,7 +144,7 @@ function TopBarComponent({
                 </div>
               </div>
               {profile?.full_name && (
-                <span className="text-[10px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: 'var(--hud-text)' }}>
+                <span className="text-[11px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: 'var(--hud-text)' }}>
                   {profile.full_name.split(' ')[0]}
                 </span>
               )}
