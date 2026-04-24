@@ -89,35 +89,41 @@ export const SwipeExhaustedState = ({
         exit="exit" 
         className="relative z-50 h-full w-full overflow-hidden flex flex-col items-center justify-center bg-transparent px-6"
       >
-        {/* ATMOSPHERIC BACKGROUND RADAR */}
+        {/* 🛸 ZENITH RADAR: High-Fidelity Discovery Animation */}
         <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden">
           <motion.div 
             animate={{ 
-              scale: [1, 2, 3],
-              opacity: [0.3, 0.1, 0]
+              scale: [1, 2.5],
+              opacity: [0.15, 0]
             }}
             transition={{ 
-              duration: 4, 
+              duration: 3.5, 
               repeat: Infinity,
-              ease: "easeOut"
+              ease: "circOut"
             }}
-            className="absolute w-[300px] h-[300px] rounded-full border border-primary/20"
+            className="absolute w-[400px] h-[400px] rounded-full border border-primary/10 shadow-[0_0_50px_rgba(var(--color-brand-primary-rgb),0.05)]"
           />
           <motion.div 
             animate={{ 
-              scale: [1, 1.5, 2],
-              opacity: [0.2, 0.05, 0]
+              scale: [1, 2],
+              opacity: [0.1, 0]
             }}
             transition={{ 
-              duration: 4, 
-              delay: 1.3,
+              duration: 3.5, 
+              delay: 1.7,
               repeat: Infinity,
-              ease: "easeOut"
+              ease: "circOut"
             }}
-            className="absolute w-[300px] h-[300px] rounded-full border border-primary/10"
+            className="absolute w-[400px] h-[400px] rounded-full border border-primary/5"
+          />
+          {/* Scanning Beam */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="absolute w-[800px] h-[2px] bg-gradient-to-r from-transparent via-primary/10 to-transparent opacity-30"
           />
           <div 
-            className="absolute w-[500px] h-[500px] rounded-full blur-[120px] opacity-20"
+            className="absolute w-[600px] h-[600px] rounded-full blur-[160px] opacity-10"
             style={{ background: activeCatInfo?.color || '#ec4899' }}
           />
         </div>
@@ -197,42 +203,49 @@ export const SwipeExhaustedState = ({
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 w-full px-2">
-            <Button
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col gap-4 w-full px-2"
+          >
+            {/* PRIMARY SECTOR SWITCHER: Text-based as requested */}
+            <button
+              onClick={() => {
+                triggerHaptic('heavy');
+                // Cycle main categories
+                const categories: string[] = ['property', 'motorcycle', 'bicycle', 'services'];
+                const currentIdx = categories.indexOf(activeCategory || 'property');
+                const nextIdx = (currentIdx + 1) % categories.length;
+                setActiveCategory(categories[nextIdx] as any);
+                setCategories([categories[nextIdx]] as any);
+              }}
+              className={cn(
+                "w-full h-20 rounded-[2.5rem] flex items-center justify-between px-8 transition-all active:scale-95 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border backdrop-blur-3xl group relative overflow-hidden",
+                isLight ? "bg-black text-white border-white/20" : "bg-white text-black border-black/10"
+              )}
+            >
+              <div className="flex flex-col items-start z-10">
+                <span className={cn("text-[10px] font-black uppercase tracking-[0.3em] mb-1 opacity-50", isLight ? "text-white" : "text-black")}>Discovery Protocol</span>
+                <span className="text-[16px] font-black uppercase tracking-wider">Change Sector</span>
+              </div>
+              <Search className="w-6 h-6 opacity-30 group-hover:opacity-100 transition-all group-hover:scale-110 z-10" />
+              {/* Inner Glow */}
+              <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+
+            <button
               onClick={handleRefreshClick}
               disabled={isRefreshing}
-              className="h-20 w-full rounded-[2.2rem] bg-primary text-black font-black uppercase italic tracking-widest shadow-[0_20px_50px_rgba(var(--color-brand-primary-rgb),0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-4 border-none text-base"
+              className={cn(
+                "w-full h-14 rounded-[1.8rem] flex items-center justify-center gap-3 transition-all active:scale-95 border",
+                isLight ? "bg-white border-black/10 text-black/60" : "bg-black/40 border-white/10 text-white/60"
+              )}
             >
-              <RefreshCw className={cn("w-6 h-6", isRefreshing && "animate-spin")} />
-              {isRefreshing ? 'Recalibrating...' : 'Refresh Intel'}
-            </Button>
-            
-            <div className="flex gap-4">
-              <Button
-                variant="outline"
-                disabled={resetMutation.isPending}
-                onClick={() => {
-                  triggerHaptic('heavy');
-                  resetMutation.mutate(activeCategory as any || 'all');
-                }}
-                className={cn("flex-1 h-18 rounded-[2rem] border font-black uppercase italic tracking-widest transition-all active:scale-95 text-xs", isLight ? "bg-black/5 hover:bg-black/10 border-black/10 text-black" : "bg-white/5 hover:bg-white/10 border-white/20 text-white backdrop-blur-md")}
-              >
-                <RotateCcw className={cn("mr-2 w-5 h-5 text-orange-400", resetMutation.isPending && "animate-spin")} />
-                Reset Session
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => {
-                  triggerHaptic('medium');
-                  (window as any).dispatchEvent(new CustomEvent('open-filters'));
-                }}
-                className={cn("w-18 h-18 rounded-[2rem] border flex items-center justify-center p-0 shadow-2xl transition-all active:scale-95", isLight ? "bg-black/5 hover:bg-black/10 border-black/10" : "bg-white/5 hover:bg-white/10 border-white/20 backdrop-blur-md")}
-              >
-                <SlidersHorizontal className="h-6 w-6 text-primary" />
-              </Button>
-            </div>
-          </div>
+              <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
+              <span className="text-[10px] font-black uppercase tracking-widest">{isRefreshing ? 'Scanning...' : 'Refresh Radar'}</span>
+            </button>
+          </motion.div>
         </div>
 
         {/* BOTTOM DECOR */}

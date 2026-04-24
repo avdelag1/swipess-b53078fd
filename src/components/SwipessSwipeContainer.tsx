@@ -1146,72 +1146,79 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
             )}
           </AnimatePresence>
       </div>
-      {/* BUILD VERSION STAMP - VISUAL PROOF OF UPDATE */}
-      {/* 🚀 QUICK FILTERS: REPOSITIONED BY USER REQUEST (Split on Both Sides) */}
-      {(!isLoading || deckQueue.length > 0) && !(storeActiveCategory && deckQueue.length === 0 && !isLoading) && (
-        <div className="absolute bottom-[40px] left-0 right-0 z-[60] w-full md:max-w-[440px] md:mx-auto flex justify-between px-6 pointer-events-none">
+
+      {/* 🚀 ZENITH DISCOVERY HUD: Clean, Text-based Switcher (Replaces cluttered icons) */}
+      {(!isLoading || deckQueue.length > 0) && (
+        <div className="absolute bottom-[42px] left-0 right-0 z-[100] flex flex-col items-center pointer-events-none px-6">
           
-          {/* LEFT SIDE: SECTOR ACQUISITION (Quick Categories) */}
-          <div className="flex gap-3 p-2.5 rounded-[2.2rem] backdrop-blur-3xl border border-white/50 bg-black/95 pointer-events-auto shadow-2xl">
-            {(userRole === 'owner' ? OWNER_INTENT_CARDS : POKER_CARDS).filter(c => 
-              userRole === 'owner' 
-                ? ['buyers', 'renters', 'hire'].includes(c.id) 
-                : ['property', 'motorcycle', 'services'].includes(c.id)
-            ).map((cat: any) => {
-              const Icon = cat.icon;
-              const isActive = storeActiveCategory === cat.id || (userRole === 'owner' && (filters as any).clientType === (cat as any).clientType);
-              return (
-                <motion.button
-                  key={cat.id}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => {
+          <div className="flex flex-col items-center gap-4 w-full max-w-[360px] pointer-events-auto">
+            {/* 🛸 THE SECTOR SWITCHER */}
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={() => {
+                triggerHaptic('heavy');
+                // Cycle through main categories
+                const categories: QuickFilterCategory[] = userRole === 'owner' 
+                  ? ['buyers', 'renters', 'hire'] 
+                  : ['property', 'motorcycle', 'services', 'bicycle'];
+                const currentIdx = categories.indexOf(storeActiveCategory as QuickFilterCategory);
+                const nextIdx = (currentIdx + 1) % categories.length;
+                setActiveCategory(categories[nextIdx]);
+              }}
+              className={cn(
+                "group relative w-full h-16 flex items-center justify-between px-6 rounded-[2rem] overflow-hidden transition-all",
+                "backdrop-blur-[40px] border border-white/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)]",
+                "bg-gradient-to-r from-black/80 via-black/90 to-black/80"
+              )}
+            >
+              {/* Inner Glow */}
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              <div className="flex flex-col items-start">
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-0.5">Active Sector</span>
+                <span className="text-[15px] font-black uppercase tracking-wider text-white flex items-center gap-2">
+                  {storeActiveCategory?.replace(/-/g, ' ') || 'All Sectors'}
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--color-brand-primary-rgb),0.8)]" />
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-[1px] bg-white/10 mx-1" />
+                <span className="text-[11px] font-bold text-primary tracking-tight group-hover:translate-x-1 transition-transform">
+                  TAP TO SWITCH
+                </span>
+              </div>
+            </motion.button>
+
+            {/* Sub-Actions: Radar & Intel */}
+            <div className="flex items-center gap-2 w-full">
+               <motion.button
+                 whileTap={{ scale: 0.95 }}
+                 onClick={() => {
                     triggerHaptic('medium');
-                    setActiveCategory(cat.id);
-                  }}
-                  className={cn(
-                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden border",
-                    isActive 
-                      ? "text-primary border-primary bg-primary/20 shadow-[0_0_25px_rgba(var(--color-brand-primary-rgb),0.4)] scale-110"
-                      : "text-white border-white/50 hover:text-white bg-white/25"
-                  )}
-                >
-                  <Icon className="w-5 h-5" />
-                  {isActive && <motion.div layoutId="activeCatLeft" className="absolute inset-0 bg-primary/10 -z-10" />}
-                </motion.button>
-              );
-            })}
-          </div>
+                    navigate('/client/filters');
+                 }}
+                 className="flex-1 h-12 rounded-2xl bg-white/10 backdrop-blur-3xl border border-white/20 flex items-center justify-center gap-2"
+               >
+                 <SlidersHorizontal className="w-4 h-4 text-white/70" />
+                 <span className="text-[10px] font-black uppercase tracking-widest text-white/80">Intel Center</span>
+               </motion.button>
 
-          {/* RIGHT SIDE: MARKET INTELLIGENCE (Advanced & Radar) */}
-          <div className="flex gap-3 p-2.5 rounded-[2.2rem] backdrop-blur-3xl border border-white/50 bg-black/95 pointer-events-auto shadow-2xl">
-             <motion.button
-               whileTap={{ scale: 0.9 }}
-               onClick={() => {
-                 triggerHaptic('medium');
-                 navigate('/client/filters');
-               }}
-               className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center border border-white/50 bg-white/30 text-white"
-             >
-               <SlidersHorizontal className="w-5 h-5 mb-0.5" />
-               <span className="text-[8px] font-black uppercase text-primary">INTEL</span>
-             </motion.button>
-
-             <motion.button
-               whileTap={{ scale: 0.9 }}
-               onClick={() => {
-                 triggerHaptic('medium');
-                 setRadiusKm(radiusKm === 100 ? 5 : radiusKm + 10);
-               }}
-               className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center border border-white/50 bg-white/30 text-white"
-             >
-               <Radar className="w-5 h-5 mb-0.5" />
-               <span className="text-[8px] font-black uppercase text-primary">{radiusKm}K</span>
-             </motion.button>
-
+               <motion.button
+                 whileTap={{ scale: 0.95 }}
+                 onClick={() => {
+                    triggerHaptic('medium');
+                    setRadiusKm(radiusKm === 100 ? 5 : radiusKm + 10);
+                 }}
+                 className="flex-1 h-12 rounded-2xl bg-white/10 backdrop-blur-3xl border border-white/20 flex items-center justify-center gap-2"
+               >
+                 <Radar className="w-4 h-4 text-white/70 animate-spin-slow" />
+                 <span className="text-[10px] font-black uppercase tracking-widest text-white/80">{radiusKm}km Scan</span>
+               </motion.button>
+            </div>
           </div>
         </div>
       )}
-
 
       {/* BUILD VERSION STAMP */}
       <div className="absolute bottom-[85px] right-6 z-0 pointer-events-none opacity-20">

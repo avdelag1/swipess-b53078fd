@@ -81,6 +81,40 @@ const DEMO_LISTINGS: any[] = [
     is_active: true,
     status: 'active',
     created_at: new Date().toISOString()
+  },
+  {
+    id: 'demo-4',
+    title: 'VanMoof S5 Electric',
+    description: 'The future of urban mobility. Integrated lights, anti-theft tech, and incredible power. Perfect for the city commute.',
+    price: 3500,
+    currency: 'USD',
+    images: ['https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&q=80&w=1200'],
+    city: 'Amsterdam',
+    category: 'bicycle',
+    listing_type: 'sell',
+    bicycle_type: 'electric',
+    electric_assist: true,
+    battery_range: 80,
+    is_active: true,
+    status: 'active',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'demo-5',
+    title: 'Senior Interior Architect',
+    description: 'Transforming spaces into experiences. Over 10 years of luxury residential design. Expert in sustainable materials.',
+    price: 150,
+    pricing_unit: 'hour',
+    currency: 'USD',
+    images: ['https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1200'],
+    city: 'Milan',
+    category: 'services',
+    service_category: 'Interior Design',
+    experience_years: 12,
+    experience_level: 'expert',
+    is_active: true,
+    status: 'active',
+    created_at: new Date().toISOString()
   }
 ];
 
