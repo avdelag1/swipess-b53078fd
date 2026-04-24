@@ -180,10 +180,10 @@ function TopBarComponent({
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => { haptics.impact('light'); navigate('/radio'); }}
+                onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); haptics.impact('light'); navigate('/radio'); }}
                 className={cn(
                   glassPillStyle,
-                  "p-2 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300",
+                  "p-2 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 pointer-events-auto",
                   "text-white/80 hover:text-white"
                 )}
                 aria-label="Sentient Radio"
