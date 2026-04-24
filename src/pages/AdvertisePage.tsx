@@ -213,11 +213,11 @@ function PromoSwipeCard({
         {/* Package name & icon */}
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
-            style={{ background: `rgba(${pkg.colorRgb}, 0.3)`, backdropFilter: "blur(12px)", border: `1px solid rgba(${pkg.colorRgb}, 0.5)` }}>
+            style={{ background: `rgba(${pkg.colorRgb}, 0.5)`, backdropFilter: "blur(12px)", border: `1px solid rgba(${pkg.colorRgb}, 0.6)` }}>
             <span className="text-white">{pkg.icon}</span>
           </div>
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">{pkg.tagline}</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">{pkg.tagline}</div>
             <div className="text-xl font-black text-white tracking-tight">{pkg.name}</div>
           </div>
         </div>
@@ -225,7 +225,7 @@ function PromoSwipeCard({
         {/* Price */}
         <div className="flex items-baseline gap-2">
           <span className="text-5xl font-black text-white">${pkg.price.toFixed(2)}</span>
-          <span className="text-sm font-bold text-white/50 uppercase tracking-wider">USD {pkg.durationLabel}</span>
+          <span className="text-sm font-bold text-white/80 uppercase tracking-wider">USD {pkg.durationLabel}</span>
         </div>
 
         {/* Perks */}

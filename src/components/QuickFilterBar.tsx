@@ -299,7 +299,7 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                   isGlobalAll ? 'w-32 h-52 rounded-[3.5rem]' : 'w-28 h-40 rounded-[2.2rem]',
                   isActive 
                     ? 'border-primary ring-2 ring-primary ring-offset-2 scale-[1.03] shadow-lg' 
-                    : 'border-border/60 opacity-90'
+                    : 'border-white/20 shadow-md'
                   )}
                   style={{ contain: 'paint', willChange: 'transform, opacity' }}
                 >
@@ -307,8 +307,8 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                     <div className={cn(
                       "absolute inset-0 z-10 transition-colors duration-300",
                       isActive 
-                        ? (isLight ? "bg-black/40" : "bg-black/60") 
-                        : (isLight ? "bg-black/75" : "bg-black/85")
+                        ? (isLight ? "bg-black/30" : "bg-black/40") 
+                        : (isLight ? "bg-black/45" : "bg-black/55")
                     )} />
 
                 <QuickFilterImage 
@@ -321,8 +321,8 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                       isActive ? "text-white" : "text-white/90"
                     )}>
                       <div className={cn(
-                        "mb-1 transition-all duration-300", 
-                        isActive && (isGlobalAll ? "scale-110 drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]" : "scale-115 drop-shadow-[0_0_15px_rgba(255,255,255,0.9)]")
+                        "mb-1 transition-all duration-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]", 
+                        isActive && (isGlobalAll ? "scale-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.9)]" : "scale-115 drop-shadow-[0_0_20px_rgba(255,255,255,1)]")
                       )}>
                         {option.icon}
                       </div>
@@ -383,15 +383,15 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
               'relative flex-shrink-0 w-32 h-52 rounded-[3.5rem] overflow-hidden border transition-all duration-200 group',
               clientIsAllSelected 
                 ? 'border-primary ring-2 ring-primary ring-offset-2 scale-[1.03] shadow-lg' 
-                : 'border-border/60 opacity-90'
+                : 'border-white/20 shadow-md'
             )}
             style={{ contain: 'paint', willChange: 'transform, opacity' }}
           >
             <div className={cn(
               "absolute inset-0 z-10 transition-colors duration-300",
               clientIsAllSelected 
-                ? (isLight ? "bg-black/40" : "bg-black/60") 
-                : (isLight ? "bg-black/75" : "bg-black/85")
+                ? (isLight ? "bg-black/30" : "bg-black/40") 
+                : (isLight ? "bg-black/45" : "bg-black/55")
             )} />
 
             <QuickFilterImage 
@@ -431,15 +431,15 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                   'relative flex-shrink-0 w-28 h-40 rounded-[2.2rem] overflow-hidden border transition-all duration-200 group',
                   isActive 
                     ? 'border-primary ring-1 ring-primary ring-offset-2 scale-[1.03] shadow-lg' 
-                    : 'border-border/60 opacity-90'
+                    : 'border-white/20 shadow-md'
                 )}
                 style={{ contain: 'paint', willChange: 'transform, opacity' }}
               >
                 <div className={cn(
                   "absolute inset-0 z-10 transition-colors duration-300",
                   isActive 
-                    ? (isLight ? "bg-black/40" : "bg-black/60") 
-                    : (isLight ? "bg-black/75" : "bg-black/85")
+                    ? (isLight ? "bg-black/30" : "bg-black/40") 
+                    : (isLight ? "bg-black/45" : "bg-black/55")
                 )} />
 
                 <QuickFilterImage 

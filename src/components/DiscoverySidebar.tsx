@@ -64,8 +64,8 @@ export const DiscoverySidebar = memo(({
       style={{ touchAction: 'manipulation' }}
       className={cn(
         "group relative rounded-2xl flex flex-col items-center justify-center transition-all pointer-events-auto",
-        "bg-black/40 backdrop-blur-md",
-        disabled ? "opacity-30 grayscale cursor-not-allowed" : "hover:bg-white/10 active:bg-white/20",
+        "bg-black/65 backdrop-blur-xl border border-white/10",
+        disabled ? "opacity-30 grayscale cursor-not-allowed" : "hover:bg-black/80 active:scale-90",
         size === 'large' ? "w-14 h-14" : "w-12 h-12"
       )}
     >
