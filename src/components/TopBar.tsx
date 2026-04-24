@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useAppNavigate } from "@/hooks/useAppNavigate";
 import { motion } from 'framer-motion';
-import { ChevronLeft, Radio, UserCircle } from 'lucide-react';
+import { ChevronLeft, UserCircle } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -12,9 +12,7 @@ import { haptics } from '@/utils/microPolish';
 import { ModeSwitcher } from './ModeSwitcher';
 import { NotificationPopover } from './NotificationPopover';
 import { ThemeToggle } from './ThemeToggle';
-import { useModalStore } from '@/state/modalStore';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
-import { AIListingTrigger } from './AIListingTrigger';
 
 interface TopBarProps {
   onNotificationsClick?: () => void;
@@ -175,22 +173,6 @@ function TopBarComponent({
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           {!minimal && (
             <>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); haptics.impact('light'); navigate('/radio'); }}
-                className={cn(
-                  "p-2 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 pointer-events-auto",
-                  "text-white/80 hover:text-white"
-                )}
-                style={glassPillStyle}
-                aria-label="Sentient Radio"
-              >
-                <Radio className="w-5 h-5" strokeWidth={2.5} />
-              </motion.button>
-
-              <AIListingTrigger glassPillStyle={glassPillStyle} />
-
               <ThemeToggle glassPillStyle={glassPillStyle} />
 
               <NotificationPopover glassPillStyle={glassPillStyle} />
