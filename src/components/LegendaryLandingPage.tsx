@@ -1,22 +1,21 @@
-import { memo, useState, useRef, useEffect } from 'react';
+import { memo, useState, useRef, useMemo, useEffect } from 'react';
 import { useAppNavigate } from "@/hooks/useAppNavigate";
 import {
-  motion, AnimatePresence
+  motion, useMotionValue, useTransform, AnimatePresence, PanInfo, animate
 } from 'framer-motion';
 import { triggerHaptic } from '@/utils/haptics';
 import { playRandomZen } from '@/utils/sounds';
 import {
-  Mail, Lock, User, ArrowLeft, Sparkles, ChevronRight, Check, LogIn, X, Eye, EyeOff, ShieldCheck, ShieldAlert, BadgeCheck
+  Mail, Lock, User, ArrowLeft, Sparkles, ChevronRight, Check, LogIn, X
 } from 'lucide-react';
 import { SwipessLogo } from './SwipessLogo';
-import { uiSounds } from '@/utils/uiSounds';
-import LandingBackgroundEffects from './LandingBackgroundEffects';
+import LandingBackgroundEffects, { type EffectMode } from './LandingBackgroundEffects';
+import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { loginSchema, signupSchema, forgotPasswordSchema } from '@/schemas/auth';
 import { cn } from '@/lib/utils';
-import { TERMS_PROTOCOL, PRIVACY_PROTOCOL } from './legal/LegalProtocols';
 
 /* ─── Types ─────────────────────────────────────────────── */
 type View = 'landing' | 'auth';
@@ -40,80 +39,114 @@ const GoogleIcon = () => (
 /* ─── Landing view ───────────────────────────────────────── */
 const LandingView = memo(({
   onEnterAuth,
-  onOpenLegal,
 }: {
   onEnterAuth: (mode: 'login' | 'signup') => void;
-  onOpenLegal: (modal: 'privacy' | 'terms') => void;
 }) => {
+  const x = useMotionValue(0);
+  const logoOpacity = useTransform(x, [0, 100, 220], [1, 0.6, 0]);
+  const logoScale = useTransform(x, [0, 120, 220], [1, 0.96, 0.86]);
+  const logoBlur = useTransform(x, [0, 100, 220], [0, 2, 14]);
+  const logoFilter = useTransform(logoBlur, (v) => `blur(${v}px)`);
+
+  const triggered = useRef(false);
+
+  const handleDragEnd = (_: any, info: PanInfo) => {
+    const shouldSwipe = info.offset.x > 100 || info.velocity.x > 400;
+    if (shouldSwipe) {
+      if (triggered.current) return;
+      triggered.current = true;
+      playRandomZen(0.45);
+      triggerHaptic('success');
+      animate(x, window.innerWidth + 100, { type: 'spring', stiffness: 200, damping: 22, mass: 0.6 });
+      setTimeout(() => onEnterAuth('login'), 280);
+    } else {
+      animate(x, 0, { type: 'spring', stiffness: 600, damping: 32, mass: 0.5 });
+    }
+  };
+
+  const handleTap = () => {
+    if (triggered.current) return;
+    triggered.current = true;
+    triggerHaptic('light');
+    animate(x, window.innerWidth + 100, { type: 'spring', stiffness: 200, damping: 22, mass: 0.6 });
+    setTimeout(() => onEnterAuth('login'), 280);
+  };
+
   return (
     <motion.div
       key="landing"
-      className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6"
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4"
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <div className="flex flex-col items-center justify-center w-full mb-10">
-        <motion.div
-          className="flex flex-col items-center"
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <SwipessLogo size="5xl" variant="gradient" />
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.6 }}
-            transition={{ delay: 1 }}
-            className="text-[10px] font-black uppercase tracking-[0.6em] mt-6 text-white italic"
-          >
-            Premium Discovery
-          </motion.p>
-        </motion.div>
-      </div>
-
       <motion.div
-        className="flex flex-col items-center gap-3 w-full max-w-[280px]"
+        drag="x"
+        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+        dragElastic={{ left: 0.05, right: 0.95 }}
+        onDragEnd={handleDragEnd}
+        onTap={handleTap}
+        style={{ x, opacity: logoOpacity, scale: logoScale, filter: logoFilter }}
+        className="cursor-grab active:cursor-grabbing touch-none select-none relative"
+      >
+        <div className="relative">
+          <SwipessLogo 
+            size="3xl" 
+            variant="white"
+            className="w-[65vw] max-w-[280px] sm:max-w-[340px] md:max-w-[420px]" 
+          />
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.2) 48%, rgba(255,255,255,0.05) 52%, transparent 70%)',
+            }}
+            animate={{ x: ['-120%', '180%'] }}
+            transition={{ duration: 2, ease: 'easeInOut', repeat: Infinity, repeatDelay: 6 }}
+          />
+        </div>
+      </motion.div>
+
+      {/* ─── Fix #4: Clear CTA buttons ─── */}
+      <motion.div
+        className="mt-12 flex flex-col items-center gap-3 w-full max-w-[280px]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.6 }}
       >
         <button
-          onClick={() => { uiSounds.playTap(); playRandomZen(0.2); triggerHaptic('medium'); onEnterAuth('login'); }}
-          className="w-full h-[52px] rounded-2xl bg-white text-black font-black uppercase tracking-[0.25em] text-[14px] shadow-[0_20px_40px_rgba(255,255,255,0.25)] active:scale-[0.97] transition-all flex items-center justify-center gap-2.5 border-none"
+          onClick={() => { triggerHaptic('medium'); onEnterAuth('login'); }}
+          className="w-full h-14 rounded-[2rem] bg-[#FF4D00] text-white font-black uppercase tracking-[0.25em] text-[12px] shadow-[0_15px_45px_rgba(255,77,0,0.3)] active:scale-[0.97] transition-all flex items-center justify-center gap-3"
         >
-          <LogIn className="w-4 h-4" strokeWidth={3} />
+          <LogIn className="w-4 h-4" />
           Sign In
         </button>
         <button
-          onClick={() => { uiSounds.playTap(); playRandomZen(0.2); triggerHaptic('medium'); onEnterAuth('signup'); }}
-          className="w-full h-[52px] rounded-2xl bg-white text-black font-black uppercase tracking-[0.25em] text-[14px] shadow-[0_20px_40px_rgba(255,255,255,0.25)] active:scale-[0.97] transition-all flex items-center justify-center gap-2.5 border-none"
+          onClick={() => { triggerHaptic('medium'); onEnterAuth('signup'); }}
+          className="w-full h-14 rounded-[2rem] bg-white/10 backdrop-blur-md border border-white/15 text-white font-black uppercase tracking-[0.25em] text-[12px] active:scale-[0.97] transition-all flex items-center justify-center gap-3 hover:bg-white/15"
         >
-          <Sparkles className="w-4 h-4 text-black" strokeWidth={3} />
+          <Sparkles className="w-4 h-4" />
           Create Account
         </button>
-
-        <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-[0.4em] text-white/60 italic mt-6">
-          <button onClick={() => onOpenLegal('privacy')} className="hover:text-white transition-colors">Privacy</button>
-          <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-          <button onClick={() => onOpenLegal('terms')} className="hover:text-white transition-colors">Terms</button>
-          <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-          <button onClick={() => onOpenLegal('terms')} className="hover:text-white transition-colors">Legal Hub</button>
-        </div>
+        <motion.p
+          animate={{ opacity: [0.15, 0.4, 0.15] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="mt-2 text-[9px] uppercase tracking-[0.35em] font-bold text-white/30 italic"
+        >
+          or swipe logo to enter →
+        </motion.p>
       </motion.div>
     </motion.div>
   );
 });
 
-/* ─── Social auth buttons ─── */
+/* ─── Fix #2 & #3: Apple-HIG-compliant social auth buttons ── */
 const AppleAuthButton = ({ onClick }: { onClick: () => void }) => (
   <button
-    type="button"
     onClick={onClick}
-    className="group flex h-[44px] w-full items-center justify-center gap-3 rounded-xl bg-white text-black active:scale-[0.97] transition-all shadow-[0_8px_20px_rgba(0,0,0,0.1)] border border-white/20 hover:bg-white/90"
+    className="group flex h-[52px] w-full items-center justify-center gap-3 rounded-2xl bg-white text-black active:scale-[0.97] transition-all shadow-lg border-none"
   >
     <AppleIcon />
-    <span className="text-[13px] font-black uppercase tracking-widest leading-none pt-0.5">
+    <span className="text-[14px] font-bold tracking-tight !text-black">
       Sign in with Apple
     </span>
   </button>
@@ -121,12 +154,11 @@ const AppleAuthButton = ({ onClick }: { onClick: () => void }) => (
 
 const GoogleAuthButton = ({ onClick }: { onClick: () => void }) => (
   <button
-    type="button"
     onClick={onClick}
-    className="group flex h-[44px] w-full items-center justify-center gap-3 rounded-xl bg-white text-black active:scale-[0.97] transition-all shadow-[0_8px_20px_rgba(0,0,0,0.1)] border border-white/20 hover:bg-white/90"
+    className="group flex h-[52px] w-full items-center justify-center gap-3 rounded-2xl bg-[#141415] border border-white/10 hover:border-white/20 active:scale-[0.97] transition-all shadow-lg"
   >
     <GoogleIcon />
-    <span className="text-[13px] font-black uppercase tracking-widest leading-none pt-0.5">
+    <span className="text-[14px] font-bold tracking-tight !text-white">
       Continue with Google
     </span>
   </button>
@@ -143,10 +175,9 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [selectedRole, setSelectedRole] = useState<'client' | 'owner'>('client');
-  const [showPassword, setShowPassword] = useState(false);
   const { signIn, signUp, signInWithOAuth } = useAuth();
 
+  /* Clear field errors when switching modes */
   useEffect(() => {
     setFieldErrors({});
   }, [isLogin, isForgotPassword]);
@@ -161,7 +192,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
-      toast({ title: 'Swipess Link Sent', description: "Check your neural inbox for reset parameters." });
+      toast({ title: 'Reset Link Sent', description: "Check your inbox for reset instructions." });
       setIsForgotPassword(false);
     } catch (error: any) {
       if (error.errors) {
@@ -176,6 +207,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
     }
   };
 
+  /* ─── Fix #7: Inline validation before submit ─── */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isForgotPassword) return handleForgotPassword(e);
@@ -184,11 +216,35 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
     triggerHaptic('medium');
     try {
       if (isLogin) {
+        const errs: Record<string, string> = {};
+        if (!email.trim()) errs.email = 'Email is required';
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = 'Enter a valid email address';
+        if (!password.trim()) errs.password = 'Password is required';
+        if (Object.keys(errs).length > 0) {
+          setFieldErrors(errs);
+          setIsLoading(false);
+          triggerHaptic('error');
+          return;
+        }
         const validated = loginSchema.parse({ email, password });
         await signIn(validated.email, validated.password);
       } else {
+        const errs: Record<string, string> = {};
+        if (!name.trim()) errs.name = 'Name is required';
+        if (!email.trim()) errs.email = 'Email is required';
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = 'Enter a valid email address';
+        if (!password.trim()) errs.password = 'Password is required';
+        else if (password.length < 6) errs.password = 'Must be at least 6 characters';
+        if (!confirmPassword.trim()) errs.confirmPassword = 'Please confirm your password';
+        else if (password !== confirmPassword) errs.confirmPassword = 'Passwords do not match';
+        if (Object.keys(errs).length > 0) {
+          setFieldErrors(errs);
+          setIsLoading(false);
+          triggerHaptic('error');
+          return;
+        }
         const validated = signupSchema.parse({ name, email, password });
-        await signUp(validated.email, validated.password, selectedRole, validated.name);
+        await signUp(validated.email, validated.password, 'client', validated.name);
       }
     } catch (error: any) {
       if (error.errors) {
@@ -204,51 +260,55 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
   };
 
   const handleSocialLogin = async (provider: 'apple' | 'google') => {
-    uiSounds.playTap();
-    playRandomZen(0.2);
     triggerHaptic('light');
-    await signInWithOAuth(provider, selectedRole);
+    await signInWithOAuth(provider, 'client');
   };
 
   return (
     <motion.div
       key="auth"
-      className="absolute inset-0 flex flex-col items-center justify-center p-4 z-20 overflow-y-auto no-scrollbar"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      className="absolute inset-0 flex flex-col items-center justify-center p-6 z-20 overflow-y-auto"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 1.1 }}
     >
-      <div className="w-full max-w-sm bg-[#0d0d0f]/90 backdrop-blur-[40px] border border-white/10 rounded-[2rem] p-4 sm:p-5 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] relative overflow-hidden shrink-0">
+      {/* 🛸 GLASS FORM PANEL */}
+      <div className="w-full max-w-sm bg-[#0d0d0f]/80 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-7 shadow-2xl relative overflow-hidden my-auto">
         
         <button
-          onClick={() => { uiSounds.playTap(); playRandomZen(0.15); triggerHaptic('light'); if (isForgotPassword) { setIsForgotPassword(false); } else { onBack(); } }}
-          className="absolute top-4 left-4 w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-black border shadow-xl active:scale-90 transition-all z-20"
+          onClick={() => { triggerHaptic('light'); isForgotPassword ? setIsForgotPassword(false) : onBack(); }}
+          className="absolute top-5 left-5 w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 border border-white/5 active:scale-90 transition-all z-20"
           aria-label="Go back"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4" />
         </button>
 
-        <div className="text-center mb-4 pt-2 flex flex-col items-center">
-          <SwipessLogo size="xl" variant="white" className="mb-4 shrink-0 mx-auto drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]" />
+        <div className="text-center mb-5 pt-4">
+          <div className="flex justify-center mb-4">
+            <SwipessLogo size="md" variant="white" />
+          </div>
 
           {isForgotPassword ? (
             <>
-              <h1 className="text-xl font-black italic tracking-tighter text-white uppercase leading-none mb-1.5">
+              <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase leading-none mb-2">
                 Reset Password
               </h1>
-              <p className="text-[8px] font-black tracking-[0.2em] text-white/30 uppercase">
-                Enter your email link
+              <p className="text-[10px] font-bold tracking-[0.2em] text-white/35 uppercase">
+                Enter your email to receive a reset link
               </p>
             </>
           ) : (
             <>
-              <div className="flex w-full items-center justify-center gap-1.5 bg-black/80 backdrop-blur-md rounded-[1.5rem] p-1 mb-4 border border-white/5 relative">
+              {/* ─── Fix #1: Prominent Login / Sign Up tab toggle ─── */}
+              <div className="flex items-center justify-center gap-1 bg-white/5 rounded-2xl p-1 mb-3">
                 <button
                   type="button"
                   onClick={() => { triggerHaptic('light'); setIsLogin(true); setFieldErrors({}); }}
                   className={cn(
-                    "flex-1 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 z-10",
-                    isLogin ? "text-black" : "text-white/80 hover:text-white"
+                    "flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all",
+                    isLogin
+                      ? "bg-[#FF4D00] text-white shadow-lg"
+                      : "text-white/40 hover:text-white/60"
                   )}
                 >
                   Sign In
@@ -257,220 +317,154 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   type="button"
                   onClick={() => { triggerHaptic('light'); setIsLogin(false); setFieldErrors({}); }}
                   className={cn(
-                    "flex-1 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 z-10",
-                    !isLogin ? "text-black" : "text-white/80 hover:text-white"
+                    "flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all",
+                    !isLogin
+                      ? "bg-[#FF4D00] text-white shadow-lg"
+                      : "text-white/40 hover:text-white/60"
                   )}
                 >
                   Sign Up
                 </button>
-                <motion.div 
-                  className="absolute top-1 bottom-1 rounded-[1.1rem] bg-white shadow-[0_0_30px_rgba(255,255,255,0.6)]"
-                  initial={false}
-                  animate={{ 
-                    left: isLogin ? '4px' : 'calc(50% + 2px)',
-                    width: 'calc(50% - 6px)'
-                  }}
-                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                />
               </div>
-              <p className="text-[8px] font-black tracking-[0.25em] text-white/90 uppercase">
-                {isLogin ? 'Welcome back' : 'Start your journey'}
+              <p className="text-[10px] font-bold tracking-[0.2em] text-white/35 uppercase">
+                {isLogin ? 'Welcome back' : 'Create your account'}
               </p>
             </>
           )}
         </div>
 
-        {!isForgotPassword && (
-          <div className="mb-4 space-y-2">
-            <div className="grid grid-cols-1 gap-2">
-              <AppleAuthButton onClick={() => handleSocialLogin('apple')} />
-              <GoogleAuthButton onClick={() => handleSocialLogin('google')} />
-            </div>
-            
-            <div className="flex items-center gap-3 pt-1">
-               <div className="flex-1 h-[1px] bg-white/5" />
-               <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">or</span>
-               <div className="flex-1 h-[1px] bg-white/5" />
-            </div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-2.5" noValidate>
+        {/* ─── Fix #5 & #7: Standard labels + inline validation ─── */}
+        <form onSubmit={handleSubmit} className="space-y-3" noValidate>
           {!isLogin && !isForgotPassword && (
-             <div className="flex flex-col gap-1 mb-1">
-                <p className="text-[7px] font-black uppercase tracking-[0.4em] text-white/50 ml-1">Identity Protocol</p>
-                <div className="grid grid-cols-2 gap-2">
-                   <button
-                     type="button"
-                     onClick={() => { triggerHaptic('light'); setSelectedRole('client'); }}
-                     className={cn(
-                       "py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border",
-                       selectedRole === 'client' ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.4)]" : "bg-white/10 text-white/60 border-white/10 hover:bg-white/20"
-                     )}
-                   >
-                     Client
-                   </button>
-                   <button
-                     type="button"
-                     onClick={() => { triggerHaptic('light'); setSelectedRole('owner'); }}
-                     className={cn(
-                       "py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border",
-                       selectedRole === 'owner' ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.4)]" : "bg-white/10 text-white/60 border-white/10 hover:bg-white/20"
-                     )}
-                   >
-                     Owner
-                   </button>
-                </div>
-             </div>
+            <div>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Input
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setFieldErrors(prev => ({ ...prev, name: '' })); }}
+                  placeholder="Your Name"
+                  autoComplete="name"
+                  className={cn(
+                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/30 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
+                    fieldErrors.name && "border-red-500/70 focus:border-red-500"
+                  )}
+                />
+              </div>
+              {fieldErrors.name && <p className="text-red-400 text-[10px] font-semibold mt-1 ml-3 animate-in fade-in slide-in-from-top-1">{fieldErrors.name}</p>}
+            </div>
           )}
 
-          <div className="space-y-3.5">
-            {!isLogin && !isForgotPassword && (
-              <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 group-focus-within:text-white transition-colors">
-                  <User className="w-4 h-4" />
-                </div>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Full Name"
-                  className={cn(
-                    "w-full h-[44px] bg-white/[0.08] border border-white/10 rounded-xl pl-10 pr-4 text-[13px] font-bold text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 focus:bg-white/[0.12] transition-all",
-                    fieldErrors.name && "border-red-500/50 bg-red-500/5"
-                  )}
-                />
-                {fieldErrors.name && <p className="absolute -bottom-4 left-3 text-[10px] font-bold text-red-400 uppercase tracking-tight">{fieldErrors.name}</p>}
-              </div>
-            )}
-
-            <div className="relative group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 group-focus-within:text-white transition-colors">
-                <Mail className="w-4 h-4" />
-              </div>
-              <input
+          <div>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email Protocol"
+                onChange={(e) => { setEmail(e.target.value); setFieldErrors(prev => ({ ...prev, email: '' })); }}
+                placeholder="Email"
+                autoComplete="email"
                 className={cn(
-                  "w-full h-[44px] bg-white/[0.08] border border-white/10 rounded-xl pl-10 pr-4 text-[13px] font-bold text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 focus:bg-white/[0.12] transition-all",
-                  fieldErrors.email && "border-red-500/50 bg-red-500/5"
+                  "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/30 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
+                  fieldErrors.email && "border-red-500/70 focus:border-red-500"
                 )}
               />
-              {fieldErrors.email && <p className="absolute -bottom-4 left-3 text-[10px] font-bold text-red-400 uppercase tracking-tight">{fieldErrors.email}</p>}
             </div>
+            {fieldErrors.email && <p className="text-red-400 text-[10px] font-semibold mt-1 ml-3 animate-in fade-in slide-in-from-top-1">{fieldErrors.email}</p>}
+          </div>
 
-            {!isForgotPassword && (
-              <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 group-focus-within:text-white transition-colors">
-                  <Lock className="w-4 h-4" />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
+          {!isForgotPassword && (
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Input
+                  type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Alpha-Numeric Key"
+                  onChange={(e) => { setPassword(e.target.value); setFieldErrors(prev => ({ ...prev, password: '' })); }}
+                  placeholder="Password"
+                  autoComplete={isLogin ? "current-password" : "new-password"}
                   className={cn(
-                    "w-full h-[44px] bg-white/[0.08] border border-white/10 rounded-xl pl-10 pr-4 text-[13px] font-bold text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 focus:bg-white/[0.12] transition-all",
-                    fieldErrors.password && "border-red-500/50 bg-red-500/5"
+                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/30 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
+                    fieldErrors.password && "border-red-500/70 focus:border-red-500"
                   )}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-                {fieldErrors.password && <p className="absolute -bottom-4 left-3 text-[10px] font-bold text-red-400 uppercase tracking-tight">{fieldErrors.password}</p>}
               </div>
-            )}
+              {fieldErrors.password && <p className="text-red-400 text-[10px] font-semibold mt-1 ml-3 animate-in fade-in slide-in-from-top-1">{fieldErrors.password}</p>}
+            </div>
+          )}
 
-            {!isLogin && !isForgotPassword && (
-              <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 group-focus-within:text-white transition-colors">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <input
+          {!isLogin && !isForgotPassword && (
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Input
                   type="password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Verify Security Key"
+                  onChange={(e) => { setConfirmPassword(e.target.value); setFieldErrors(prev => ({ ...prev, confirmPassword: '' })); }}
+                  placeholder="Confirm Password"
+                  autoComplete="new-password"
                   className={cn(
-                    "w-full h-[44px] bg-white/[0.08] border border-white/10 rounded-xl pl-10 pr-4 text-[13px] font-bold text-white placeholder:text-white/50 focus:outline-none focus:border-white/40 focus:bg-white/[0.12] transition-all",
-                    fieldErrors.confirmPassword && "border-red-500/50 bg-red-500/5"
+                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/30 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
+                    fieldErrors.confirmPassword && "border-red-500/70 focus:border-red-500"
                   )}
                 />
-                {fieldErrors.confirmPassword && <p className="absolute -bottom-4 left-3 text-[10px] font-bold text-red-400 uppercase tracking-tight">{fieldErrors.confirmPassword}</p>}
               </div>
-            )}
-          </div>
+              {fieldErrors.confirmPassword && <p className="text-red-400 text-[10px] font-semibold mt-1 ml-3 animate-in fade-in slide-in-from-top-1">{fieldErrors.confirmPassword}</p>}
+            </div>
+          )}
 
           {isLogin && !isForgotPassword && (
             <div className="flex items-center justify-between px-1 pt-1">
                <button 
                  type="button" 
                  onClick={() => { triggerHaptic('light'); setRememberMe(!rememberMe); }}
-                 className="flex items-center gap-1.5 group transition-all"
+                 className="flex items-center gap-2 group transition-all"
                >
                   <div className={cn(
-                    "w-4 h-4 rounded-md border-2 transition-all flex items-center justify-center",
-                    rememberMe ? "bg-primary border-primary scale-110" : "border-white/10 group-hover:border-white/20"
+                    "w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center",
+                    rememberMe ? "bg-[#FF4D00] border-[#FF4D00] scale-110" : "border-white/10 group-hover:border-white/20"
                   )}>
-                    {rememberMe && <Check className="w-2.5 h-2.5 text-black stroke-[4px]" />}
+                    {rememberMe && <Check className="w-3 h-3 text-white stroke-[4px]" />}
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/80 group-hover:text-white transition-colors">Remember</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 group-hover:text-white transition-colors">Remember me</span>
                </button>
                
+               {/* ─── Fix #6: Single clear "Forgot Password?" link ─── */}
                <button 
                  type="button" 
                  onClick={() => { triggerHaptic('light'); setIsForgotPassword(true); }}
-                 className="text-[10px] font-black uppercase tracking-widest text-white hover:text-primary transition-all underline underline-offset-4"
+                 className="text-[10px] font-bold uppercase tracking-widest text-[#FF4D00] hover:text-[#FF4D00]/80 transition-all"
                >
-                 Forgot?
+                 Forgot Password?
                </button>
-            </div>
-          )}
-
-          {!isLogin && !isForgotPassword && (
-            <div className="text-[8px] font-bold uppercase tracking-widest text-white/60 text-center px-2 leading-relaxed mt-1">
-              By joining, you agree to{' '}
-              <button 
-                type="button" 
-                onClick={() => { triggerHaptic('light'); (window as any).dispatchEvent(new CustomEvent('open-legal', { detail: 'terms' })); }}
-                className="text-white hover:text-primary transition-colors underline underline-offset-2"
-              >
-                Terms
-              </button>
-              {' '}and{' '}
-              <button 
-                type="button" 
-                onClick={() => { triggerHaptic('light'); (window as any).dispatchEvent(new CustomEvent('open-legal', { detail: 'privacy' })); }}
-                className="text-white hover:text-primary transition-colors underline underline-offset-2"
-              >
-                Privacy
-              </button>
             </div>
           )}
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-[52px] rounded-2xl bg-white text-black font-black uppercase tracking-[0.25em] text-[13px] shadow-[0_20px_40px_rgba(255,255,255,0.25)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 border-none mt-4 disabled:opacity-60 disabled:pointer-events-none"
+            className="w-full h-[52px] rounded-2xl bg-[#FF4D00] text-white font-black uppercase tracking-[0.25em] text-[13px] shadow-[0_12px_40px_rgba(255,77,0,0.35)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 border-none mt-3 disabled:opacity-50 disabled:pointer-events-none"
           >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-black/20 border-t-black animate-spin rounded-full" />
-            ) : (
-              <>
-                <LogIn className="w-4 h-4" strokeWidth={3} />
-                <span>
-                  {isForgotPassword ? 'Reset Terminal' : isLogin ? 'Launch Swipess' : 'Create Account'}
-                </span>
-              </>
-            )}
+            <Sparkles className="w-4 h-4 !text-white" />
+            <span className="drop-shadow-md !text-white">
+              {isLoading ? 'Please wait...' : isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In' : 'Create Account'}
+            </span>
           </button>
         </form>
+
+        {!isForgotPassword && (
+          <div className="mt-5 space-y-3">
+            <div className="flex items-center gap-4">
+               <div className="flex-1 h-[1px] bg-white/5" />
+               <span className="text-[9px] font-bold text-white/20 uppercase tracking-[0.2em]">or continue with</span>
+               <div className="flex-1 h-[1px] bg-white/5" />
+            </div>
+            
+            <div className="grid grid-cols-1 gap-2.5">
+              <AppleAuthButton onClick={() => handleSocialLogin('apple')} />
+              <GoogleAuthButton onClick={() => handleSocialLogin('google')} />
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );
@@ -478,65 +472,38 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
 
 /* ─── Root component ─────────────────────────────────────── */
 function LegendaryLandingPage() {
+  const { navigate } = useAppNavigate();
   const [view, setView] = useState<View>('landing');
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [legalModal, setLegalModal] = useState<'privacy' | 'terms' | null>(null);
 
-  useEffect(() => {
-    const handleOpenLegal = (e: any) => setLegalModal(e.detail);
-    window.addEventListener('open-legal', handleOpenLegal);
-    return () => window.removeEventListener('open-legal', handleOpenLegal);
-  }, []);
-
-  // Unlock Web Audio + HTMLAudio policy on very first tap anywhere on the page
-  useEffect(() => {
-    let unlocked = false;
-    const unlock = () => {
-      if (unlocked) return;
-      unlocked = true;
-      try {
-        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-        const ctx = new AudioContextClass();
-        const buf = ctx.createBuffer(1, 1, 22050);
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-        src.connect(ctx.destination);
-        src.start(0);
-        if (ctx.state === 'suspended') ctx.resume();
-      } catch (_) {}
-      // Also unlock HTMLAudio by playing a 0-duration silent audio
-      try {
-        const silent = new Audio();
-        silent.play().catch(() => {});
-      } catch (_) {}
-    };
-    document.addEventListener('pointerdown', unlock, { once: true, passive: true });
-    document.addEventListener('touchstart', unlock, { once: true, passive: true });
-    return () => {
-      document.removeEventListener('pointerdown', unlock);
-      document.removeEventListener('touchstart', unlock);
-    };
-  }, []);
-
   return (
     <div className="h-screen h-dvh relative overflow-hidden bg-black text-white">
+      {/* 🛸 ATMOSPHERIC BACKGROUND */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(var(--color-brand-primary-rgb),0.08)_0%,transparent_70%)]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(235,72,152,0.08)_0%,transparent_70%)]" />
         <LandingBackgroundEffects mode={view === 'auth' ? 'off' : 'stars'} isLightTheme={false} />
       </div>
 
       <AnimatePresence mode="wait">
         {view === 'landing' ? (
-          <LandingView 
-            key="landing" 
-            onEnterAuth={(mode) => { setAuthMode(mode); setView('auth'); }} 
-            onOpenLegal={(modal) => setLegalModal(modal)}
-          />
+          <LandingView key="landing" onEnterAuth={(mode) => { setAuthMode(mode); setView('auth'); }} />
         ) : (
           <AuthView key="auth" onBack={() => setView('landing')} initialMode={authMode} />
         )}
       </AnimatePresence>
 
+      {/* 🛸 LEGAL FOOTER */}
+      <div className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-1.5 opacity-30 hover:opacity-80 transition-opacity">
+        <div className="flex items-center gap-5 text-[9px] font-black uppercase tracking-[0.3em] text-white italic">
+          <button onClick={() => setLegalModal('privacy')} className="hover:text-[#EB4898] transition-colors">Privacy</button>
+          <div className="w-1 h-1 rounded-full bg-white/20" />
+          <button onClick={() => setLegalModal('terms')} className="hover:text-[#EB4898] transition-colors">Terms</button>
+        </div>
+        <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 italic">© 2026 Swipess</p>
+      </div>
+
+      {/* 🛸 LEGAL POPUP MODAL */}
       <AnimatePresence>
         {legalModal && (
           <motion.div
@@ -544,7 +511,7 @@ function LegendaryLandingPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="absolute inset-x-0 bottom-0 top-10 z-[100] bg-black/60 backdrop-blur-[40px] saturate-[180%] rounded-t-[2.5rem] border-t border-white/20 flex flex-col pt-10 px-6 pb-8 shadow-[0_-20px_50px_rgba(0,0,0,0.8)]"
+            className="absolute inset-x-0 bottom-0 top-10 z-[100] bg-black/95 backdrop-blur-3xl rounded-t-[2.5rem] border-t border-white/10 flex flex-col pt-10 px-6 pb-8 shadow-[0_-20px_50px_rgba(0,0,0,0.8)]"
           >
             <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-white/20 rounded-full" />
             
@@ -562,46 +529,35 @@ function LegendaryLandingPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto pr-2 space-y-6 text-white/80 scrollbar-none pb-12">
-               {(() => {
-                 const protocol = legalModal === 'terms' ? TERMS_PROTOCOL : PRIVACY_PROTOCOL;
-                 return (
-                   <div className="space-y-8">
-                     <div className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/5">
-                        <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
-                           <ShieldAlert className="w-6 h-6 text-primary" />
-                        </div>
-                        <div>
-                           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-0.5">Integrity Sync</p>
-                           <p className="text-[12px] font-bold text-white/90 leading-tight">{protocol.introduction}</p>
-                        </div>
-                     </div>
-
-                     <div className="h-px bg-white/5 mx-2" />
-
-                     {protocol.sections.map((section) => (
-                       <div key={section.id} className="group transition-all">
-                         <div className="flex items-center gap-3 mb-3">
-                           <div className="px-2.5 py-1 rounded-md bg-white/10 text-[9px] font-black tracking-widest text-white/50 group-hover:text-white group-hover:bg-primary/40 transition-colors">
-                             SEC-{section.id}
-                           </div>
-                           <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-white/90 group-hover:text-primary transition-colors">{section.title}</h3>
-                         </div>
-                         <p className="text-[13px] font-medium opacity-60 leading-relaxed group-hover:opacity-100 transition-opacity">
-                           {section.content}
-                         </p>
-                       </div>
-                     ))}
-
-                     <div className="pt-6 border-t border-white/5 flex items-center justify-between opacity-30">
-                        <div className="flex items-center gap-2">
-                           <BadgeCheck className="w-3 h-3" />
-                           <span className="text-[8px] font-black uppercase tracking-widest">Protocol Verified</span>
-                        </div>
-                        <span className="text-[8px] font-black uppercase tracking-widest">Updated: {protocol.lastUpdated}</span>
-                     </div>
-                   </div>
-                 );
-               })()}
+               {legalModal === 'terms' ? (
+                 <div className="space-y-5">
+                    <p className="text-sm font-bold leading-relaxed text-white">By initializing the Swipess nexus, you agree to be bound by these Legal Protocols. Access is denied to non-compliant entities.</p>
+                    <div className="h-px bg-white/10 my-6" />
+                    
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#EB4898] mb-2">01 — Entity Eligibility</h3>
+                    <p className="text-sm opacity-80 leading-relaxed">Minimum age of 18 required. You must possess the legal authority to enter binding digital agreements.</p>
+                    
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#EB4898] mt-6 mb-2">02 — Identity Security</h3>
+                    <p className="text-sm opacity-80 leading-relaxed">You are solely responsible for the encryption integrity of your access credentials. Notify the Registry immediately upon unauthorized sync.</p>
+                    
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#EB4898] mt-6 mb-2">03 — Prohibited Acts</h3>
+                    <p className="text-sm opacity-80 leading-relaxed">Entities shall not transmit fraudulent logs, harass other users, or bypass platform security. Violations result in immediate ban.</p>
+                 </div>
+               ) : (
+                 <div className="space-y-5">
+                    <p className="text-sm font-bold leading-relaxed text-white">We value your privacy and security. Swipess uses advanced end-to-end encryption for sensitive data.</p>
+                    <div className="h-px bg-white/10 my-6" />
+                    
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#EB4898] mb-2">01 — Data Collection</h3>
+                    <p className="text-sm opacity-80 leading-relaxed">We collect email, authentication tokens, and basic interaction data necessary to operate the matching engine.</p>
+                    
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#EB4898] mt-6 mb-2">02 — Data Sharing</h3>
+                    <p className="text-sm opacity-80 leading-relaxed">Your personal identity is strictly shielded. We do not sell your data to external data brokers.</p>
+                    
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#EB4898] mt-6 mb-2">03 — Asset Privacy</h3>
+                    <p className="text-sm opacity-80 leading-relaxed">Location and discovery history is kept private and only utilized for matchmaking algorithms.</p>
+                 </div>
+               )}
             </div>
 
             <div className="shrink-0 pt-4 flex flex-col gap-3">
@@ -610,7 +566,7 @@ function LegendaryLandingPage() {
                    triggerHaptic('medium');
                    setLegalModal(null);
                  }} 
-                 className="w-full h-14 bg-primary text-black font-black uppercase italic tracking-widest rounded-2xl shadow-[0_0_30px_rgba(var(--color-brand-primary-rgb),0.3)] hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
+                 className="w-full h-14 bg-[#EB4898] text-white font-black uppercase italic tracking-widest rounded-2xl shadow-[0_0_30px_rgba(235,72,152,0.3)] hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
                >
                  <Check className="w-5 h-5" /> I Accept & Acknowledge
                </button>
