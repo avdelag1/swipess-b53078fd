@@ -51,7 +51,7 @@ function SwipessLogoComponent({
           ) : (
             <div className="relative">
               <img
-                src={isIcon ? "/icons/Swipess-logo-transparent.png" : "/icons/Swipess-wordmark-transparent.png"}
+                src={isIcon ? "/icons/Swipess-logo.png" : "/icons/Swipess-wordmark-white.png"}
                 alt="Swipess"
                 draggable={false}
                 fetchPriority="high"
