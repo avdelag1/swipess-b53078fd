@@ -55,9 +55,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.9 }}
-        onPointerDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        onClick={(e) => {
           handleModeSwitch('client');
         }}
         disabled={!canSwitchMode || isSwitching}
@@ -77,9 +75,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.9 }}
-        onPointerDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        onClick={(e) => {
           handleModeSwitch('owner');
         }}
         disabled={!canSwitchMode || isSwitching}

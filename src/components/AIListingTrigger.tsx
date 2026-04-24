@@ -61,6 +61,7 @@ export function AIListingTrigger({ glassPillStyle }: AIListingTriggerProps) {
           onClick={() => {
             triggerHaptic('light');
           }}
+          style={glassPillStyle}
           className={cn(
             "w-11 h-11 flex items-center justify-center p-0 rounded-full relative group transition-all duration-500",
             "bg-gradient-to-br from-indigo-600 via-purple-600 to-rose-500 shadow-[0_0_15px_rgba(99,102,241,0.4)]"

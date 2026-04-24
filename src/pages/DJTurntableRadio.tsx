@@ -96,14 +96,23 @@ export default function DJTurntableRadio() {
       {/* 🛸 Global AtmosphericLayer is handled by PersistentDashboardLayout */}
 
       {/* ── Radio Info & List Toggle ── */}
-      <div className="flex items-center justify-between px-6 pt-24 pb-2 z-20 relative">
-        <div className="flex flex-col">
-          <p className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
-            {state.currentStation?.frequency || '93.1'} FM
-          </p>
-          <h2 className={cn("text-xl font-black truncate tracking-tighter", isDark ? "text-white" : "text-black")}>
-            {state.currentStation?.name || 'Radio'}
-          </h2>
+      <div className="flex items-center justify-between px-6 pt-12 pb-2 z-20 relative">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => { triggerHaptic('light'); navigate(-1); }}
+            className={cn('w-12 h-12 flex items-center justify-center rounded-2xl', neumBtn, neumBtnActive)}
+          >
+            <ArrowLeft className={cn("w-6 h-6", isDark ? "text-white" : "text-black")} />
+          </button>
+          
+          <div className="flex flex-col">
+            <p className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
+              {state.currentStation?.frequency || '93.1'} FM
+            </p>
+            <h2 className={cn("text-xl font-black truncate tracking-tighter", isDark ? "text-white" : "text-black")}>
+              {state.currentStation?.name || 'Radio'}
+            </h2>
+          </div>
         </div>
 
         <button 
@@ -203,13 +212,13 @@ export default function DJTurntableRadio() {
               className={cn(
                 'w-20 h-20 rounded-full flex items-center justify-center relative transition-all duration-300',
                 neumBtnActive,
-                'bg-white border-2 transition-all duration-300',
-                isDark ? 'shadow-[0_0_50px_rgba(255,255,255,0.4)] border-white' : 'shadow-[0_15px_45px_rgba(0,0,0,0.12)] border-slate-200'
+                'bg-primary border-none transition-all duration-300',
+                isDark ? 'shadow-[0_0_50px_rgba(var(--color-primary),0.4)]' : 'shadow-[0_15px_45px_rgba(var(--color-primary),0.12)]'
               )}
             >
               {state.isPlaying
-                ? <Pause className="w-8 h-8 text-black" fill="currentColor" />
-                : <Play className="w-8 h-8 ml-1 text-black" fill="currentColor" />
+                ? <Pause className="w-8 h-8 text-white" fill="currentColor" />
+                : <Play className="w-8 h-8 ml-1 text-white" fill="currentColor" />
               }
             </button>
 

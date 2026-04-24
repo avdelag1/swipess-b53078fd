@@ -19,6 +19,7 @@ import { useInstantReactivity } from '@/hooks/useInstantReactivity';
 import { cn } from '@/lib/utils';
 import { SentientHud } from './SentientHud';
 import { VapIdCardModal } from './VapIdCardModal';
+import { RadioMiniPlayer } from './RadioMiniPlayer';
 
 const NotificationSystem = lazy(() =>
   import('@/components/NotificationSystem').then(m => ({ default: m.NotificationSystem }))
@@ -41,7 +42,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { user } = useAuth();
   const { navigate } = useAppNavigate();
   const modalStore = useModalStore();
-  const { showAIChat } = modalStore;
+  const { showAIChat, showAIListing } = modalStore;
   const { activeMode } = useActiveMode();
   const { isRefreshing, pullDistance, triggered } = usePullToRefresh();
 
@@ -93,8 +94,8 @@ export function AppLayout({ children }: AppLayoutProps) {
   }, [location.pathname]);
 
   const isFullScreen = useMemo(() => {
-    return isCameraRoute || showAIChat;
-  }, [isCameraRoute, showAIChat]);
+    return isCameraRoute || showAIChat || showAIListing || isRadioRoute;
+  }, [isCameraRoute, showAIChat, showAIListing, isRadioRoute]);
 
   const handleFilterClick = () => {
     const role = userRole === 'admin' ? 'admin' : activeMode;
@@ -164,6 +165,9 @@ export function AppLayout({ children }: AppLayoutProps) {
           />
         </SentientHud>
       )}
+
+      {/* 📻 CONNECTED RADIO: Floating player bubble */}
+      <RadioMiniPlayer />
     </div>
   );
 }

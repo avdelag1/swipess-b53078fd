@@ -312,9 +312,7 @@ export function NotificationPopover({ className, children, glassPillStyle }: Not
         "touch-manipulation"
       )}
       style={glassPillStyle}
-      onPointerDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+      onClick={(e) => {
         haptics.tap();
         setIsOpen(true);
       }}

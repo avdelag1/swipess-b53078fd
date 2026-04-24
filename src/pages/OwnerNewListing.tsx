@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CategorySelectionDialog } from "@/components/CategorySelectionDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useModalStore } from "@/state/modalStore";
 
 const OwnerNewListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -64,8 +65,9 @@ const OwnerNewListing = () => {
 
 
   const handleAIOpen = () => {
-    // Navigate to the new conversational AI flow
-    navigate('/owner/listings/new-ai');
+    // Open the global AI Listing modal instead of navigating to a non-existent page
+    const { openAIListing } = useModalStore.getState();
+    openAIListing();
   };
 
   return (

@@ -38,9 +38,7 @@ function ThemeToggleComponent({ className, glassPillStyle }: ThemeToggleProps) {
 
     return (
         <button
-            onPointerDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+            onClick={(e) => {
                 handleToggle(e as any);
             }}
             className={cn(
