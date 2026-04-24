@@ -50,7 +50,7 @@ const LandingView = memo(({
   return (
     <motion.div
       key="landing"
-      className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 pb-12"
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6"
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

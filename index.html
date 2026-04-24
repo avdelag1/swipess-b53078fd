@@ -103,10 +103,31 @@
   <meta name="apple-mobile-web-app-title" content="Swipess">
   <meta name="application-name" content="Swipess">
   <!-- Speculation rules removed — prefetching handled by routePrefetcher.ts -->
+  <style>
+    .static-splash { position: fixed; inset: 0; background: #000; z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.4s ease-out, visibility 0.4s; }
+    .static-splash.fade-out { opacity: 0; visibility: hidden; }
+    .splash-content { display: flex; flex-col; items-center; animation: breathing 2.2s ease-in-out infinite; }
+    @keyframes breathing { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } }
+    .splash-logo { width: 120px; height: auto; }
+  </style>
 </head>
 
 <body>
+  <div id="static-splash" class="static-splash">
+    <div class="splash-content">
+      <img src="/icons/Swipess-logo.png" alt="Swipess" class="splash-logo" />
+    </div>
+  </div>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx" fetchpriority="high"></script>
+  <script>
+    window.addEventListener('load', function() {
+      // Small delay to ensure React has started mounting
+      setTimeout(function() {
+        const splash = document.getElementById('static-splash');
+        if (splash) splash.classList.add('fade-out');
+      }, 500);
+    });
+  </script>
 </body>
 </html>
