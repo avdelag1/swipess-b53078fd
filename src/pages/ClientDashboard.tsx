@@ -6,8 +6,6 @@ import { SwipeAllDashboard } from '@/components/swipe/SwipeAllDashboard';
 import { QuickFilterBar } from '@/components/QuickFilterBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { QuickFilterCategory } from '@/types/filters';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
-import ClientFilters from './ClientFilters';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 import { useSmartListingMatching } from '@/hooks/smartMatching/useSmartListingMatching';
@@ -29,7 +27,6 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
 
   // Phase state: 'cards' | 'swipe'
   const [phase, setPhase] = useState<'cards' | 'swipe'>(activeCategory ? 'swipe' : 'cards');
-  const [showFilters, setShowFilters] = useState(false);
 
   // 🚀 PERFORMANCE HYDRATION: Pre-fetch listing data while user is on map phase
   // so the swipe deck is ready instantly when they tap "Start Swiping".
@@ -47,11 +44,6 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
 
   // ─── Actions ─────────────────────────────────────────────────────────────
   
-  useEffect(() => {
-    const handleOpenFilters = () => setShowFilters(true);
-    window.addEventListener('open-client-filters', handleOpenFilters);
-    return () => window.removeEventListener('open-client-filters', handleOpenFilters);
-  }, []);
 
   // 🛰️ DISCOVERY SYNC: Bidirectional sync between activeCategory and phase
   useEffect(() => {
@@ -123,21 +115,6 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
         )}
       </AnimatePresence>
 
-      <Sheet open={showFilters} onOpenChange={setShowFilters}>
-          <SheetContent side="bottom" className="h-[92vh] p-0 border-none bg-transparent overflow-hidden">
-            <div className={cn(
-              "w-full h-full transition-all duration-500 rounded-t-[3.5rem] border-t overflow-y-auto shadow-2xl",
-              isLight ? "bg-white/95 border-black/5" : "bg-black/95 border-white/10"
-            )}>
-               <div className="sticky top-0 z-[60] flex items-center justify-center pt-4 pb-2">
-                  <div className={cn("w-12 h-1.5 rounded-full", isLight ? "bg-black/10" : "bg-white/20")} />
-               </div>
-               <div className="px-1 pb-20">
-                  <ClientFilters isEmbedded={true} onClose={() => setShowFilters(false)} />
-               </div>
-            </div>
-          </SheetContent>
-      </Sheet>
     </div>
   );
 }

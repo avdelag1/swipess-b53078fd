@@ -1188,6 +1188,18 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                whileTap={{ scale: 0.9 }}
                onClick={() => {
                  triggerHaptic('medium');
+                 navigate('/client/filters');
+               }}
+               className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center border border-white/5 bg-white/5 text-white/40"
+             >
+               <SlidersHorizontal className="w-5 h-5 mb-0.5" />
+               <span className="text-[7px] font-black uppercase text-primary">INTEL</span>
+             </motion.button>
+
+             <motion.button
+               whileTap={{ scale: 0.9 }}
+               onClick={() => {
+                 triggerHaptic('medium');
                  setRadiusKm(radiusKm === 100 ? 5 : radiusKm + 10);
                }}
                className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center border border-white/5 bg-white/5 text-white/40"

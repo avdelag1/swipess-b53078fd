@@ -75,7 +75,7 @@ export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps)
             <h1 className={cn(
               "text-xl font-black uppercase italic tracking-widest",
               isLight ? "text-slate-900" : "text-white"
-            )}>Filter Matrix</h1>
+            )}>RADAR NEXUS</h1>
             <button 
               onClick={handleReset}
               className={cn(
@@ -181,7 +181,9 @@ export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps)
             )}
           >
             <Sparkles className="w-6 h-6 md:w-7 md:h-7 animate-pulse group-hover:scale-110 transition-transform" />
-            Initiate Radar Scan
+            <span className="text-sm font-black uppercase italic tracking-[0.2em]">
+              INITIATE RADAR SCAN
+            </span>
           </motion.button>
         </div>
       </div>

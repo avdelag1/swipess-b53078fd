@@ -66,7 +66,32 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
       isLight ? (isEmbedded ? "bg-transparent" : "bg-[#F8FAFC]") : (isEmbedded ? "bg-transparent" : "bg-black"),
       isLight ? "text-slate-900" : "text-white"
     )}>
-      {!isEmbedded && <div className="pt-24" />}
+      {!isEmbedded && (
+        <div className="pt-24 px-6 flex items-center justify-between">
+            <button 
+              onClick={() => navigate(-1)}
+              className={cn(
+                "w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-xl border transition-all active:scale-90",
+                isLight ? "bg-black/5 border-black/10 text-black" : "bg-white/10 border-white/10 text-white"
+              )}
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <h1 className={cn(
+              "text-xl font-black uppercase italic tracking-widest",
+              isLight ? "text-slate-900" : "text-white"
+            )}>INTELLIGENCE NEXUS</h1>
+            <button 
+              onClick={handleReset}
+              className={cn(
+                "w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-xl border transition-all active:scale-90",
+                isLight ? "bg-black/5 border-black/10 text-black" : "bg-white/10 border-white/10 text-white"
+              )}
+            >
+              <RotateCcw className="w-5 h-5" />
+            </button>
+        </div>
+      )}
 
       {/* 🛸 SECTOR NAVIGATION */}
       <nav className={cn(
@@ -146,8 +171,10 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
               "hover:bg-primary hover:text-white"
             )}
           >
-            <Sparkles className="w-7 h-7 animate-pulse group-hover:scale-110 transition-transform" />
-            Engage Intelligence
+            <Sparkles className="w-6 h-6 animate-pulse group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-black uppercase italic tracking-[0.2em]">
+              TARGET INTELLIGENCE
+            </span>
           </motion.button>
           
           <button 

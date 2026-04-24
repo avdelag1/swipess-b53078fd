@@ -33,7 +33,7 @@ import { useStartConversation } from '@/hooks/useConversations';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '@/utils/prodLogger';
 import { SwipeExhaustedState } from './swipe/SwipeExhaustedState';
-import { Home, RefreshCw, ChevronLeft } from 'lucide-react';
+import { Home, RefreshCw, ChevronLeft, Radar, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 import { SwipeLoadingSkeleton } from './swipe/SwipeLoadingSkeleton';
@@ -88,6 +88,7 @@ const ClientSwipeContainerComponent = ({
   };
 
   const labels = getCategoryLabel();
+  const storeActiveCategory = useFilterStore((s) => s.activeCategory);
   const setActiveCategory = useFilterStore((s) => s.setActiveCategory);
 
   const handleMapCategorySelect = useCallback((nextCategory: 'property' | 'motorcycle' | 'bicycle' | 'services') => {
@@ -927,6 +928,67 @@ const ClientSwipeContainerComponent = ({
           </AnimatePresence>
         </div>
         </div>
+
+        {/* 🛸 QUICK FILTERS: REPOSITIONED BY USER REQUEST (Split on Both Sides) */}
+        {(!isLoading || deckQueue.length > 0) && (
+          <div className="absolute bottom-[40px] left-0 right-0 z-[60] w-full md:max-w-[440px] md:mx-auto flex justify-between px-6 pointer-events-none">
+            
+            {/* LEFT SIDE: SECTOR ACQUISITION (Quick Categories) */}
+            <div className="flex gap-3 p-2 rounded-[2rem] backdrop-blur-3xl border border-white/10 bg-black/40 pointer-events-auto shadow-2xl">
+              {OWNER_INTENT_CARDS.filter(c => 
+                ['buyers', 'renters', 'hire'].includes(c.id) 
+              ).map((cat: any) => {
+                const Icon = cat.icon;
+                const isActive = storeActiveCategory === cat.id;
+                return (
+                  <motion.button
+                    key={cat.id}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      triggerHaptic('medium');
+                      setActiveCategory(cat.id);
+                    }}
+                    className={cn(
+                      "w-14 h-14 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden border",
+                      isActive 
+                        ? "text-primary border-primary bg-primary/10 shadow-[0_0_200px_rgba(var(--color-brand-primary-rgb),0.3)] scale-110"
+                        : "text-white/40 border-white/5 hover:text-white/60 bg-white/5"
+                    )}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {isActive && <motion.div layoutId="activeCatLeftOwner" className="absolute inset-0 bg-primary/10 -z-10" />}
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* RIGHT SIDE: RADAR NEXUS (Advanced Filters) */}
+            <div className="flex gap-3 p-2 rounded-[2rem] backdrop-blur-3xl border border-white/10 bg-black/40 pointer-events-auto shadow-2xl">
+               <motion.button
+                 whileTap={{ scale: 0.9 }}
+                 onClick={() => {
+                   triggerHaptic('medium');
+                   navigate('/owner/filters');
+                 }}
+                 className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center border border-white/5 bg-white/5 text-white/40"
+               >
+                 <SlidersHorizontal className="w-5 h-5 mb-0.5" />
+                 <span className="text-[7px] font-black uppercase text-primary">INTEL</span>
+               </motion.button>
+
+               <motion.button
+                 whileTap={{ scale: 0.9 }}
+                 onClick={() => {
+                   triggerHaptic('medium');
+                 }}
+                 className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center border border-white/5 bg-white/5 text-white/40"
+               >
+                 <Radar className="w-5 h-5 mb-0.5" />
+                 <span className="text-[7px] font-black uppercase text-primary">RADAR</span>
+               </motion.button>
+            </div>
+          </div>
+        )}
       </div>
 
 
