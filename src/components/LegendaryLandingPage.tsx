@@ -246,7 +246,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   onClick={() => { triggerHaptic('light'); setIsLogin(true); setFieldErrors({}); }}
                   className={cn(
                     "flex-1 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 z-10",
-                    isLogin ? "text-black" : "text-white/30 hover:text-white/50"
+                    isLogin ? "text-black" : "text-white/60 hover:text-white/80"
                   )}
                 >
                   Sign In
@@ -256,7 +256,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   onClick={() => { triggerHaptic('light'); setIsLogin(false); setFieldErrors({}); }}
                   className={cn(
                     "flex-1 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-300 z-10",
-                    !isLogin ? "text-black" : "text-white/30 hover:text-white/50"
+                    !isLogin ? "text-black" : "text-white/60 hover:text-white/80"
                   )}
                 >
                   Sign Up
