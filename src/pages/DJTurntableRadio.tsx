@@ -96,9 +96,18 @@ export default function DJTurntableRadio() {
       <AtmosphericLayer variant={isDark ? 'indigo' : 'default'} />
 
       {/* ── Top Bar ── */}
-      {/* ── Radio Info & List Toggle ── */}
-      <div className="flex items-center justify-between px-6 pt-4 pb-2 z-20 relative">
-        <div className="flex flex-col">
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 z-20 relative gap-3">
+        {/* Back button */}
+        <button
+          onClick={() => { triggerHaptic('medium'); navigate(-1); }}
+          className={cn('w-11 h-11 flex shrink-0 items-center justify-center rounded-full', neumBtn, neumBtnActive)}
+          aria-label="Go back"
+        >
+          <ArrowLeft className={cn("w-5 h-5", isDark ? "text-white" : "text-black")} />
+        </button>
+
+        {/* Station info */}
+        <div className="flex flex-col flex-1 min-w-0">
           <p className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
             {state.currentStation?.frequency || '93.1'} FM
           </p>
@@ -107,9 +116,9 @@ export default function DJTurntableRadio() {
           </h2>
         </div>
 
-        <button 
+        <button
           onClick={() => { triggerHaptic('medium'); setShowDrawer(true); }}
-          className={cn('w-12 h-12 flex items-center justify-center rounded-2xl', neumBtn, neumBtnActive)}
+          className={cn('w-12 h-12 flex shrink-0 items-center justify-center rounded-2xl', neumBtn, neumBtnActive)}
         >
           <ListMusic className={cn("w-6 h-6", isDark ? "text-white" : "text-black")} />
         </button>
@@ -201,10 +210,13 @@ export default function DJTurntableRadio() {
 
             <button
               onClick={() => { togglePlayPause(); triggerHaptic('heavy'); }}
-              className={cn(
-                'w-20 h-20 rounded-full flex items-center justify-center relative transition-all duration-300 bg-white border border-white shadow-2xl',
-                isDark ? 'shadow-[0_15px_50px_rgba(255,255,255,0.35)]' : 'shadow-[0_15px_45px_rgba(0,0,0,0.12)]'
-              )}
+              style={{
+                background: '#ffffff',
+                boxShadow: isDark
+                  ? '0 0 0 1px rgba(255,255,255,0.3), 0 15px 50px rgba(255,255,255,0.4), 0 4px 20px rgba(255,255,255,0.25)'
+                  : '0 15px 45px rgba(0,0,0,0.12)',
+              }}
+              className="w-20 h-20 rounded-full flex items-center justify-center relative transition-all duration-300 active:scale-95"
             >
               {state.isPlaying
                 ? <Pause className="w-8 h-8 text-black" fill="currentColor" />
