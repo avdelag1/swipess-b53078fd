@@ -24,9 +24,9 @@
   ],
   "categories": ["lifestyle", "business", "social", "travel", "productivity"],
   "shortcuts": [
-    { "name": "Discover Feed", "short_name": "Discover", "description": "Explore the elite feed", "url": "/client/dashboard", "icons": [{ "src": "/icons/Swipess-wordmark-512.png", "sizes": "192x192" }] },
-    { "name": "AI Concierge", "short_name": "AI Chat", "description": "Talk to your sentient assistant", "url": "/concierge", "icons": [{ "src": "/icons/Swipess-wordmark-512.png", "sizes": "192x192" }] },
-    { "name": "Radio & Vibe", "short_name": "Radio", "description": "Listen to the vibration", "url": "/radio", "icons": [{ "src": "/icons/Swipess-wordmark-512.png", "sizes": "192x192" }] }
+    { "name": "Discover Feed", "short_name": "Discover", "description": "Explore the elite feed", "url": "/client/dashboard", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "AI Concierge", "short_name": "AI Chat", "description": "Talk to your sentient assistant", "url": "/concierge", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Radio & Vibe", "short_name": "Radio", "description": "Listen to the vibration", "url": "/radio", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
   ],
   "screenshots": [
     { "src": "/images/screenshot-mobile-1.png", "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Discovery Feed" },
