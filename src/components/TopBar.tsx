@@ -158,7 +158,9 @@ function TopBarComponent({
           )}
         </div>
 
-        <div className="flex-1" />
+        <div className="flex-1 flex justify-center">
+          <SwipessLogo size="sm" variant="transparent" className="opacity-90 group-hover:opacity-100 transition-opacity" />
+        </div>
 
         {/* RIGHT CLUSTER: Individual Action Pills */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">

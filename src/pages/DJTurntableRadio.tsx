@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useRadio } from '@/contexts/RadioContext';
-import { cityThemes, getStationById, getStationsByCity, radioStations } from '@/data/radioStations';
+import { cityThemes, getStationById, getStationsByCity } from '@/data/radioStations';
 import { CityLocation } from '@/types/radio';
 import { StationDrawer } from '@/components/radio/retro/StationDrawer';
 import { FrequencyBand } from '@/components/radio/FrequencyBand';
@@ -11,15 +11,16 @@ import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 import {
   ArrowLeft, Globe, Star, Heart, Shuffle,
-  SkipBack, SkipForward, Play, Pause, Volume2
+  SkipBack, SkipForward, Play, Pause, Volume2, ListMusic
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AtmosphericLayer } from '@/components/AtmosphericLayer';
+import { SwipessLogo } from '@/components/SwipessLogo';
 
 /**
  * DJTurntableRadio — Clean FM Tuner interface (Apple-inspired redesign).
  * Horizontal touch-draggable frequency band, large frequency display,
- * neumorphic circular controls.
+ * premium controls.
  */
 export default function DJTurntableRadio() {
   const navigate = useNavigate();
@@ -27,13 +28,10 @@ export default function DJTurntableRadio() {
     state, loading, play, togglePlayPause, togglePower, changeStation,
     setCity, setVolume, toggleShuffle, toggleFavorite, isStationFavorite,
   } = useRadio();
-  const { theme, isDark, isLight } = useAppTheme();
+  const { isDark } = useAppTheme();
 
   const [showDrawer, setShowDrawer] = useState(false);
   const [showFavoritesDrawer, setShowFavoritesDrawer] = useState(false);
-
-  const cityTheme = (state.currentCity && cityThemes[state.currentCity]) ? cityThemes[state.currentCity] : cityThemes['tulum'];
-  const primaryColor = cityTheme?.primaryColor || '#FF4D00';
 
   // POWER ON / INITIALIZATION GUARD
   const hasInitRef = useRef(false);
@@ -60,13 +58,11 @@ export default function DJTurntableRadio() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [state.volume, togglePlayPause, changeStation, setVolume]);
 
-  // Get all station frequencies for the current city
   const cityStations = useMemo(() => getStationsByCity(state.currentCity), [state.currentCity]);
   const stationFrequencies = useMemo(() => cityStations.map(s => parseFloat(s.frequency) || 93.1), [cityStations]);
   const currentFrequency = parseFloat(state.currentStation?.frequency || '93.1');
 
   const handleFrequencyChange = useCallback((freq: number) => {
-    // Find station matching this frequency
     const station = cityStations.find(s => Math.abs(parseFloat(s.frequency) - freq) < 0.15);
     if (station && station.id !== state.currentStation?.id) {
       play(station);
@@ -86,8 +82,6 @@ export default function DJTurntableRadio() {
     setShowFavoritesDrawer(false);
   }, [play]);
 
-
-
   const neumBtn = isDark
     ? 'bg-white/[0.08] border border-white/[0.1] shadow-[0_8px_30px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)]'
     : 'bg-white border border-slate-200 shadow-[6px_6px_20px_rgba(0,0,0,0.06),-4px_-4px_15px_rgba(255,255,255,0.9)]';
@@ -95,96 +89,73 @@ export default function DJTurntableRadio() {
   const neumBtnActive = 'active:scale-[0.94] transition-transform duration-[40ms]';
 
   return (
-    <main
-      id="main-content"
-      className={cn(
-        "fixed inset-0 z-[20000] flex flex-col select-none",
-        isDark ? "bg-[#0A0A0A]" : "bg-[#F2F2F7]"
-      )}
+    <div 
+      className="relative w-full h-full flex flex-col bg-[#0A0A0A] overflow-hidden"
+      id="main-radio-content"
     >
       <AtmosphericLayer variant={isDark ? 'indigo' : 'default'} />
 
       {/* ── Top Bar ── */}
-      <div className="flex items-center justify-between px-5 pt-[env(safe-area-inset-top,16px)] pb-3 z-20">
-        <button
-          onClick={() => {
-            if (window.history.length > 2) {
-              navigate(-1);
-            } else {
-              // Context-aware fallback: Ensure Owners go back to Owner dashboard
-              const path = window.location.pathname;
-              const isOwner = path.includes('/owner/') || localStorage.getItem('last_active_mode') === 'owner';
-              navigate(isOwner ? '/owner/dashboard' : '/client/dashboard');
-            }
-          }}
-          className={cn('w-9 h-9 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
+      <div className="flex items-center justify-between px-5 pt-[calc(var(--safe-top,0px)+12px)] pb-3 z-20 relative">
+        <button 
+          onClick={() => { triggerHaptic('light'); navigate(-1); }}
+          className={cn('w-10 h-10 flex items-center justify-center rounded-full', neumBtn, neumBtnActive)}
         >
-          <ArrowLeft className={cn('w-4.5 h-4.5', isDark ? 'text-white/60' : 'text-black/50')} />
+          <ArrowLeft className="w-5 h-5 text-white" />
         </button>
 
-        {/* City name */}
-        <div className="flex flex-col items-center">
-              <p className={cn("text-xs font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
-                {state.currentStation?.frequency || '93.1'}
-              </p>
-              <h2 className={cn("text-2xl font-black truncate tracking-tighter mt-1", isDark ? "text-white" : "text-slate-900")}>
-                {state.currentStation?.name || 'Radio'}
-              </h2>
-              <p className={cn("text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mt-2 flex items-center gap-2", isDark ? "text-white" : "text-slate-900")}>
-                <span className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isDark ? "bg-blue-400" : "bg-primary")} />
-                Live from {state.currentCity || 'Mars'}
-              </p>
+        <div className="flex-1 flex justify-center">
+          <SwipessLogo size="sm" variant="transparent" />
         </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={() => { toggleShuffle(); triggerHaptic('light'); }}
-            className={cn('w-9 h-9 rounded-full flex items-center justify-center', neumBtn, neumBtnActive,
-              state.isShuffle && (isDark ? 'ring-1 ring-white/20' : 'ring-1 ring-black/10')
-            )}
-          >
-            <Shuffle className={cn('w-3.5 h-3.5', state.isShuffle ? (isDark ? 'text-white' : 'text-black') : (isDark ? 'text-white/30' : 'text-black/25'))} />
-          </button>
-        <button
-          onClick={() => { setShowDrawer(true); triggerHaptic('medium'); }}
-          className={cn('w-9 h-9 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
+        <button 
+          onClick={() => setShowDrawer(true)}
+          className={cn('w-10 h-10 flex items-center justify-center rounded-full', neumBtn, neumBtnActive)}
         >
-          <Globe className={cn('w-3.5 h-3.5', isDark ? 'text-white' : 'text-slate-900')} strokeWidth={2.5} />
+          <ListMusic className="w-5 h-5 text-white" />
         </button>
-        </div>
       </div>
 
       {/* ── Main Content ── */}
       <div className="flex-1 flex flex-col items-center justify-between px-4">
+        
+        {/* Info cluster */}
+        <div className="flex flex-col items-center mt-2">
+          <p className={cn("text-xs font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
+            {state.currentStation?.frequency || '93.1'}
+          </p>
+          <h2 className={cn("text-2xl font-black truncate tracking-tighter mt-1", isDark ? "text-white" : "text-slate-900")}>
+            {state.currentStation?.name || 'Radio'}
+          </h2>
+          <p className={cn("text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mt-2 flex items-center gap-2", isDark ? "text-white" : "text-slate-900")}>
+            <span className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isDark ? "bg-blue-400" : "bg-primary")} />
+            Live from {state.currentCity || 'Mars'}
+          </p>
+        </div>
 
         {/* Large Frequency Display */}
-        <ScrollArea className="flex-1 h-0 w-full">
-          <div className="flex flex-col items-center justify-center min-h-[300px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={state.currentStation?.id || 'none'}
-                initial={{ opacity: 0, scale: 1.1, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 0.95, filter: 'blur(8px)' }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="text-center"
-              >
-                <div className={cn('text-[72px] sm:text-[88px] font-black leading-none tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
-                  {state.currentStation?.frequency || '93.1'}
-                </div>
-                <div className={cn('text-lg font-black tracking-[0.3em] uppercase mt-1', isDark ? 'text-blue-400' : 'text-primary')}>
-                  FM
-                </div>
-                <div className={cn('text-sm font-black mt-4 tracking-widest uppercase', isDark ? 'text-white' : 'text-slate-900')}>
-                  {state.currentStation?.name || 'Radio'}
-                </div>
-                <div className={cn('text-[10px] font-black mt-2 tracking-[0.2em] uppercase', isDark ? 'text-white/40' : 'text-slate-400')}>
-                  {state.currentStation?.genre || ''}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </ScrollArea>
+        <div className="flex-1 flex flex-col items-center justify-center w-full min-h-[250px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={state.currentStation?.id || 'none'}
+              initial={{ opacity: 0, scale: 1.1, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 0.95, filter: 'blur(8px)' }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="text-center"
+            >
+              <div className={cn('text-[72px] sm:text-[88px] font-black leading-none tracking-tight', isDark ? 'text-white' : 'text-slate-900')}>
+                {state.currentStation?.frequency || '93.1'}
+              </div>
+              <div className={cn('text-lg font-black tracking-[0.3em] uppercase mt-1', isDark ? 'text-blue-400' : 'text-primary')}>
+                FM
+              </div>
+              <div className={cn('text-sm font-black mt-4 tracking-widest uppercase', isDark ? 'text-white' : 'text-slate-900')}>
+                {state.currentStation?.name || 'Radio'}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
         {/* Frequency Band */}
         <div className="w-full mb-6">
@@ -197,11 +168,9 @@ export default function DJTurntableRadio() {
         </div>
 
         {/* ── Playback Controls ── */}
-        <div className="flex flex-col items-center gap-5 w-full" style={{ marginBottom: 'calc(env(safe-area-inset-bottom, 20px) + 16px)' }}>
+        <div className="flex flex-col items-center gap-5 w-full pb-8">
           
-          {/* Main controls row */}
           <div className="flex items-center gap-5">
-            {/* Favorite */}
             <button
               onClick={() => { if (state.currentStation) { toggleFavorite(state.currentStation.id); triggerHaptic('success'); } }}
               className={cn('w-12 h-12 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
@@ -212,7 +181,6 @@ export default function DJTurntableRadio() {
               />
             </button>
 
-            {/* Skip Back */}
             <button
               onClick={() => { changeStation('prev'); triggerHaptic('medium'); }}
               className={cn('w-14 h-14 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
@@ -220,7 +188,6 @@ export default function DJTurntableRadio() {
               <SkipBack className={cn('w-6 h-6', isDark ? 'text-white/50' : 'text-black/40')} fill="currentColor" />
             </button>
 
-            {/* Play/Pause — largest */}
             <button
               onClick={() => { togglePlayPause(); triggerHaptic('heavy'); }}
               className={cn(
@@ -235,7 +202,6 @@ export default function DJTurntableRadio() {
               }
             </button>
 
-            {/* Skip Forward */}
             <button
               onClick={() => { changeStation('next'); triggerHaptic('medium'); }}
               className={cn('w-14 h-14 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
@@ -243,7 +209,6 @@ export default function DJTurntableRadio() {
               <SkipForward className={cn('w-6 h-6', isDark ? 'text-white' : 'text-slate-900')} fill="currentColor" />
             </button>
 
-            {/* Favorites list */}
             <button
               onClick={() => { setShowFavoritesDrawer(true); triggerHaptic('medium'); }}
               className={cn('w-12 h-12 rounded-full flex items-center justify-center relative', neumBtn, neumBtnActive)}
@@ -255,19 +220,17 @@ export default function DJTurntableRadio() {
             </button>
           </div>
 
-          {/* Volume slider */}
-          <div className="w-full px-10 pb-1">
+          <div className="w-full px-10">
             <div className="flex items-center justify-between mb-2 px-1">
               <div className="flex items-center gap-2 opacity-40">
                 <Volume2 size={12} className={isDark ? 'text-white' : 'text-black'} />
-                <span className={cn("text-[10px] font-black uppercase tracking-widest", isDark ? 'text-white' : 'text-black')}>Volumen</span>
+                <span className={cn("text-[10px] font-black uppercase tracking-widest", isDark ? 'text-white' : 'text-black')}>Volume</span>
               </div>
               <span className={cn("text-[10px] font-black tabular-nums tracking-wider", isDark ? 'text-blue-400' : 'text-primary')}>
                 {Math.round(state.volume * 100)}%
               </span>
             </div>
             <div className="relative w-full h-10 flex items-center">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
               <div className={cn('absolute w-full h-[4px] rounded-full', isDark ? 'bg-white/[0.08]' : 'bg-black/[0.06]')}>
                 <div
                   className="h-full rounded-full transition-none"
@@ -300,7 +263,6 @@ export default function DJTurntableRadio() {
         </div>
       </div>
 
-      {/* Station Drawer */}
       <StationDrawer
         isOpen={showDrawer || showFavoritesDrawer}
         onClose={() => { setShowDrawer(false); setShowFavoritesDrawer(false); }}
@@ -313,8 +275,6 @@ export default function DJTurntableRadio() {
         onStationSelect={handleStationSelect}
         onToggleFavorite={toggleFavorite}
       />
-    </main>
+    </div>
   );
 }
-
-
