@@ -240,7 +240,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
             </>
           ) : (
             <>
-              <div className="flex w-full items-center justify-center gap-1.5 bg-black/40 backdrop-blur-md rounded-[1.5rem] p-1 mb-4 border border-white/5 relative">
+              <div className="flex w-full items-center justify-center gap-1.5 bg-black/80 backdrop-blur-md rounded-[1.5rem] p-1 mb-4 border border-white/5 relative">
                 <button
                   type="button"
                   onClick={() => { triggerHaptic('light'); setIsLogin(true); setFieldErrors({}); }}
