@@ -25,6 +25,65 @@ export const SWIPE_CARD_FIELDS = `
   latitude, longitude, status, is_active
 `;
 
+const DEMO_LISTINGS: any[] = [
+  {
+    id: 'demo-1',
+    title: 'Ultra-Modern Penthouse',
+    description: 'Breathtaking 360-degree views of the skyline. Private elevator and infinity pool access. Pure luxury living.',
+    price: 4500,
+    currency: 'USD',
+    images: ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200'],
+    city: 'Los Angeles',
+    neighborhood: 'Hollywood Hills',
+    category: 'property',
+    listing_type: 'rent',
+    property_type: 'penthouse',
+    beds: 3,
+    baths: 4,
+    square_footage: 2800,
+    is_active: true,
+    status: 'active',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'demo-2',
+    title: 'Ducati Panigale V4',
+    description: 'Pristine condition. Low mileage. The pinnacle of Italian engineering. Ready for the track or the street.',
+    price: 24000,
+    currency: 'USD',
+    images: ['https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&q=80&w=1200'],
+    city: 'Miami',
+    category: 'motorcycle',
+    listing_type: 'sell',
+    vehicle_brand: 'Ducati',
+    vehicle_model: 'Panigale V4',
+    year: 2023,
+    mileage: 1200,
+    is_active: true,
+    status: 'active',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'demo-3',
+    title: 'Creative Studio Loft',
+    description: 'Industrial chic at its finest. High ceilings, exposed brick, and perfect natural light for artists.',
+    price: 3200,
+    currency: 'USD',
+    images: ['https://images.unsplash.com/photo-1536376074432-cd424369ffdd?auto=format&fit=crop&q=80&w=1200'],
+    city: 'New York',
+    neighborhood: 'Brooklyn',
+    category: 'property',
+    listing_type: 'rent',
+    property_type: 'loft',
+    beds: 1,
+    baths: 1,
+    square_footage: 1100,
+    is_active: true,
+    status: 'active',
+    created_at: new Date().toISOString()
+  }
+];
+
 export function useSmartListingMatching(
     userId: string | undefined,
     _excludeSwipedIds: string[] = [],
@@ -242,18 +301,30 @@ export function useSmartListingMatching(
                     const match = calculateListingMatch((filters || {}) as any, listing as Listing);
                     
                     // CHECK FOR RECOVERY: If this listing was swiped but updated since, it should bypass exclusion
-                    // Note: In a real app we'd use updated_at, but using created_at/metadata check here
                     const swipe = userSwipes?.left.get(listing.id);
                     const isUpdated = swipe && new Date(listing.created_at) > new Date(swipe);
                     
                     return {
                         ...listing as Listing,
-                        matchPercentage: isUpdated ? Math.min(match.percentage + 10, 100) : match.percentage, // Boost updated ones
+                        matchPercentage: isUpdated ? Math.min(match.percentage + 10, 100) : match.percentage,
                         matchReasons: isUpdated ? ['Recently Updated', ...match.reasons] : match.reasons,
                         incompatibleReasons: match.incompatible,
                         isUpdatedRecovery: !!isUpdated
                     };
                 });
+
+                // 🚀 EMERGENCY DEMO FALLBACK: If results are zero, manifest high-fidelity demo cards
+                // This ensures the 'Wow' reaction even on a fresh database.
+                if (matchedResults.length === 0 && page === 0) {
+                    logger.info('[SmartMatching] Manifesting high-fidelity demo cards');
+                    return DEMO_LISTINGS.map(l => ({
+                        ...l,
+                        matchPercentage: 92 + Math.floor(Math.random() * 7),
+                        matchReasons: ['Highly Recommended', 'Perfect Match for you'],
+                        incompatibleReasons: [],
+                        isDemo: true
+                    }));
+                }
 
                 const finalResults = matchedResults.sort((a, b) => b.matchPercentage - a.matchPercentage);
 

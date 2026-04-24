@@ -13,6 +13,48 @@ const CLIENT_FIELDS = `
     languages_spoken, neighborhood, bio, onboarding_completed
 `;
 
+const DEMO_CLIENTS: any[] = [
+  {
+    user_id: 'demo-client-1',
+    full_name: 'Sophia Laurent',
+    age: 26,
+    gender: 'female',
+    city: 'Paris',
+    country: 'France',
+    images: ['https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=1200'],
+    interests: ['Architecture', 'Piano', 'Gourmet Cooking'],
+    lifestyle_tags: ['Non-smoker', 'Early Riser', 'Fitness Enthusiast'],
+    bio: 'Looking for a premium workspace or a chic loft in the heart of the city.',
+    onboarding_completed: true
+  },
+  {
+    user_id: 'demo-client-2',
+    full_name: 'Marcus Chen',
+    age: 31,
+    gender: 'male',
+    city: 'Singapore',
+    country: 'Singapore',
+    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=1200'],
+    interests: ['Web3', 'High-speed Racing', 'Mixology'],
+    lifestyle_tags: ['Tech Nomad', 'Night Owl'],
+    bio: 'Relocating for a tech venture. Need a secure spot for my motorcycle and a view of the harbor.',
+    onboarding_completed: true
+  },
+  {
+    user_id: 'demo-client-3',
+    full_name: 'Elena Rodriguez',
+    age: 29,
+    gender: 'female',
+    city: 'Barcelona',
+    country: 'Spain',
+    images: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1200'],
+    interests: ['Art History', 'Surfing', 'Sustainable Design'],
+    lifestyle_tags: ['Pet Friendly', 'Yoga Daily'],
+    bio: 'Art director seeking a sun-drenched studio. Love minimalism and natural light.',
+    onboarding_completed: true
+  }
+];
+
 
 export function useSmartClientMatching(
     userId?: string,
@@ -181,6 +223,33 @@ export function useSmartClientMatching(
 
                 if (isRoommateSection) {
                     results = results.filter(r => r.roommate_available);
+                }
+
+                // 🚀 EMERGENCY DEMO FALLBACK: If results are zero, manifest high-fidelity demo cards
+                // This ensures the 'Wow' reaction even on a fresh database.
+                if (results.length === 0 && page === 0) {
+                    logger.info('[SmartClientMatching] Manifesting high-fidelity demo cards');
+                    return DEMO_CLIENTS.map(c => ({
+                        id: c.user_id,
+                        user_id: c.user_id,
+                        name: c.full_name,
+                        age: c.age,
+                        gender: c.gender,
+                        interests: c.interests,
+                        preferred_activities: [],
+                        location: { city: c.city },
+                        lifestyle_tags: c.lifestyle_tags,
+                        profile_images: c.images,
+                        matchPercentage: 88 + Math.floor(Math.random() * 10),
+                        matchReasons: ['Profile available', 'Highly compatible'],
+                        incompatibleReasons: [],
+                        verified: true,
+                        roommate_available: false,
+                        city: c.city,
+                        country: c.country,
+                        work_schedule: 'Flexible',
+                        isDemo: true
+                    })) as MatchedClientProfile[];
                 }
 
                 runIdleTask(() => {
