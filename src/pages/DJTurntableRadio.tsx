@@ -151,7 +151,7 @@ export default function DJTurntableRadio() {
               <div className={cn('text-lg font-black tracking-[0.3em] uppercase mt-1', isDark ? 'text-blue-400' : 'text-primary')}>
                 FM
               </div>
-              <div className={cn('text-sm font-black mt-4 tracking-widest uppercase', isDark ? 'text-white' : 'text-slate-900')}>
+              <div className={cn('text-sm font-black mt-4 tracking-widest uppercase', isDark ? 'text-white' : 'text-black')}>
                 {state.currentStation?.name || 'Radio'}
               </div>
             </motion.div>
@@ -177,7 +177,7 @@ export default function DJTurntableRadio() {
               className={cn('w-12 h-12 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
             >
               <Heart
-                className={cn('w-5 h-5', isStationFavorite(state.currentStation?.id || '') ? 'text-red-500' : (isDark ? 'text-white/35' : 'text-black/30'))}
+                className={cn('w-5 h-5', isStationFavorite(state.currentStation?.id || '') ? 'text-red-500' : (isDark ? 'text-white/35' : 'text-black/50'))}
                 fill={isStationFavorite(state.currentStation?.id || '') ? 'currentColor' : 'none'}
               />
             </button>
@@ -186,7 +186,7 @@ export default function DJTurntableRadio() {
               onClick={() => { changeStation('prev'); triggerHaptic('medium'); }}
               className={cn('w-14 h-14 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
             >
-              <SkipBack className={cn('w-6 h-6', isDark ? 'text-white/50' : 'text-black/40')} fill="currentColor" />
+              <SkipBack className={cn('w-6 h-6', isDark ? 'text-white/50' : 'text-black/60')} fill="currentColor" />
             </button>
 
             <button
@@ -207,14 +207,14 @@ export default function DJTurntableRadio() {
               onClick={() => { changeStation('next'); triggerHaptic('medium'); }}
               className={cn('w-14 h-14 rounded-full flex items-center justify-center', neumBtn, neumBtnActive)}
             >
-              <SkipForward className={cn('w-6 h-6', isDark ? 'text-white' : 'text-slate-900')} fill="currentColor" />
+              <SkipForward className={cn('w-6 h-6', isDark ? 'text-white' : 'text-black')} fill="currentColor" />
             </button>
 
             <button
               onClick={() => { setShowFavoritesDrawer(true); triggerHaptic('medium'); }}
               className={cn('w-12 h-12 rounded-full flex items-center justify-center relative', neumBtn, neumBtnActive)}
             >
-              <Star className={cn('w-5 h-5', isDark ? 'text-white/35' : 'text-black/30')} />
+              <Star className={cn('w-5 h-5', isDark ? 'text-white/35' : 'text-black/50')} />
               {state.favorites.length > 0 && (
                 <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500" />
               )}
