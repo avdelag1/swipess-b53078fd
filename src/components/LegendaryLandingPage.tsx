@@ -207,7 +207,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <div className="w-full max-w-sm bg-[#0d0d0f]/90 backdrop-blur-[40px] border border-white/10 rounded-[2.5rem] p-6 sm:p-8 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] relative overflow-hidden shrink-0">
+      <div className="w-full max-w-sm bg-[#0d0d0f]/90 backdrop-blur-[40px] border border-white/10 rounded-[2.5rem] p-5 sm:p-6 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.9)] relative overflow-hidden shrink-0">
         {/* Shimmer effect removed as per user request */}
         
         <button
