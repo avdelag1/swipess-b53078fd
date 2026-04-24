@@ -137,8 +137,8 @@ function FilterDropdown({
           isActive
             ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]'
             : isLight 
-              ? 'bg-white/80 border-black/20 text-black shadow-sm backdrop-blur-md hover:bg-black/5' 
-              : 'bg-black/60 border-white/20 text-white shadow-xl backdrop-blur-xl hover:bg-black/40'
+              ? 'bg-white/95 border-black/30 text-black shadow-md backdrop-blur-md hover:bg-black/5' 
+              : 'bg-black/95 border-white/40 text-white shadow-2xl backdrop-blur-xl hover:bg-black/40'
         )}
       >
         {icon && <span className="opacity-80">{icon}</span>}
@@ -299,7 +299,7 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                   isGlobalAll ? 'w-32 h-52 rounded-[3.5rem]' : 'w-28 h-40 rounded-[2.2rem]',
                   isActive 
                     ? 'border-primary ring-2 ring-primary ring-offset-2 scale-[1.03] shadow-lg border-[2px]' 
-                    : 'border-white/40 shadow-md border-[1.5px]'
+                    : 'border-white/70 shadow-md border-[2px]'
                   )}
                   style={{ contain: 'paint', willChange: 'transform, opacity' }}
                 >
@@ -307,8 +307,8 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                     <div className={cn(
                       "absolute inset-0 z-10 transition-colors duration-300",
                       isActive 
-                        ? (isLight ? "bg-black/30" : "bg-black/40") 
-                        : (isLight ? "bg-black/45" : "bg-black/55")
+                        ? (isLight ? "bg-black/25" : "bg-black/35") 
+                        : (isLight ? "bg-black/60" : "bg-black/70")
                     )} />
 
                 <QuickFilterImage 
@@ -326,7 +326,7 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                       )}>
                         {option.icon}
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-90 mb-0.5 drop-shadow-md">{option.description}</span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-0.5 drop-shadow-md">{option.description}</span>
                       <span className={cn("font-black whitespace-nowrap uppercase tracking-tighter drop-shadow-lg", isGlobalAll ? "text-2xl" : "text-sm")}>{option.label}</span>
                     </div>
                   {isActive && (
@@ -383,15 +383,15 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
               'relative flex-shrink-0 w-32 h-52 rounded-[3.5rem] overflow-hidden border transition-all duration-200 group',
               clientIsAllSelected 
                 ? 'border-primary ring-2 ring-primary ring-offset-2 scale-[1.03] shadow-lg border-[2px]' 
-                : 'border-white/40 shadow-md border-[1.5px]'
+                : 'border-white/70 shadow-md border-[2px]'
             )}
             style={{ contain: 'paint', willChange: 'transform, opacity' }}
           >
             <div className={cn(
               "absolute inset-0 z-10 transition-colors duration-300",
               clientIsAllSelected 
-                ? (isLight ? "bg-black/30" : "bg-black/40") 
-                : (isLight ? "bg-black/45" : "bg-black/55")
+                ? (isLight ? "bg-black/25" : "bg-black/35") 
+                : (isLight ? "bg-black/60" : "bg-black/70")
             )} />
 
             <QuickFilterImage 
@@ -401,10 +401,10 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
 
             <div className={cn(
               "absolute inset-0 flex flex-col items-center justify-center z-20 transition-all duration-300",
-              clientIsAllSelected ? "text-white" : "text-white/90"
+              clientIsAllSelected ? "text-white" : "text-white"
             )}>
               <Globe className={cn("w-7 h-7 mb-1 transition-all duration-300", clientIsAllSelected && "scale-110 drop-shadow-[0_0_12px_rgba(255,255,255,0.8)]")} />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-0.5">Global</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">Global</span>
               <span className="text-2xl font-black uppercase tracking-tighter drop-shadow-md">ALL</span>
             </div>
             {clientIsAllSelected && (
@@ -431,15 +431,15 @@ function QuickFilterBarComponent({ filters, onChange, onSelect, className, userR
                   'relative flex-shrink-0 w-28 h-40 rounded-[2.2rem] overflow-hidden border transition-all duration-200 group',
                   isActive 
                     ? 'border-primary ring-1 ring-primary ring-offset-2 scale-[1.03] shadow-lg border-[2px]' 
-                    : 'border-white/40 shadow-md border-[1.5px]'
+                    : 'border-white/70 shadow-md border-[2px]'
                 )}
                 style={{ contain: 'paint', willChange: 'transform, opacity' }}
               >
                 <div className={cn(
                   "absolute inset-0 z-10 transition-colors duration-300",
                   isActive 
-                    ? (isLight ? "bg-black/30" : "bg-black/40") 
-                    : (isLight ? "bg-black/45" : "bg-black/55")
+                    ? (isLight ? "bg-black/25" : "bg-black/35") 
+                    : (isLight ? "bg-black/60" : "bg-black/70")
                 )} />
 
                 <QuickFilterImage 
