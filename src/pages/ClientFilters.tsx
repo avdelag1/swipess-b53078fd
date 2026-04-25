@@ -154,7 +154,7 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
                   isLight ? "text-slate-900" : "text-white"
                 )}
               >
-                <ChevronLeft className="w-4 h-4" /> Back to Nexus
+                <ChevronLeft className="w-4 h-4" /> Back
               </button>
 
               {/* Category switcher */}
