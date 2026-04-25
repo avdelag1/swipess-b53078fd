@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Sparkles, ChevronLeft, Search, RotateCcw, Home, Bike, Briefcase, Zap
+  Sparkles, ChevronLeft, ChevronRight, Search, RotateCcw, Home, Bike, Briefcase, Zap, Radar
 } from 'lucide-react';
 import { MotorcycleIcon } from '@/components/icons/MotorcycleIcon';
 import { PropertyClientFilters } from '@/components/filters/PropertyClientFilters';
@@ -35,16 +35,20 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
   const [localFilters, setLocalFilters] = useState<Record<string, any>>(getListingFilters());
   const [isScanning, setIsScanning] = useState(false);
 
-  const handleApply = useCallback(() => {
+  const handleScan = useCallback(() => {
     haptics.success();
+    setIsScanning(true);
     updateFilters(localFilters);
     queryClient.invalidateQueries({ queryKey: ['smart-listings'] });
     
-    if (isEmbedded && onClose) {
-      onClose();
-    } else {
-      navigate('/client/dashboard');
-    }
+    setTimeout(() => {
+      setIsScanning(false);
+      if (isEmbedded && onClose) {
+        onClose();
+      } else {
+        navigate('/client/dashboard');
+      }
+    }, 2000);
   }, [navigate, queryClient, updateFilters, localFilters, isEmbedded, onClose]);
 
   const handleReset = useCallback(() => {
@@ -53,11 +57,11 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
     setLocalFilters({});
   }, [resetClientFilters]);
 
-  const categories = [
-    { id: 'property', name: 'Properties', icon: Home },
-    { id: 'motorcycle', name: 'Motos', icon: MotorcycleIcon },
-    { id: 'bicycle', name: 'Bikes', icon: Bike },
-    { id: 'services', name: 'Workers', icon: Briefcase },
+  const CATEGORIES = [
+    { id: 'property', label: 'Properties', desc: 'Settle Anywhere', icon: Home },
+    { id: 'motorcycle', label: 'Motos', desc: 'High Velocity', icon: MotorcycleIcon },
+    { id: 'bicycle', label: 'Bikes', desc: 'Urban Agility', icon: Bike },
+    { id: 'services', label: 'Workers', desc: 'Elite Skillset', icon: Briefcase },
   ];
 
   return (
@@ -206,7 +210,7 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
                 </button>
 
                 <button
-                  onClick={() => { resetFilters(); setActiveCategory(null); }}
+                  onClick={() => { handleReset(); setActiveCategory(null); }}
                   className={cn(
                     "w-full h-16 rounded-[2rem] flex items-center justify-center gap-2 transition-all",
                     isLight ? "bg-slate-100 text-slate-900 hover:bg-slate-200" : "bg-white/10 text-white hover:bg-white/20"
