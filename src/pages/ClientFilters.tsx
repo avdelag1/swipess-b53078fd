@@ -26,7 +26,7 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
   const queryClient = useQueryClient();
   const { isLight } = useAppTheme();
   
-  const activeCategory = useFilterStore(s => s.activeCategory) || 'property';
+  const activeCategory = useFilterStore(s => s.activeCategory);
   const setActiveCategory = useFilterStore(s => s.setActiveCategory);
   const getListingFilters = useFilterStore(s => s.getListingFilters);
   const updateFilters = useFilterStore(s => s.updateFilters);
@@ -148,10 +148,12 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
               className="space-y-6 pb-20"
             >
               <button
-                onClick={() => setActiveCategory(null)}
+                onClick={() => { haptics.tap(); setActiveCategory(null); }}
                 className={cn(
-                  "flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity",
-                  isLight ? "text-slate-900" : "text-white"
+                  "flex items-center gap-2 px-3 py-2 text-[11px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-90",
+                  isLight
+                    ? "text-slate-900 hover:bg-slate-100"
+                    : "text-white hover:bg-white/10"
                 )}
               >
                 <ChevronLeft className="w-4 h-4" /> Back
