@@ -1001,26 +1001,6 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
     }
   }, []);
 
-  // Category cycle order: null = ALL → property → motorcycle → bicycle → services → null
-  const CLIENT_CYCLE: (QuickFilterCategory | null)[] = [null, 'property', 'motorcycle', 'bicycle', 'services'];
-  const OWNER_CYCLE: (QuickFilterCategory | null)[] = [null, 'buyers', 'renters', 'hire'];
-
-  const handleCycleSector = useCallback(() => {
-    triggerHaptic('heavy');
-    const cycle = userRole === 'owner' ? OWNER_CYCLE : CLIENT_CYCLE;
-    const currentIdx = cycle.indexOf(storeActiveCategory as any);
-    const nextIdx = (currentIdx + 1) % cycle.length;
-    setActiveCategory(cycle[nextIdx] as any);
-  }, [storeActiveCategory, userRole, setActiveCategory]);
-
-  const sectorLabel = storeActiveCategory
-    ? storeActiveCategory.replace(/-/g, ' ').toUpperCase()
-    : 'ALL SECTORS';
-
-  // Hide the sector pill when exhausted state is showing (it has its own button)
-  const showCards = deckQueue.length > 0 && currentIndex < deckQueue.length;
-  const showLoading = !showCards && (isLoading || isFetching || !isMountSettledRef.current);
-  const showExhausted = !showCards && !showLoading;
 
   const radarNodes = useMemo(() => (smartListings || []).map(l => ({
     id: l.id,
@@ -1153,73 +1133,6 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
           </AnimatePresence>
       </div>
 
-      {/* Sector Switcher — only visible when cards are shown (exhausted state has its own button) */}
-      {!showExhausted && <div
-        className="absolute left-0 right-0 z-[100] flex flex-col items-center pointer-events-none px-6"
-        style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 12px)' }}
-      >
-        <div className="flex flex-col items-center gap-3 w-full max-w-[360px] pointer-events-auto">
-          {/* Main cycle button */}
-          <motion.button
-            whileTap={{ scale: 0.96 }}
-            onClick={handleCycleSector}
-            className={cn(
-              "group relative w-full h-16 flex items-center justify-between px-6 rounded-[2rem] overflow-hidden transition-all",
-              "backdrop-blur-[40px] border border-white/30 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]",
-              storeActiveCategory
-                ? "bg-gradient-to-r from-primary/30 via-primary/20 to-primary/30 border-primary/50"
-                : "bg-gradient-to-r from-black/80 via-black/90 to-black/80"
-            )}
-          >
-            <div className="absolute inset-0 bg-primary/5 opacity-0 group-active:opacity-100 transition-opacity" />
-
-            <div className="flex flex-col items-start">
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60 mb-0.5">
-                Viewing Sector
-              </span>
-              <span className="text-[15px] font-black uppercase tracking-wider text-white flex items-center gap-2">
-                {sectorLabel}
-                <div className={cn(
-                  "w-1.5 h-1.5 rounded-full animate-pulse",
-                  storeActiveCategory
-                    ? "bg-primary shadow-[0_0_8px_rgba(var(--color-brand-primary-rgb),0.8)]"
-                    : "bg-white/40"
-                )} />
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-[1px] bg-white/10" />
-              <span className="text-[11px] font-bold text-primary/80 tracking-tight group-hover:translate-x-0.5 transition-transform">
-                TAP TO SWITCH
-              </span>
-            </div>
-          </motion.button>
-
-          {/* Sub-actions row */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => { triggerHaptic('medium'); setFilterDialogOpen(true); }}
-              className="opacity-70 active:opacity-100 transition-opacity touch-manipulation"
-            >
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-white/80">
-                FILTERS
-              </span>
-            </button>
-
-            <div className="w-px h-3 bg-white/20" />
-
-            <button
-              onClick={() => { triggerHaptic('medium'); navigate(userRole === 'owner' ? '/owner/filters' : '/client/filters'); }}
-              className="opacity-70 active:opacity-100 transition-opacity touch-manipulation"
-            >
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-primary">
-                ADVANCED SEARCH
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>}
 
     </div>
     </div>
