@@ -78,12 +78,12 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
             "text-4xl font-black uppercase italic tracking-[-0.05em] leading-none",
             isLight ? "text-slate-900" : "text-white"
           )}>
-            Swipes <span className="text-primary">Filter</span>
+            Swipess <span className="text-primary">Filter</span>
           </h1>
           <p className={cn(
             "text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mt-1",
             isLight ? "text-slate-900" : "text-white"
-          )}>Find Your Match</p>
+          )}>Filter Your Best Deal</p>
         </div>
       )}
 

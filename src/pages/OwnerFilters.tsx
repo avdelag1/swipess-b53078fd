@@ -71,7 +71,7 @@ export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps)
             <h1 className={cn(
               "text-4xl font-black uppercase italic tracking-[-0.05em] leading-none",
               isLight ? "text-slate-900" : "text-white"
-            )}>Swipes <span className="text-primary">Radar</span></h1>
+            )}>Swipess <span className="text-primary">Radar</span></h1>
             <button
               onClick={handleReset}
               className={cn(
