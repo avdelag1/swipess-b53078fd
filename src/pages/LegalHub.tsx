@@ -730,7 +730,7 @@ const LegalHub = () => {
             </div>
           </motion.div>
         )}
-      </div>
+      </main>
       
       {/* 🛸 FIXED TELEMETRY TAG */}
       <p className="fixed bottom-6 right-10 text-[8px] font-black uppercase tracking-[1em] opacity-10 pointer-events-none z-0">Legal Terminal v15.0</p>
