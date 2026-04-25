@@ -13,138 +13,131 @@ const CLIENT_FIELDS = `
     languages_spoken, neighborhood, bio, onboarding_completed
 `;
 
+// 3 per client type: buyers, renters, workers + 2 roommate-available
+// Coords near Tulum so owner-side radius slider reacts during testing
 const DEMO_CLIENTS: any[] = [
+  // ── BUYERS (looking to purchase) ──────────────────────────────────────
   {
     user_id: 'demo-client-1',
     full_name: 'Sophia Laurent',
-    age: 26,
-    gender: 'female',
-    city: 'Paris',
-    country: 'France',
+    age: 26, gender: 'female',
+    city: 'Tulum', country: 'Mexico',
     images: ['https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=1200'],
     interests: ['Architecture', 'Piano', 'Gourmet Cooking'],
     lifestyle_tags: ['Non-smoker', 'Early Riser', 'Fitness Enthusiast'],
-    bio: 'Looking for a premium workspace or a chic loft in the heart of the city.',
-    onboarding_completed: true
-  },
-  {
-    user_id: 'demo-client-2',
-    full_name: 'Marcus Chen',
-    age: 31,
-    gender: 'male',
-    city: 'Singapore',
-    country: 'Singapore',
-    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=1200'],
-    interests: ['Web3', 'High-speed Racing', 'Mixology'],
-    lifestyle_tags: ['Tech Nomad', 'Night Owl'],
-    bio: 'Relocating for a tech venture. Need a secure spot for my motorcycle and a view of the harbor.',
-    onboarding_completed: true
-  },
-  {
-    user_id: 'demo-client-3',
-    full_name: 'Elena Rodriguez',
-    age: 29,
-    gender: 'female',
-    city: 'Barcelona',
-    country: 'Spain',
-    images: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1200'],
-    interests: ['Art History', 'Surfing', 'Sustainable Design'],
-    lifestyle_tags: ['Pet Friendly', 'Yoga Daily'],
-    bio: 'Art director seeking a sun-drenched studio. Love minimalism and natural light.',
-    onboarding_completed: true
+    bio: 'Looking to purchase a villa or penthouse in Tulum. Budget up to $500k.',
+    occupation: 'buyer', client_type: 'buyer',
+    latitude: 20.2384, longitude: -87.4654, // ~3km
+    roommate_available: false, onboarding_completed: true
   },
   {
     user_id: 'demo-client-4',
     full_name: 'Julian Sterling',
-    age: 34,
-    gender: 'male',
-    city: 'New York',
-    country: 'USA',
+    age: 34, gender: 'male',
+    city: 'Playa del Carmen', country: 'Mexico',
     images: ['https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=1200'],
     interests: ['Venture Capital', 'Sailing', 'Espresso'],
     lifestyle_tags: ['High Net Worth', 'Urban Professional'],
-    bio: 'Seeking an executive residence for short-term project stays. Priority on privacy and high-speed infrastructure.',
-    onboarding_completed: true
+    bio: 'Investor buying beachfront property. Need it fast, need it premium.',
+    occupation: 'buyer', client_type: 'buyer',
+    latitude: 20.1474, longitude: -87.4654, // ~7km
+    roommate_available: false, onboarding_completed: true
   },
   {
-    user_id: 'demo-client-5',
-    full_name: 'Amara Okafor',
-    age: 27,
-    gender: 'female',
-    city: 'Lagos',
-    country: 'Nigeria',
-    images: ['https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=1200'],
-    interests: ['Afrobeats', 'Fashion Design', 'Urban Exploration'],
-    lifestyle_tags: ['Creative Professional', 'Weekend Adventurer'],
-    bio: 'Fashion designer looking for a studio space with character. Need inspiration from the surroundings.',
-    onboarding_completed: true
+    user_id: 'demo-client-8',
+    full_name: 'Alexei Volkov',
+    age: 33, gender: 'male',
+    city: 'Tulum', country: 'Mexico',
+    images: ['https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=1200'],
+    interests: ['Classic Cars', 'Desert Safari', 'Fintech'],
+    lifestyle_tags: ['Collector', 'Private Investor'],
+    bio: 'Buying a high-security villa with garage space for vehicle collection.',
+    occupation: 'buyer', client_type: 'buyer',
+    latitude: 20.4914, longitude: -87.4654, // ~31km
+    roommate_available: false, onboarding_completed: true
+  },
+
+  // ── RENTERS (looking to rent) ─────────────────────────────────────────
+  {
+    user_id: 'demo-client-2',
+    full_name: 'Marcus Chen',
+    age: 31, gender: 'male',
+    city: 'Tulum', country: 'Mexico',
+    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=1200'],
+    interests: ['Web3', 'Motorcycles', 'Mixology'],
+    lifestyle_tags: ['Tech Nomad', 'Night Owl'],
+    bio: 'Remote founder relocating to Tulum. Needs fiber optic and a garage for my bike.',
+    occupation: 'renter', client_type: 'renter',
+    latitude: 20.2834, longitude: -87.4654, // ~8km
+    roommate_available: true, onboarding_completed: true
+  },
+  {
+    user_id: 'demo-client-3',
+    full_name: 'Elena Rodriguez',
+    age: 29, gender: 'female',
+    city: 'Tulum', country: 'Mexico',
+    images: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1200'],
+    interests: ['Art', 'Surfing', 'Sustainable Design'],
+    lifestyle_tags: ['Pet Friendly', 'Yoga Daily'],
+    bio: 'Art director seeking a sun-drenched studio or shared house near the beach.',
+    occupation: 'renter', client_type: 'renter',
+    latitude: 20.2114, longitude: -87.3764, // ~10km
+    roommate_available: true, onboarding_completed: true
   },
   {
     user_id: 'demo-client-6',
     full_name: 'Liam Henderson',
-    age: 28,
-    gender: 'male',
-    city: 'London',
-    country: 'UK',
+    age: 28, gender: 'male',
+    city: 'Playa del Carmen', country: 'Mexico',
     images: ['https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=1200'],
-    interests: ['Rugby', 'Historical Fiction', 'Craft Beer'],
-    lifestyle_tags: ['Social Butterfly', 'Gym Regular'],
-    bio: 'Junior partner at a law firm. Looking for a modern apartment with easy access to the Tube.',
-    onboarding_completed: true
+    interests: ['Rugby', 'Craft Beer', 'Kitesurfing'],
+    lifestyle_tags: ['Social', 'Gym Regular'],
+    bio: 'Looking for a furnished apartment near the beach, 6-month minimum lease.',
+    occupation: 'renter', client_type: 'renter',
+    latitude: 20.2114, longitude: -87.6044, // ~15km
+    roommate_available: false, onboarding_completed: true
+  },
+
+  // ── WORKERS / HIRE ────────────────────────────────────────────────────
+  {
+    user_id: 'demo-client-5',
+    full_name: 'Amara Okafor',
+    age: 27, gender: 'female',
+    city: 'Tulum', country: 'Mexico',
+    images: ['https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=1200'],
+    interests: ['Fashion Design', 'Urban Art', 'Photography'],
+    lifestyle_tags: ['Creative Professional', 'Freelancer'],
+    bio: 'Fashion designer & creative director. Available for brand shoots and interior styling.',
+    occupation: 'worker', client_type: 'hire',
+    latitude: 20.2454, longitude: -87.4654, // ~4km
+    roommate_available: false, onboarding_completed: true
   },
   {
     user_id: 'demo-client-7',
     full_name: 'Yuki Tanaka',
-    age: 24,
-    gender: 'female',
-    city: 'Tokyo',
-    country: 'Japan',
+    age: 24, gender: 'female',
+    city: 'Tulum', country: 'Mexico',
     images: ['https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=1200'],
-    interests: ['Hyper-local Travel', 'Robotics', 'Tea Ceremony'],
-    lifestyle_tags: ['Digital Artist', 'Zen Practice'],
-    bio: 'Finding beauty in the small things. Seeking a creative collective or a minimalist condo with a rooftop view.',
-    onboarding_completed: true
+    interests: ['Robotics', 'Photography', 'Digital Art'],
+    lifestyle_tags: ['Digital Artist', 'Freelancer'],
+    bio: 'Full-stack dev & photographer. Remote-first. Available for product launches.',
+    occupation: 'worker', client_type: 'hire',
+    latitude: 20.2114, longitude: -87.1274, // ~37km
+    roommate_available: false, onboarding_completed: true
   },
   {
-    user_id: 'demo-client-8',
-    full_name: 'Alexei Ivanov',
-    age: 33,
-    gender: 'male',
-    city: 'Dubai',
-    country: 'UAE',
-    images: ['https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=1200'],
-    interests: ['Classic Cars', 'Desert Safari', 'Fintech'],
-    lifestyle_tags: ['Ultra-High Net Worth', 'Private Jet Travel'],
-    bio: 'Restoring a vintage car collection. Looking for a high-security villa with a 10-car garage and climate control.',
-    onboarding_completed: true
-  }
-,
-  {
-    user_id: 'demo-client-7',
-    full_name: 'Yuki Tanaka',
-    age: 24,
-    gender: 'female',
-    city: 'Tokyo',
-    country: 'Japan',
-    images: ['https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=1200'],
-    interests: ['Anime Art', 'Tea Ceremonies', 'Photography'],
-    lifestyle_tags: ['Quiet Observer', 'Minimalist'],
-    bio: 'Photography student looking for a shared living space with other creatives. Budget-conscious but style-focused.',
-    onboarding_completed: true
-  },
-  {
-    user_id: 'demo-client-8',
+    user_id: 'demo-client-9',
     full_name: 'David Van der Berg',
-    age: 30,
-    gender: 'male',
-    city: 'Cape Town',
-    country: 'South Africa',
+    age: 30, gender: 'male',
+    city: 'Playa del Carmen', country: 'Mexico',
     images: ['https://images.unsplash.com/photo-1504257432389-52343af06ae3?auto=format&fit=crop&q=80&w=1200'],
-    interests: ['Mountain Biking', 'Wine Tasting', 'Architecture'],
-    lifestyle_tags: ['Outdoor Enthusiast', 'Remote Worker'],
-    bio: 'Software engineer working remotely. Need a place with a view of Table Mountain and a solid workspace.',
-    onboarding_completed: true
-  }
+    interests: ['Mountain Biking', 'Architecture', 'Woodworking'],
+    lifestyle_tags: ['Craftsman', 'Remote Worker'],
+    bio: 'Construction project manager & interior carpenter. 8 years building premium residences.',
+    occupation: 'worker', client_type: 'hire',
+    latitude: 19.8114, longitude: -87.4654, // ~44km
+    roommate_available: false, onboarding_completed: true
+  },
 ];
 
 
