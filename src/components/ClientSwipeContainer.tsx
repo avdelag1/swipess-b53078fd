@@ -1070,7 +1070,9 @@ const ClientSwipeContainerComponent = ({
                </button>
             </div>
           </div>
-        )}
+        </div>
+      </div>
+    )}
       </div>
 
 
