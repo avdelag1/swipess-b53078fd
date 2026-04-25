@@ -118,11 +118,13 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
   const handleCardSelect = useCallback((card: any) => {
     triggerHaptic('medium');
-    const cat = (card.category || 'property') as QuickFilterCategory;
-    
+    // For owner intent cards, use card.id (buyers/renters/hire/all-clients) as the category
+    // card.category is undefined for OWNER_INTENT_CARDS which use id and clientType instead
+    const cat = (card.id || card.category || 'buyers') as QuickFilterCategory;
+
     setCategories([cat]);
     setActiveCategory(cat);
-    
+
     if (card.clientType) setClientType(card.clientType as any);
     if (card.listingType) setListingType(card.listingType as any);
   }, [setClientType, setListingType, setActiveCategory, setCategories]);

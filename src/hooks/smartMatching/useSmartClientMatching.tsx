@@ -212,7 +212,7 @@ export function useSmartClientMatching(
                     });
                 }
 
-                // RPC attempt
+                // RPC attempt — only use results if they match the current category filter
                 try {
                     const { data: rpcClients, error: rpcError } = await (supabase as any).rpc('get_smart_clients', {
                         p_user_id: userId,
@@ -222,18 +222,29 @@ export function useSmartClientMatching(
 
                     if (!rpcError && rpcClients && Array.isArray(rpcClients) && rpcClients.length > 0) {
                         let finalClients = (rpcClients as any[])
-                            .filter(c => c.user_id !== userId) // self-exclusion
-                            .filter(c => !adminIds?.has(c.user_id)); // admin exclusion
-                        
+                            .filter(c => c.user_id !== userId)
+                            .filter(c => !adminIds?.has(c.user_id));
+
                         if (isRoommateSection) {
                           finalClients = finalClients.filter(c => c.roommate_available || (c as any).roommate_active);
                         }
 
-                        runIdleTask(() => {
-                            const imagesToPrewarm = finalClients.flatMap(p => p.profile_images || p.images || []).slice(0, 5);
-                            pwaImagePreloader.batchPreload(imagesToPrewarm.map(url => getCardImageUrl(url)));
-                        });
-                        return finalClients;
+                        // Apply client_type filtering for owner categories (buyers/renters/hire)
+                        // If no matching results, fall through to demo fallback below
+                        if (_category && ['buyers', 'renters', 'hire'].includes(_category)) {
+                            const clientTypeMap: Record<string, string> = { 'buyers': 'buyer', 'renters': 'renter', 'hire': 'hire' };
+                            finalClients = finalClients.filter(c => (c.client_type || 'unknown') === clientTypeMap[_category]);
+                        }
+
+                        // Only return early from RPC if we have results after filtering
+                        if (finalClients.length > 0) {
+                            runIdleTask(() => {
+                                const imagesToPrewarm = finalClients.flatMap(p => p.profile_images || p.images || []).slice(0, 5);
+                                pwaImagePreloader.batchPreload(imagesToPrewarm.map(url => getCardImageUrl(url)));
+                            });
+                            return finalClients;
+                        }
+                        // Fall through to demo logic below when RPC has results but none match category
                     }
                 } catch (_e) {}
 
