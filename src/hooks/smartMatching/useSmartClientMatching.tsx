@@ -256,10 +256,26 @@ export function useSmartClientMatching(
                 if (isRoommateSection) {
                     query = (query as any).eq('roommate_available', true);
                 }
-                
+
+                // Support both listing type filters (property/motorcycle/bicycle/services)
+                // AND client type filters (buyers/renters/hire) for owner side
                 if (_category && _category !== 'all') {
-                    const mappedCategory = _category === 'worker' ? 'services' : _category;
-                    query = query.contains('preferred_listing_types', [mappedCategory]);
+                    const isClientType = ['buyers', 'renters', 'hire'].includes(_category);
+                    if (isClientType) {
+                        // Owner side: filter by client_type field
+                        const clientTypeMap: Record<string, string> = {
+                            'buyers': 'buyer',
+                            'renters': 'renter',
+                            'hire': 'hire'
+                        };
+                        const mappedType = clientTypeMap[_category];
+                        // Note: client_type is stored in client_profiles table, not profiles
+                        // We'll filter it after the join below
+                    } else {
+                        // Client side: filter by preferred_listing_types
+                        const mappedCategory = _category === 'worker' ? 'services' : _category;
+                        query = query.contains('preferred_listing_types', [mappedCategory]);
+                    }
                 }
 
                 // Apply swipes filter ONLY if we have a massive pool (avoids empty decks)
@@ -269,11 +285,16 @@ export function useSmartClientMatching(
                 }
 
                 let { data: profiles, error } = await query.range(page * pageSize, (page + 1) * pageSize - 1);
-                
-                // 3. EMERGENCY FALLBACK: If deck is empty, fetch ANYONE (ignoring ALL constraints)
-                // This ensures "Show swipe cards users again" request is always fulfilled
-                if (!profiles || profiles.length === 0) {
-                    logger.warn('[SmartMatching] Deck empty, triggering hyper-aggressive fallback');
+
+                // 3. DEMO FALLBACK: If first page and no category-filtered results, show demo
+                // This ensures users see demo cards immediately when a category is selected
+                if ((!profiles || profiles.length === 0) && page === 0 && _category && _category !== 'all') {
+                    logger.warn('[SmartMatching] No results for category ' + _category + ', showing demo cards');
+                    // Fall through to demo fallback below (line 315)
+                }
+                // 4. EMERGENCY FALLBACK: If deck is empty on non-first-pages, fetch ANYONE
+                else if ((!profiles || profiles.length === 0) && page > 0) {
+                    logger.warn('[SmartMatching] Deck empty on page ' + page + ', triggering hyper-aggressive fallback');
                     const { data: fallbackData } = await supabase.from('profiles')
                         .select(CLIENT_FIELDS)
                         .eq('role', targetRole)
@@ -310,6 +331,21 @@ export function useSmartClientMatching(
                     results = results.filter(r => r.roommate_available);
                 }
 
+                // Filter by client_type if owner selected a category (buyers/renters/hire)
+                if (_category && ['buyers', 'renters', 'hire'].includes(_category)) {
+                    const clientTypeMap: Record<string, string> = {
+                        'buyers': 'buyer',
+                        'renters': 'renter',
+                        'hire': 'hire'
+                    };
+                    const targetType = clientTypeMap[_category];
+                    results = results.filter(r => {
+                        // Demo clients have client_type set, real profiles may not
+                        const rType = (r as any).client_type || 'unknown';
+                        return rType === targetType;
+                    });
+                }
+
                 // 🚀 EMERGENCY DEMO FALLBACK: If results are zero, manifest high-fidelity demo cards
                 // This ensures the 'Wow' reaction even on a fresh database.
                 if (results.length === 0 && page === 0) {
@@ -329,11 +365,16 @@ export function useSmartClientMatching(
                         matchReasons: ['Profile available', 'Highly compatible'],
                         incompatibleReasons: [],
                         verified: true,
-                        roommate_available: false,
+                        roommate_available: c.roommate_available ?? false,
                         city: c.city,
                         country: c.country,
                         work_schedule: 'Flexible',
-                        isDemo: true
+                        latitude: c.latitude,
+                        longitude: c.longitude,
+                        isDemo: true,
+                        occupation: c.occupation,
+                        client_type: c.client_type,
+                        bio: c.bio
                     })) as MatchedClientProfile[];
                 }
 

@@ -97,10 +97,11 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     return { ...filters, ...clientFilters };
   }, [filters, clientFilters]);
 
-  const filterCategory = mergedFilters?.categories?.[0] || undefined;
+  // Use activeCategory from filterStore which is set by ClientSwipeContainer (buyers/renters/hire)
+  // This ensures demo fallback triggers when a category is selected
   const { data: clientProfiles = [], isLoading, error } = useSmartClientMatching(
     user?.id,
-    filterCategory,
+    activeCategory as any,
     0,
     50,
     false,
