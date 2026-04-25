@@ -176,7 +176,7 @@ export function MessagingDashboard() {
     const listing = conversation?.listing;
 
     return (
-      <div className={cn("w-full flex flex-col transition-colors duration-500 overflow-hidden", isLight ? "bg-white" : "bg-black")} style={{ height: 'calc(100dvh - 52px - 68px)' }}>
+      <div className={cn("w-full flex flex-col transition-colors duration-500 overflow-hidden", isLight ? "bg-white" : "bg-black")} style={{ height: 'calc(100dvh - var(--top-bar-height, 60px) - var(--safe-top, 0px) - var(--bottom-nav-height, 72px) - var(--safe-bottom, 0px))' }}>
         <AnimatePresence mode="wait">
           <motion.div 
             key="interface" 
@@ -209,7 +209,7 @@ export function MessagingDashboard() {
   }
 
   return (
-    <div className={cn("min-h-screen w-full transition-colors duration-500 relative overflow-hidden", isLight ? "bg-white" : "bg-black")}>
+    <div className={cn("w-full transition-colors duration-500 relative overflow-y-auto scrollbar-hide", isLight ? "bg-white" : "bg-black")} style={{ height: 'calc(100dvh - var(--top-bar-height, 60px) - var(--safe-top, 0px))' }}>
       <AtmosphericLayer variant="rose" />
 
       <MessageActivationBanner isVisible={showActivationBanner} onClose={() => setShowActivationBanner(false)} userRole={userRole} variant="conversation-limit" />

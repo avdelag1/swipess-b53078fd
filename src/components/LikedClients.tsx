@@ -157,7 +157,7 @@ export function LikedClients() {
   }, [likedClients, selectedCategory, searchTerm, filterSafeOnly, sortBy]);
 
   return (
-    <div className="w-full relative flex flex-col pb-40 min-h-screen overflow-y-auto" data-no-swipe-nav="true">
+    <div className="w-full relative flex flex-col pb-40 overflow-y-auto scrollbar-hide" data-no-swipe-nav="true" style={{ height: 'calc(100dvh - var(--top-bar-height, 60px) - var(--safe-top, 0px))' }}>
       <div className="flex-1 flex flex-col p-4 pt-24 sm:p-8 sm:pt-24 max-w-7xl mx-auto w-full">
         <div className="flex items-center justify-between mb-8">
             <h1 className="text-2xl font-black italic uppercase tracking-tighter">Your Talents</h1>

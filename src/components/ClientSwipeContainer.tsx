@@ -976,29 +976,31 @@ const ClientSwipeContainerComponent = ({
                   externalX={topCardX}
                 />
               </motion.div>
-            ) : !externalIsLoading ? (
-               <motion.div
-                 key="exhausted"
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 exit={{ opacity: 0 }}
-                 className="w-full h-full z-50 overflow-hidden"
-               >
-                <SwipeExhaustedState
-                  isRefreshing={isRefreshing}
-                  onRefresh={handleRefresh}
-                  error={externalError}
-                />
-               </motion.div>
             ) : (
-              <motion.div 
-                key="loading-skeleton"
+              <motion.div
+                key="exhausted"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-full h-full flex items-center justify-center"
+                className="w-full h-full z-50 overflow-hidden"
               >
-                <SwipeLoadingSkeleton />
+                <SwipeExhaustedState
+                  radiusKm={radiusKm}
+                  onRadiusChange={setRadiusKm as any}
+                  onDetectLocation={detectLocation}
+                  detecting={locationDetecting}
+                  detected={locationDetected}
+                  categoryName={labels.plural}
+                  isLoading={isLoading}
+                  activeCategory={storeActiveCategory || category}
+                  onCategoryChange={(cat) => {
+                    setActiveCategory(cat as any);
+                  }}
+                  onOpenFilters={() => {
+                    navigate('/owner/filters');
+                  }}
+                  role="owner"
+                />
               </motion.div>
             )}
           </AnimatePresence>
