@@ -1162,16 +1162,6 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                   externalX={topCardX}
                 />
               </motion.div>
-            ) : (isLoading || isFetching || !isMountSettledRef.current) ? (
-              <motion.div 
-                key="loading-skeleton"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full h-full flex items-center justify-center"
-              >
-                <SwipeLoadingSkeleton />
-              </motion.div>
             ) : (
               <motion.div
                 key="exhausted"
@@ -1187,6 +1177,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                   detecting={locationDetecting}
                   detected={locationDetected}
                   categoryName={currentCategoryName}
+                  isLoading={isLoading || isFetching}
                   activeCategory={storeActiveCategory}
                   onCategoryChange={(cat) => {
                     triggerHaptic('medium');

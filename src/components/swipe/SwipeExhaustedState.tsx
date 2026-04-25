@@ -11,6 +11,7 @@ interface SwipeExhaustedStateProps {
   detecting?: boolean;
   detected?: boolean;
   categoryName?: string;
+  isLoading?: boolean;
   activeCategory?: string;
   onCategoryChange?: (category: string) => void;
   onOpenFilters?: () => void;
@@ -25,6 +26,7 @@ export const SwipeExhaustedState = ({
   detecting = false,
   detected = false,
   categoryName = 'listings',
+  isLoading = false,
   activeCategory = 'property',
   onCategoryChange,
   onOpenFilters,
@@ -53,10 +55,10 @@ export const SwipeExhaustedState = ({
         {/* Message */}
         <div className="space-y-2">
           <p className={cn("text-xs font-bold uppercase tracking-wider", isLight ? "text-black/50" : "text-white/50")}>
-            No {categoryName} found nearby
+            {isLoading ? `Searching ${categoryName}...` : `No ${categoryName} found nearby`}
           </p>
           <h2 className={cn("text-2xl font-black tracking-tight", isLight ? "text-black" : "text-white")}>
-            Adjust your distance
+            {isLoading ? 'Finding results' : 'Adjust your distance'}
           </h2>
         </div>
 
