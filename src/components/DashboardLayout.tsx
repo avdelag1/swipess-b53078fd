@@ -276,12 +276,6 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
     return path === '/client/dashboard' || path === '/owner/dashboard' || path === '/client/dashboard/' || path === '/owner/dashboard/';
   }, [location.pathname]);
 
-  // Filter pages need h-screen + overflow-y-auto to scroll within the main container
-  const isScrollableFilterPage = useMemo(() => {
-    const path = location.pathname;
-    return path === '/client/filters' || path === '/client/filters/' || path === '/owner/filters' || path === '/owner/filters/';
-  }, [location.pathname]);
-
   useSwipeNavigation({
     paths: userRole === 'client' ? clientSwipePaths : userRole === 'owner' ? ownerSwipePaths : [],
     containerSelector: '#dashboard-scroll-container',
@@ -291,7 +285,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
   return (
     <div className={cn(
       "dashboard-root w-full min-h-screen relative flex flex-col",
-      (isFullScreenRoute || isZeroScrollDashboard || isImmersiveDashboard || isScrollableFilterPage) ? "h-screen overflow-hidden" : "overflow-x-hidden",
+      (isFullScreenRoute || isZeroScrollDashboard || isImmersiveDashboard) ? "h-screen overflow-hidden" : "overflow-x-hidden",
       isDark ? "dark dark-matte" : "light white-matte"
     )}>
       <main
@@ -310,7 +304,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
         )}
         style={{
           paddingTop: (isFullScreenRoute || isImmersiveDashboard) ? '0px' : 'calc(var(--top-bar-height) + var(--safe-top))',
-          paddingBottom: (isFullScreenRoute || isZeroScrollDashboard) ? '0px' : isScrollableFilterPage ? 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 16px)' : 'calc(80px + env(safe-area-inset-bottom, 20px))',
+          paddingBottom: (isFullScreenRoute || isZeroScrollDashboard) ? '0px' : 'calc(80px + env(safe-area-inset-bottom, 20px))',
           paddingLeft: 'max(var(--safe-left), 0px)',
           paddingRight: 'max(var(--safe-right), 0px)',
         }}

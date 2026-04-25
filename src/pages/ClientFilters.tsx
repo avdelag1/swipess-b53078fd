@@ -65,10 +65,13 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
   ];
 
   return (
-    <div className={cn(
-      "w-full flex flex-col p-4 relative pb-24",
-      isLight ? "bg-white text-slate-900" : "bg-[#020202] text-white"
-    )}>
+    <div
+      className={cn(
+        "w-full flex flex-col p-4 relative overflow-y-auto scrollbar-hide",
+        isLight ? "bg-white text-slate-900" : "bg-[#020202] text-white"
+      )}
+      style={{ height: 'calc(100dvh - var(--top-bar-height, 60px) - var(--safe-top, 0px))', paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 24px)' }}
+    >
       {!isEmbedded && (
         <div className="flex items-center justify-between mb-8 pt-4">
           <div>

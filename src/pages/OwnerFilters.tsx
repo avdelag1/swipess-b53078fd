@@ -57,12 +57,14 @@ export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps)
   ];
 
   const content = (
-    <div className={cn(
-      "flex flex-col transition-colors duration-500",
-      !isEmbedded && "pb-48",
-      isLight ? (isEmbedded ? "bg-transparent" : "bg-[#F8FAFC]") : (isEmbedded ? "bg-transparent" : "bg-black"),
-      isLight ? "text-slate-900" : "text-white"
-    )}>
+    <div
+      className={cn(
+        "flex flex-col transition-colors duration-500 overflow-y-auto scrollbar-hide",
+        isLight ? (isEmbedded ? "bg-transparent" : "bg-[#F8FAFC]") : (isEmbedded ? "bg-transparent" : "bg-black"),
+        isLight ? "text-slate-900" : "text-white"
+      )}
+      style={!isEmbedded ? { height: 'calc(100dvh - var(--top-bar-height, 60px) - var(--safe-top, 0px))', paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 24px)' } : undefined}
+    >
       {/* HEADER - Only in standalone */}
       {!isEmbedded && (
         <div className="pt-32 px-6 flex items-center justify-between">
