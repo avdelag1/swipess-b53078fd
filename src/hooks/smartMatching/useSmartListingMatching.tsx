@@ -29,7 +29,7 @@ const DEMO_LISTINGS: any[] = [
   {
     id: 'demo-1',
     title: 'Ultra-Modern Penthouse',
-    description: 'Breathtaking 360-degree views of the skyline. Private elevator and infinity pool access. Pure luxury living.',
+    description: 'Breathtaking 360-degree views of the skyline. Private elevator and infinity pool access. Pure luxury living with state-of-the-art automation.',
     price: 4500,
     currency: 'USD',
     images: ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200'],
@@ -48,7 +48,7 @@ const DEMO_LISTINGS: any[] = [
   {
     id: 'demo-2',
     title: 'Ducati Panigale V4',
-    description: 'Pristine condition. Low mileage. The pinnacle of Italian engineering. Ready for the track or the street.',
+    description: 'Pristine condition. Low mileage. The pinnacle of Italian engineering. Ready for the track or the street with carbon fiber upgrades.',
     price: 24000,
     currency: 'USD',
     images: ['https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&q=80&w=1200'],
@@ -66,7 +66,7 @@ const DEMO_LISTINGS: any[] = [
   {
     id: 'demo-3',
     title: 'Creative Studio Loft',
-    description: 'Industrial chic at its finest. High ceilings, exposed brick, and perfect natural light for artists.',
+    description: 'Industrial chic at its finest. High ceilings, exposed brick, and perfect natural light for artists and creators.',
     price: 3200,
     currency: 'USD',
     images: ['https://images.unsplash.com/photo-1536376074432-cd424369ffdd?auto=format&fit=crop&q=80&w=1200'],
@@ -102,7 +102,7 @@ const DEMO_LISTINGS: any[] = [
   {
     id: 'demo-5',
     title: 'Senior Interior Architect',
-    description: 'Transforming spaces into experiences. Over 10 years of luxury residential design. Expert in sustainable materials.',
+    description: 'Transforming spaces into experiences. Over 10 years of luxury residential design. Expert in sustainable materials and premium finishes.',
     price: 150,
     pricing_unit: 'hour',
     currency: 'USD',
@@ -137,7 +137,7 @@ const DEMO_LISTINGS: any[] = [
   {
     id: 'demo-7',
     title: 'Vintage Porsche 911',
-    description: 'Air-cooled perfection. Fully restored. A time capsule on wheels that turns heads at every corner.',
+    description: 'Air-cooled perfection. Fully restored. A time capsule on wheels that turns heads at every corner. Collectors dream.',
     price: 125000,
     currency: 'USD',
     images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200'],
@@ -150,8 +150,40 @@ const DEMO_LISTINGS: any[] = [
     is_active: true,
     status: 'active',
     created_at: new Date().toISOString()
+  },
+  {
+    id: 'demo-8',
+    title: 'High-End Fullstack Developer',
+    description: 'Specializing in React, Node.js and AI integrations. Available for premium software architecture and product launches.',
+    price: 120,
+    pricing_unit: 'hour',
+    currency: 'USD',
+    images: ['https://images.unsplash.com/photo-1573164773711-33023fd666cb?auto=format&fit=crop&q=80&w=1200'],
+    city: 'San Francisco',
+    category: 'services',
+    service_category: 'Software Development',
+    experience_years: 8,
+    experience_level: 'expert',
+    is_active: true,
+    status: 'active',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'demo-9',
+    title: 'Specialized Road Bike S-Works',
+    description: 'Featherlight carbon frame. Dura-Ace Di2 shifting. The ultimate racing machine for serious cyclists.',
+    price: 12000,
+    currency: 'USD',
+    images: ['https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&q=80&w=1200'],
+    city: 'Girona',
+    category: 'bicycle',
+    listing_type: 'sell',
+    bicycle_type: 'road',
+    frame_material: 'carbon',
+    is_active: true,
+    status: 'active',
+    created_at: new Date().toISOString()
   }
-
 ];
 
 export function useSmartListingMatching(

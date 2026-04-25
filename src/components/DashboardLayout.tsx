@@ -224,7 +224,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
 
   const isImmersiveDashboard = useMemo(() => {
     const path = location.pathname;
-    // Only the primary swipe card discovery and specific immersive listing views should be locked
+    // Primary swipe card discovery and specific immersive listing views should be locked
     const lockedRoutes = [
       '/client/dashboard', 
       '/owner/dashboard',
@@ -235,8 +235,8 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
     const isLocked = lockedRoutes.some(route => path === route || path === route + '/');
     const isSpecialImmersive = path.includes('/listing/') || path.includes('view-client');
     
-    // Explicitly exclude profile and legal routes from being "immersive" (non-scrollable)
-    if (path.includes('/profile') || path.includes('/legal')) return false;
+    // Profiles and legal hub MUST scroll
+    if (path.includes('/profile') || path.includes('/legal') || path.includes('/settings')) return false;
     
     return isLocked || isSpecialImmersive;
   }, [location.pathname]);
@@ -258,17 +258,18 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
   const isCameraRoute = useMemo(() => location.pathname.includes('/camera'), [location.pathname]);
 
   const isFullScreenRoute = useMemo(() => {
-    const scrollExclusions = ['likes', 'interested', 'liked'];
+    const scrollExclusions = ['likes', 'interested', 'liked', 'profile', 'legal', 'settings'];
     if (scrollExclusions.some(path => location.pathname.includes(path))) return false;
+    
     const isRoommatesPageLocal = location.pathname.startsWith('/explore/roommates');
     const isSpecialSubPage = [
       '/explore/prices', '/explore/intel', '/explore/tours',
       '/documents', '/escrow', '/admin/eventos', '/about', '/contact',
-      '/privacy-policy', '/terms-of-service', '/legal', '/agl',
       '/subscription/packages', '/notifications', '/explore/eventos'
     ].some(path => location.pathname === path || location.pathname === path + '/');
-    return isCameraRoute || isRadioRoute || isRoommatesPageLocal || isSpecialSubPage || (modalStore as any).showMapFullscreen;
-  }, [location.pathname, isCameraRoute, isRadioRoute, (modalStore as any).showMapFullscreen]);
+    
+    return isCameraRoute || isRadioRoute || isRoommatesPageLocal || isSpecialSubPage;
+  }, [location.pathname, isCameraRoute, isRadioRoute]);
 
   const isZeroScrollDashboard = useMemo(() => {
     const path = location.pathname;
@@ -283,7 +284,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
 
   return (
     <div className={cn(
-      "dashboard-root w-full min-h-[100dvh] relative flex flex-col",
+      "dashboard-root w-full min-h-screen relative flex flex-col",
       (isFullScreenRoute || isZeroScrollDashboard || isImmersiveDashboard) ? "h-screen overflow-hidden" : "overflow-x-hidden",
       isDark ? "dark dark-matte" : "light white-matte"
     )}>

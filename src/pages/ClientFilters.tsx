@@ -62,195 +62,200 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
 
   return (
     <div className={cn(
-      "flex flex-col transition-colors duration-500 overflow-y-auto",
-      !isEmbedded && "min-h-screen pb-32",
-      isLight ? (isEmbedded ? "bg-transparent" : "bg-[#F8FAFC]") : (isEmbedded ? "bg-transparent" : "bg-black"),
-      isLight ? "text-slate-900" : "text-white"
+      "flex-1 flex flex-col p-4 relative overflow-y-auto scrollbar-hide pb-24",
+      isLight ? "bg-white text-slate-900" : "bg-[#020202] text-white"
     )}>
       {!isEmbedded && (
-        <div className="pt-32 px-6 flex items-center justify-between">
-            <button 
-              onClick={() => navigate(-1)}
-              className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-xl border transition-all active:scale-90",
-                isLight ? "bg-black/5 border-black/10 text-black" : "bg-white/10 border-white/10 text-white"
-              )}
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
+        <div className="flex items-center justify-between mb-8 pt-4">
+          <div>
             <h1 className={cn(
-              "text-xl font-black uppercase italic tracking-widest",
+              "text-4xl font-black uppercase italic tracking-[-0.05em] leading-none",
               isLight ? "text-slate-900" : "text-white"
-            )}>INTELLIGENCE NEXUS</h1>
+            )}>
+              Intelligence <span className="text-primary">Nexus</span>
+            </h1>
+            <p className={cn(
+              "text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mt-1",
+              isLight ? "text-slate-900" : "text-white"
+            )}>Sector Calibration</p>
+          </div>
+          <div className="flex items-center gap-2">
             <button 
-              onClick={handleReset}
+              onClick={() => navigate('/client/dashboard')}
               className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-xl border transition-all active:scale-90",
-                isLight ? "bg-black/5 border-black/10 text-black" : "bg-white/10 border-white/10 text-white"
+                "w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90",
+                isLight ? "bg-slate-100 text-slate-900" : "bg-white/10 text-white"
               )}
             >
-              <RotateCcw className="w-5 h-5" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
+          </div>
         </div>
       )}
 
-      {/* 🛸 SECTOR NAVIGATION */}
-      <nav className={cn(
-        "container mx-auto px-6 py-8 max-w-4xl",
-        isEmbedded && "py-4 px-2"
-      )}>
-        <div className={cn(
-          "grid grid-cols-4 gap-3 p-2 rounded-[2.5rem] border",
-          isLight ? "bg-white border-slate-200 shadow-sm" : "bg-white/[0.03] border-white/5"
-        )}>
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            const active = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => { haptics.tap(); setActiveCategory(cat.id as any); }}
+      {/* 🛸 RADAR CALIBRATION GRID */}
+      <div className="flex-1 w-full max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative z-10">
+        <AnimatePresence mode="wait">
+          {!activeCategory ? (
+            <motion.div 
+              key="selector"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="grid grid-cols-1 gap-4 pt-4"
+            >
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={cn(
+                    "group relative h-28 w-full rounded-[2.5rem] overflow-hidden border transition-all duration-300 active:scale-[0.97]",
+                    isLight 
+                      ? "bg-white border-slate-200 shadow-xl" 
+                      : "bg-white/5 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                  )}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative h-full px-8 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                      <div className={cn(
+                        "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110",
+                        isLight ? "bg-slate-900 text-white" : "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+                      )}>
+                        <cat.icon className="w-7 h-7" />
+                      </div>
+                      <div className="text-left">
+                        <h3 className={cn(
+                          "text-xl font-black uppercase italic tracking-tight",
+                          isLight ? "text-slate-900" : "text-white"
+                        )}>{cat.label}</h3>
+                        <p className={cn(
+                          "text-[10px] font-bold uppercase tracking-widest opacity-40",
+                          isLight ? "text-slate-900" : "text-white"
+                        )}>{cat.desc}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className={cn(
+                      "w-6 h-6 transition-transform group-hover:translate-x-2",
+                      isLight ? "text-slate-400" : "text-white/30"
+                    )} />
+                  </div>
+                </button>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="filters"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6 pb-20"
+            >
+              <button 
+                onClick={() => setActiveCategory(null)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-2 py-5 rounded-[2rem] transition-all duration-300 relative overflow-hidden group",
-                  active 
-                    ? (isLight ? "bg-slate-900 text-white shadow-xl scale-[1.03] translate-y-[-2px]" : "bg-white text-black shadow-2xl scale-[1.03] translate-y-[-2px]") 
-                    : (isLight ? "text-slate-500 hover:bg-slate-100" : "text-white/40 hover:bg-white/5")
+                  "flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-50 hover:opacity-100 transition-opacity",
+                  isLight ? "text-slate-900" : "text-white"
                 )}
               >
-                <Icon className={cn("w-6 h-6", active ? (isLight ? "text-white" : "text-primary") : "opacity-60")} />
-                <span className="text-[10px] font-black uppercase tracking-tighter">{cat.name}</span>
-                {active && !isLight && (
-                  <motion.div 
-                    layoutId="active-highlight"
-                    className="absolute inset-0 bg-primary/5 pointer-events-none"
-                  />
-                )}
+                <ChevronLeft className="w-4 h-4" /> Back to Nexus
               </button>
-            );
-          })}
-        </div>
-      </nav>
 
-      {/* 🛸 FILTER GRID */}
-      <main className={cn(
-        "container mx-auto px-6 max-w-4xl flex-1",
-        isEmbedded ? "pb-4" : "pb-48"
-      )}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory}
-            initial={{ opacity: 0, scale: 0.98, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: -10 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={cn(
-              "p-6 sm:p-10 rounded-[3.5rem] border backdrop-blur-3xl min-h-[40vh]",
-              isLight ? "bg-white border-slate-200 shadow-xl" : "bg-white/[0.02] border-white/5"
-            )}
-          >
-            {activeCategory === 'property' && <PropertyClientFilters onApply={(f) => setLocalFilters(f)} initialFilters={localFilters} activeCount={0} />}
-            {activeCategory === 'motorcycle' && <MotoClientFilters onApply={(f) => setLocalFilters(f)} initialFilters={localFilters} activeCount={0} />}
-            {activeCategory === 'bicycle' && <BicycleClientFilters onApply={(f) => setLocalFilters(f)} initialFilters={localFilters} activeCount={0} />}
-            {activeCategory === 'services' && <WorkerClientFilters onApply={(f) => setLocalFilters(f)} initialFilters={localFilters} activeCount={0} />}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+              <h2 className={cn(
+                "text-5xl font-black uppercase italic tracking-[-0.05em] mb-2",
+                isLight ? "text-slate-900" : "text-white"
+              )}>
+                {activeCategory === 'property' && 'Property'}
+                {activeCategory === 'motorcycle' && 'Moto'}
+                {activeCategory === 'bicycle' && 'Bicycle'}
+                {activeCategory === 'services' && 'Worker'}
+                <span className="text-primary block text-xl tracking-[0.2em] mt-2">Calibration</span>
+              </h2>
 
-      {/* 🛸 ENGAGEMENT FOOTER */}
-      <div className={cn(
-        "px-6 z-50",
-        isEmbedded ? "mt-8 pb-12" : "fixed bottom-12 left-0 right-0"
-      )}>
-        <div className="max-w-md mx-auto">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => {
-              setIsScanning(true);
-              setTimeout(() => {
-                handleApply();
-                setIsScanning(false);
-              }, 2200);
-            }}
-            disabled={isScanning}
-            className={cn(
-              "w-full h-20 rounded-[2.5rem] font-black uppercase italic tracking-[0.2em] text-xl shadow-[0_30px_70px_rgba(0,0,0,0.5)] flex items-center justify-center gap-4 group transition-all",
-              isLight ? "bg-slate-900 text-white" : "bg-white text-black",
-              "hover:bg-primary hover:text-white disabled:opacity-50"
-            )}
-          >
-            <Sparkles className={cn("w-6 h-6 animate-pulse group-hover:scale-110 transition-transform", isScanning && "animate-spin")} />
-            <span className="text-sm font-black uppercase italic tracking-[0.2em]">
-              {isScanning ? 'CALIBRATING...' : 'TARGET INTELLIGENCE'}
-            </span>
-          </motion.button>
-          
-          <button 
-            onClick={handleReset}
-            className={cn(
-              "w-full mt-4 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity",
-              isLight ? "text-black" : "text-white"
-            )}
-          >
-            <RotateCcw className="w-3 h-3" />
-            Reset Filters
-          </button>
-        </div>
-      </div>
+              <div className={cn(
+                "rounded-[3rem] p-6 shadow-2xl",
+                isLight ? "bg-white border border-slate-100" : "bg-white/5 border border-white/10 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+              )}>
+                {activeCategory === 'property' && <PropertyClientFilters onApply={(f) => setLocalFilters(f)} initialFilters={localFilters} activeCount={0} />}
+                {activeCategory === 'motorcycle' && <MotoClientFilters onApply={(f) => setLocalFilters(f)} initialFilters={localFilters} activeCount={0} />}
+                {activeCategory === 'bicycle' && <BicycleClientFilters onApply={(f) => setLocalFilters(f)} initialFilters={localFilters} activeCount={0} />}
+                {activeCategory === 'services' && <WorkerClientFilters onApply={(f) => setLocalFilters(f)} initialFilters={localFilters} activeCount={0} />}
+              </div>
 
-      {/* 🛸 CINEMATIC SCANNING OVERLAY */}
-      <AnimatePresence>
-        {isScanning && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-black/80 backdrop-blur-2xl pointer-events-auto"
-          >
-            {/* Pulsing Core */}
-            <motion.div
-              animate={{ 
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3]
-              }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="absolute w-[500px] h-[500px] rounded-full bg-primary/20 blur-[120px]"
-            />
-            
-            {/* Scanning Ring */}
-            <div className="relative w-64 h-64 flex items-center justify-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-                className="absolute inset-0 border-2 border-dashed border-primary/40 rounded-full"
-              />
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-                className="absolute inset-4 border border-white/20 rounded-full"
-              />
-              <Search className="w-16 h-16 text-primary animate-pulse" strokeWidth={1} />
-            </div>
+              <div className="flex flex-col gap-4 sticky bottom-0 pt-4 z-20">
+                <button
+                  onClick={handleScan}
+                  disabled={isScanning}
+                  className={cn(
+                    "w-full h-20 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center justify-center gap-4 group transition-all active:scale-95",
+                    isLight ? "bg-slate-900 text-white" : "bg-white text-black",
+                    "hover:bg-primary hover:text-white disabled:opacity-50 overflow-hidden relative"
+                  )}
+                >
+                  {isScanning && (
+                    <motion.div 
+                      className="absolute inset-0 bg-primary/20"
+                      animate={{ x: ['-100%', '100%'] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                    />
+                  )}
+                  <Radar className={cn("w-6 h-6", isScanning && "animate-spin")} />
+                  <span className="text-lg font-black uppercase italic tracking-widest">
+                    {isScanning ? 'Synchronizing...' : 'Initiate Scan'}
+                  </span>
+                </button>
 
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="mt-12 text-center"
-            >
-              <h2 className="text-2xl font-black uppercase italic tracking-[0.4em] text-white">Targeting Nexus</h2>
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mt-2">Optimizing Signal Parameters...</p>
+                <button
+                  onClick={() => { resetFilters(); setActiveCategory(null); }}
+                  className={cn(
+                    "w-full h-16 rounded-[2rem] flex items-center justify-center gap-2 transition-all",
+                    isLight ? "bg-slate-100 text-slate-900 hover:bg-slate-200" : "bg-white/10 text-white hover:bg-white/20"
+                  )}
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">Reset Parameters</span>
+                </button>
+              </div>
             </motion.div>
+          )}
+        </AnimatePresence>
 
-            {/* Scanning Line */}
+        <AnimatePresence>
+          {isScanning && (
             <motion.div 
-              animate={{ top: ['0%', '100%', '0%'] }}
-              transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_rgba(255,107,53,0.8)] z-10 opacity-40"
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 backdrop-blur-3xl bg-black/80"
+            >
+              <div className="relative w-72 h-72 flex items-center justify-center">
+                {/* Outer Glow */}
+                <motion.div 
+                  className="absolute inset-0 rounded-full border border-primary/30"
+                  animate={{ scale: [1, 1.2], opacity: [0.3, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: 'conic-gradient(from 0deg, #ec4899 0%, transparent 25%, transparent 100%)',
+                    opacity: 0.4
+                  }}
+                />
+
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  <Radar className="w-16 h-16 text-primary animate-pulse mb-4" />
+                  <h2 className="text-2xl font-black uppercase italic tracking-[0.4em] text-white animate-pulse">Scanning</h2>
+                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.5em] mt-2">Proximity Sync</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
