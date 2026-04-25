@@ -33,7 +33,7 @@ const OwnerProperties = () => {
     <div className="w-full relative bg-transparent overflow-y-auto scrollbar-hide" style={{ height: 'calc(100dvh - var(--top-bar-height, 60px) - var(--safe-top, 0px))' }}>
       <AtmosphericLayer variant="primary" />
       
-      <div className="w-full relative px-4 sm:px-6 pb-12 z-10">
+      <div className="w-full relative px-4 sm:px-6 pb-12 z-10 h-full overflow-y-auto">
         <PropertyManagement initialCategory={initialCategory} initialMode={initialMode} />
       </div>
     </div>
@@ -41,5 +41,6 @@ const OwnerProperties = () => {
 };
 
 export default OwnerProperties;
+
 
 

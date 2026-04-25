@@ -357,9 +357,10 @@ export function useSmartClientMatching(
 
                 // 🚀 EMERGENCY DEMO FALLBACK: If results are zero, manifest high-fidelity demo cards
                 // This ensures the 'Wow' reaction even on a fresh database.
-                if (results.length === 0 && page === 0) {
-                    logger.info('[SmartClientMatching] Manifesting high-fidelity demo cards');
-                    return DEMO_CLIENTS.map(c => ({
+                if (results.length < 5 && page === 0) {
+                    logger.info('[SmartClientMatching] Appending high-fidelity demo cards');
+                    const existingDemoIds = new Set(results.map(r => r.id));
+                    const newDemos = DEMO_CLIENTS.filter(c => !existingDemoIds.has(c.user_id)).map(c => ({
                         id: c.user_id,
                         user_id: c.user_id,
                         name: c.full_name,
@@ -385,6 +386,8 @@ export function useSmartClientMatching(
                         client_type: c.client_type,
                         bio: c.bio
                     })) as MatchedClientProfile[];
+                    
+                    results = [...results, ...newDemos];
                 }
 
                 runIdleTask(() => {

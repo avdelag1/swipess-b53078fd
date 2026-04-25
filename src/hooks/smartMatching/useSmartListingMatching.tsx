@@ -418,17 +418,19 @@ export function useSmartListingMatching(
                     };
                 });
 
-                // 🚀 EMERGENCY DEMO FALLBACK: If results are zero, manifest high-fidelity demo cards
+                // 🚀 EMERGENCY DEMO FALLBACK: If results are very few, manifest high-fidelity demo cards
                 // This ensures the 'Wow' reaction even on a fresh database.
-                if (matchedResults.length === 0 && page === 0) {
-                    logger.info('[SmartMatching] Manifesting high-fidelity demo cards');
-                    return DEMO_LISTINGS.map(l => ({
+                if (matchedResults.length < 5 && page === 0) {
+                    logger.info('[SmartMatching] Appending high-fidelity demo cards for testing');
+                    const existingDemoIds = new Set(matchedResults.map(r => r.id));
+                    const newDemos = DEMO_LISTINGS.filter(l => !existingDemoIds.has(l.id)).map(l => ({
                         ...l,
                         matchPercentage: 92 + Math.floor(Math.random() * 7),
                         matchReasons: ['Highly Recommended', 'Perfect Match for you'],
                         incompatibleReasons: [],
                         isDemo: true
                     }));
+                    matchedResults.push(...newDemos);
                 }
 
                 const finalResults = matchedResults.sort((a, b) => b.matchPercentage - a.matchPercentage);
