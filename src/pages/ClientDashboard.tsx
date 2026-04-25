@@ -1,4 +1,5 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { SwipessSwipeContainer } from '@/components/SwipessSwipeContainer';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { QuickFilterBar } from '@/components/QuickFilterBar';
@@ -17,15 +18,24 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
   const { user } = useAuth();
   const { setActiveCategory, setCategories } = useFilterActions();
 
-  // Get filter state
+  // Stable filter version trigger (primitive number, no reference instability)
   const filterVersion = useFilterStore(s => s.filterVersion);
-  const filters = useFilterStore(s => s.getListingFilters());
-  const quickFilters = useFilterStore(s => ({
-    categories: s.categories,
-    listingType: s.listingType,
-  }));
 
-  // Pre-fetch data
+  // Computed filters - re-derived only when filterVersion changes (prevents infinite re-renders)
+  const filters = useMemo(
+    () => useFilterStore.getState().getListingFilters(),
+    [filterVersion]
+  );
+
+  // QuickFilters with shallow comparison so the object reference stays stable
+  const quickFilters = useFilterStore(
+    useShallow(s => ({
+      categories: s.categories,
+      listingType: s.listingType,
+    }))
+  );
+
+  // Pre-fetch listing data so the swipe deck is ready instantly
   useSmartListingMatching(user?.id, [], filters, 0, 20, false);
 
   const handleCategorySelect = useCallback((category: QuickFilterCategory) => {
