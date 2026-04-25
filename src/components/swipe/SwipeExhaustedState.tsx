@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { triggerHaptic } from '@/utils/haptics';
 import useAppTheme from '@/hooks/useAppTheme';
-import { RefreshCw, RotateCcw, Zap, SlidersHorizontal, ChevronLeft, Home, Bike, Briefcase, Search } from 'lucide-react';
+import { RefreshCw, RotateCcw, Zap, SlidersHorizontal, Home, Bike, Briefcase, Search } from 'lucide-react';
 import { MotorcycleIcon } from '@/components/icons/MotorcycleIcon';
 import { Button } from '@/components/ui/button';
 import { useCardReset } from '@/hooks/useCardReset';
@@ -130,25 +130,8 @@ export const SwipeExhaustedState = ({
           />
         </div>
 
-        {/* TOP BAR ACTION - Significant padding to clear system UI and header buttons */}
-        <div className="absolute top-32 left-8 z-[90]">
-           <button
-             onClick={() => {
-               triggerHaptic('medium');
-               setActiveCategory(null);
-               setCategories([]);
-             }}
-             className={cn(
-               "flex items-center gap-3 px-6 h-14 rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-3xl border transition-all active:scale-95 group", 
-               isLight ? "bg-white/90 border-black/10 text-black" : "bg-black/40 border-white/20 text-white"
-             )}
-           >
-             <ChevronLeft className="w-5 h-5 -ml-1 transition-transform group-hover:-translate-x-1" />
-             <span className="text-[12px] font-black uppercase tracking-[0.25em]">Back</span>
-           </button>
-        </div>
-
-        <div className="relative flex flex-col items-center text-center max-w-sm z-10 w-full pt-[26dvh] pb-20">
+        {/* Content — vertically centred, leave room for sector button at bottom */}
+        <div className="relative flex flex-col items-center text-center max-w-sm z-10 w-full py-8 pb-24">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

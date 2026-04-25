@@ -1028,7 +1028,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
   return (
     <>
     <div className={cn(
-      "relative w-full h-full overflow-hidden flex flex-col transition-colors duration-500",
+      "relative w-full h-full flex flex-col transition-colors duration-500",
       isLight ? "bg-transparent" : "bg-black"
     )}>
       <div className={cn(
@@ -1054,9 +1054,9 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
       </div>
 
 
-      {/* Card area — flex-1 fills remaining space */}
+      {/* Card area — flex-1 fills remaining space; overflow-hidden here keeps swipe cards contained */}
       <div className={cn(
-        "flex-1 relative flex flex-col items-center justify-center px-0 pt-0 z-10 pointer-events-none min-h-0",
+        "flex-1 relative flex flex-col items-center justify-center px-0 pt-0 z-10 pointer-events-none min-h-0 overflow-hidden",
         (storeActiveCategory && deckQueue.length > 0 && currentIndex < deckQueue.length) ? "pb-0" : ""
       )}>
 
