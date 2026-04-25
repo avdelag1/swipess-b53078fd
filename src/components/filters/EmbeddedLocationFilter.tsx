@@ -583,6 +583,6 @@ export const EmbeddedLocationFilter = memo(function EmbeddedLocationFilter({
       </CollapsibleContent>
     </Collapsible>
   );
-}
+});
 
 
