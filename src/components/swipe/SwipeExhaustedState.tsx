@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw, MapPin, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useFilterStore } from '@/store/useFilterStore';
+import { useFilterStore } from '@/state/filterStore';
 import useAppTheme from '@/hooks/useAppTheme';
 
 interface SwipeExhaustedStateProps {
