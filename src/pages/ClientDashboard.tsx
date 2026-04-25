@@ -26,7 +26,7 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
   return (
     <div
       className={cn(
-        "flex-1 flex flex-col overflow-hidden relative w-full h-full",
+        "flex-1 flex flex-col relative w-full h-full",
         isLight ? "bg-white" : "bg-[#020202]"
       )}
       style={{

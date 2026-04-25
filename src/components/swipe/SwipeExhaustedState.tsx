@@ -97,9 +97,9 @@ export const SwipeExhaustedState = ({
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 15 }}
-            src="/icons/Swipess-wordmark-transparent.png"
+            src="/icons/Swipess-wordmark-white.svg"
             alt="Swipess"
-            className="h-16 mb-12 object-contain"
+            className={cn("h-12 mb-12 object-contain", isLight && "invert")}
           />
 
           {/* Searching Text */}

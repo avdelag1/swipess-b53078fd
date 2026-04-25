@@ -1017,6 +1017,11 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
     ? storeActiveCategory.replace(/-/g, ' ').toUpperCase()
     : 'ALL SECTORS';
 
+  // Hide the sector pill when exhausted state is showing (it has its own button)
+  const showCards = deckQueue.length > 0 && currentIndex < deckQueue.length;
+  const showLoading = !showCards && (isLoading || isFetching || !isMountSettledRef.current);
+  const showExhausted = !showCards && !showLoading;
+
   const radarNodes = useMemo(() => (smartListings || []).map(l => ({
     id: l.id,
     lat: l.latitude || 0,
@@ -1148,8 +1153,8 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
           </AnimatePresence>
       </div>
 
-      {/* Sector Switcher — always visible above the nav bar */}
-      <div
+      {/* Sector Switcher — only visible when cards are shown (exhausted state has its own button) */}
+      {!showExhausted && <div
         className="absolute left-0 right-0 z-[100] flex flex-col items-center pointer-events-none px-6"
         style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 12px)' }}
       >
@@ -1214,7 +1219,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
             </button>
           </div>
         </div>
-      </div>
+      </div>}
 
     </div>
     </div>
