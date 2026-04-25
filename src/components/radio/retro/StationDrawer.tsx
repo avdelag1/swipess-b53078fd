@@ -71,7 +71,7 @@ export const StationDrawer = ({
             } as React.CSSProperties}
           >
             {/* Liquid Shine Overlay */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-70">
                <div className="liquid-glass-highlight--animated absolute inset-0" />
             </div>
 
@@ -136,7 +136,7 @@ export const StationDrawer = ({
             <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide space-y-3 stagger-enter">
               {filteredStations.length === 0 ? (
                 <div className="h-40 flex flex-col items-center justify-center text-white/20">
-                  <Globe size={40} className="mb-4 opacity-30" />
+                  <Globe size={40} className="mb-4 opacity-70" />
                   <p className="font-black text-xs tracking-widest">STATIONS OFFLINE</p>
                 </div>
               ) : (
@@ -219,7 +219,7 @@ export const StationDrawer = ({
                           size={20} 
                           className={cn(
                             "transition-all duration-300",
-                            isFavorite ? "text-rose-500 scale-110 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]" : "text-white/10 group-hover:text-white/30"
+                            isFavorite ? "text-rose-500 scale-110 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]" : "text-white/10 group-hover:text-white/60"
                           )} 
                           fill={isFavorite ? "currentColor" : "none"}
                         />

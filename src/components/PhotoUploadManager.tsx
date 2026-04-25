@@ -175,7 +175,7 @@ export function PhotoUploadManager({
                     </button>
 
                     <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                       <span className="text-[10px] font-black text-white/40 italic uppercase tracking-widest">Asset #{index + 1}</span>
+                       <span className="text-[10px] font-black text-white/70 italic uppercase tracking-widest">Asset #{index + 1}</span>
                     </div>
                   </motion.div>
                 </Reorder.Item>
@@ -188,9 +188,9 @@ export function PhotoUploadManager({
                     className="w-48 h-64 rounded-[2rem] border-2 border-dashed border-white/10 bg-white/5 flex flex-col items-center justify-center gap-3 hover:bg-white/10 transition-all group shrink-0"
                  >
                     <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:border-[#EB4898]/50 transition-all">
-                       <Plus className="w-6 h-6 text-white/40 group-hover:text-[#EB4898]" />
+                       <Plus className="w-6 h-6 text-white/70 group-hover:text-[#EB4898]" />
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest italic text-white/30 group-hover:text-white/60">Upload Asset</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest italic text-white/60 group-hover:text-white/60">Upload Asset</span>
                  </button>
               )}
             </Reorder.Group>
@@ -215,11 +215,11 @@ export function PhotoUploadManager({
           
           <div className="relative z-10 text-center flex flex-col items-center gap-6 p-8">
             <div className="w-20 h-20 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:border-[#EB4898]/50 transition-all shadow-2xl">
-              <Camera className="w-8 h-8 text-white/40 group-hover:text-[#EB4898]" />
+              <Camera className="w-8 h-8 text-white/70 group-hover:text-[#EB4898]" />
             </div>
             <div className="space-y-2">
               <h4 className="text-xl font-black uppercase italic tracking-tighter text-white">Initialize Visual Identity</h4>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 italic">Drag Assets or Tap to Browse</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60 italic">Drag Assets or Tap to Browse</p>
             </div>
 
             <div className="flex gap-4">
@@ -261,7 +261,7 @@ export function PhotoUploadManager({
            ].map((tip) => (
              <div key={tip.label} className="space-y-1">
                 <p className="text-[9px] font-black uppercase text-[#EB4898] italic">{tip.label}</p>
-                <p className="text-[10px] text-white/40 leading-relaxed font-medium uppercase italic">{tip.desc}</p>
+                <p className="text-[10px] text-white/70 leading-relaxed font-medium uppercase italic">{tip.desc}</p>
              </div>
            ))}
         </div>

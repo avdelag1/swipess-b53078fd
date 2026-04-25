@@ -987,7 +987,7 @@ export function ClientPreferencesDialog({ open, onOpenChange }: ClientPreference
               Radar Nexus
             </motion.h2>
             <div className="flex gap-2">
-               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Calibrating Intelligence</span>
+               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">Calibrating Intelligence</span>
                <motion.span 
                 animate={{ opacity: [0, 1, 0] }}
                 transition={{ duration: 0.5, repeat: Infinity }}
@@ -997,7 +997,7 @@ export function ClientPreferencesDialog({ open, onOpenChange }: ClientPreference
           </div>
 
           {/* Data Stream */}
-          <div className="absolute -bottom-24 w-64 overflow-hidden h-12 flex flex-col items-center justify-start opacity-30">
+          <div className="absolute -bottom-24 w-64 overflow-hidden h-12 flex flex-col items-center justify-start opacity-70">
             {[...Array(5)].map((_, i) => (
               <motion.span 
                 key={i}

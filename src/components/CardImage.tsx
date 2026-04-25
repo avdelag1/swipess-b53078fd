@@ -174,7 +174,7 @@ const CardImage = memo(({
               aria-hidden="true"
               loading="eager"
               decoding="async"
-              className="absolute inset-0 w-full h-full object-cover filter blur-[20px] scale-110 opacity-40 mix-blend-overlay transition-opacity duration-300"
+              className="absolute inset-0 w-full h-full object-cover filter blur-[20px] scale-110 opacity-70 mix-blend-overlay transition-opacity duration-300"
             />
           )}
         </div>

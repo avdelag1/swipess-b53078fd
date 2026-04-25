@@ -78,7 +78,7 @@ export function OwnerInsightsDashboard() {
               </div>
               <div className="space-y-0.5">
                 <div className={cn("text-xl font-black tracking-tighter", isLight ? "text-slate-900" : "text-white")}>{stat.value}</div>
-                <div className={cn("text-[9px] font-black uppercase tracking-widest", isLight ? "text-slate-400" : "text-white/30")}>{stat.label}</div>
+                <div className={cn("text-[9px] font-black uppercase tracking-widest", isLight ? "text-slate-400" : "text-white/60")}>{stat.label}</div>
               </div>
             </div>
           </motion.div>
@@ -137,7 +137,7 @@ export function OwnerInsightsDashboard() {
         
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className={cn("text-[11px] font-medium", isLight ? "text-slate-400" : "text-white/40")}>Response Accuracy</span>
+            <span className={cn("text-[11px] font-medium", isLight ? "text-slate-400" : "text-white/70")}>Response Accuracy</span>
             <span className={cn("text-[11px] font-black", isLight ? "text-slate-900" : "text-white")}>98.2%</span>
           </div>
           <div className={cn("h-1.5 w-full rounded-full overflow-hidden", isLight ? "bg-black/5" : "bg-white/5")}>
@@ -149,7 +149,7 @@ export function OwnerInsightsDashboard() {
           </div>
           
           <div className="flex items-center justify-between pt-2">
-            <span className={cn("text-[11px] font-medium", isLight ? "text-slate-400" : "text-white/40")}>Converged Matches</span>
+            <span className={cn("text-[11px] font-medium", isLight ? "text-slate-400" : "text-white/70")}>Converged Matches</span>
             <span className={cn("text-[11px] font-black", isLight ? "text-slate-900" : "text-white")}>{data?.conversion_rate}%</span>
           </div>
           <div className={cn("h-1.5 w-full rounded-full overflow-hidden", isLight ? "bg-black/5" : "bg-white/5")}>

@@ -191,7 +191,7 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
           )}>
             Discovery Filters
           </h3>
-          <span className="text-xs font-black uppercase tracking-widest opacity-40">Active Range</span>
+          <span className="text-xs font-black uppercase tracking-widest opacity-70">Active Range</span>
         </div>
         <Badge variant="outline" className="text-[9px] font-bold border-primary/20 text-primary uppercase">{category}</Badge>
       </div>
@@ -200,7 +200,7 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
       <div className="space-y-3 px-1 mt-6">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Intent</h2>
-            <span className="text-[10px] font-black uppercase tracking-widest opacity-40">{category}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest opacity-70">{category}</span>
           </div>
 
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 px-1">
@@ -292,7 +292,7 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
                 min={1} max={200} step={1} 
                 className="py-2"
              />
-             <p className={cn("text-[9px] font-medium", isLight ? "text-black/40" : "text-white/20")}>Radius filtering uses your current GPS or selected location.</p>
+             <p className={cn("text-[9px] font-medium", isLight ? "text-black/70" : "text-white/20")}>Radius filtering uses your current GPS or selected location.</p>
           </div>
         </CardContent>
       </Card>

@@ -171,7 +171,7 @@ export function PropertyDetails({ listingId, isOpen, onClose, onMessageClick }: 
                   <div key={i} className="flex flex-col items-center justify-center p-4 transition-all hover:scale-105 bg-muted/30 rounded-lg">
                     <item.icon className="w-6 h-6 mb-2 text-primary" />
                     <div className="font-black text-xl leading-none">{item.value}</div>
-                    <div className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">{item.label}</div>
+                    <div className="text-[10px] font-black uppercase tracking-widest opacity-70 mt-1">{item.label}</div>
                   </div>
                 ))}
               </div>
@@ -215,7 +215,7 @@ export function PropertyDetails({ listingId, isOpen, onClose, onMessageClick }: 
                       <div className="text-xl font-black uppercase italic leading-none">
                         {listing.profiles.full_name}
                       </div>
-                      <div className="text-[11px] font-black uppercase tracking-widest opacity-40 mt-1">Certified Listing Authority</div>
+                      <div className="text-[11px] font-black uppercase tracking-widest opacity-70 mt-1">Certified Listing Authority</div>
                     </div>
                   </div>
                 </div>

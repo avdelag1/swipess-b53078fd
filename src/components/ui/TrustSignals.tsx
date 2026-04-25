@@ -38,7 +38,7 @@ export const VerifiedBadge = memo(({ size = 'md', showLabel = false, className }
           )} 
         />
         {/* Subtle pulse animation */}
-        <div className="absolute inset-0 animate-ping opacity-30">
+        <div className="absolute inset-0 animate-ping opacity-70">
           <BadgeCheck className={cn(sizeClasses[size], 'text-blue-400')} />
         </div>
       </div>

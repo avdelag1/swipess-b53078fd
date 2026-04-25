@@ -363,7 +363,7 @@ export function PhotoEditor({ imageDataUrl, onSave, onCancel }: PhotoEditorProps
                             onValueChange={([value]) => updateAdjustment(control.key, value)}
                             className="w-full"
                           />
-                          <div className="flex justify-between text-white/40 text-xs">
+                          <div className="flex justify-between text-white/70 text-xs">
                             <span>{control.min}</span>
                             <button
                               onClick={() => updateAdjustment(control.key, 0)}

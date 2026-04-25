@@ -103,7 +103,7 @@ const PlaceholderImage = memo(({ name }: { name?: string | null }) => {
         />
       </div>
       <h3 className="text-white text-2xl font-black tracking-tight mb-2 uppercase">{name || 'Client'}</h3>
-      <p className="text-white/40 text-xs font-bold uppercase tracking-widest leading-relaxed">
+      <p className="text-white/70 text-xs font-bold uppercase tracking-widest leading-relaxed">
         Visual identity is being processed<br/>by the sentient engine
       </p>
     </div>

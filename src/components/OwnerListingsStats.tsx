@@ -89,7 +89,7 @@ export function OwnerListingsStats({ listings, isLight = false }: OwnerListingsS
               <div className="relative p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <p className={cn("text-[10px] font-black uppercase tracking-[0.2em] truncate italic", isLight ? 'text-slate-500' : 'text-white/40')}>
+                    <p className={cn("text-[10px] font-black uppercase tracking-[0.2em] truncate italic", isLight ? 'text-slate-500' : 'text-white/70')}>
                       {stat.title}
                     </p>
                     <div className="flex items-baseline gap-1 mt-2.5">
@@ -100,7 +100,7 @@ export function OwnerListingsStats({ listings, isLight = false }: OwnerListingsS
                         <TrendingUp className="w-4 h-4 text-primary" strokeWidth={4} />
                       )}
                     </div>
-                    <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-2 italic", isLight ? 'text-slate-400' : 'text-white/30')}>
+                    <p className={cn("text-[9px] font-black uppercase tracking-[0.3em] mt-2 italic", isLight ? 'text-slate-400' : 'text-white/60')}>
                       {stat.description}
                     </p>
                   </div>
@@ -136,7 +136,7 @@ export function OwnerListingsStats({ listings, isLight = false }: OwnerListingsS
                 <h4 className={cn("text-[10px] font-black uppercase tracking-[0.3em] italic", isLight ? 'text-black opacity-50' : 'text-white opacity-50')}>Asset Breakdown</h4>
                 <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                    <span className={cn("text-[10px] font-black uppercase tracking-widest italic opacity-40", isLight ? 'text-black' : 'text-white')}>{totalListings} Units synchronized</span>
+                    <span className={cn("text-[10px] font-black uppercase tracking-widest italic opacity-70", isLight ? 'text-black' : 'text-white')}>{totalListings} Units synchronized</span>
                 </div>
               </div>
 
@@ -163,7 +163,7 @@ export function OwnerListingsStats({ listings, isLight = false }: OwnerListingsS
                         <span className={cn("text-[10px] font-black uppercase tracking-widest italic leading-none", isLight ? 'text-black' : 'text-white')}>
                         {cat.name}
                         </span>
-                        <span className={cn("text-[8px] font-black uppercase tracking-[0.1em] opacity-30 mt-0.5", isLight ? 'text-black' : 'text-white')}>
+                        <span className={cn("text-[8px] font-black uppercase tracking-[0.1em] opacity-70 mt-0.5", isLight ? 'text-black' : 'text-white')}>
                         {cat.count} synchronized
                         </span>
                     </div>

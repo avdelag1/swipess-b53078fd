@@ -225,7 +225,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
               <div className="space-y-1">
                  <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#EB4898]" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 italic">Identity Terminal</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/70 italic">Identity Terminal</span>
                  </div>
                  <h2 className="text-3xl font-black italic uppercase tracking-tighter text-white">Edit Profile</h2>
               </div>
@@ -241,7 +241,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
               </div>
            </div>
            
-           <button onClick={() => { triggerHaptic('light'); onOpenChange(false); }} className="absolute -top-2 -right-2 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all active:scale-90">
+           <button onClick={() => { triggerHaptic('light'); onOpenChange(false); }} className="absolute -top-2 -right-2 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white transition-all active:scale-90">
              <X className="w-5 h-5" />
            </button>
         </div>
@@ -253,7 +253,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
             <section className="space-y-6">
                <div className="flex flex-col gap-1">
                   <h3 className="text-sm font-black uppercase italic tracking-widest text-white/90">Visual Assets</h3>
-                  <p className="text-[10px] uppercase tracking-widest text-white/30 italic">High-fidelity primary and lifestyle imagery</p>
+                  <p className="text-[10px] uppercase tracking-widest text-white/60 italic">High-fidelity primary and lifestyle imagery</p>
                </div>
                <PhotoUploadManager
                  maxPhotos={6}
@@ -277,16 +277,16 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 italic ml-1">Station ID (Name)</Label>
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-white/70 italic ml-1">Station ID (Name)</Label>
                       <Input value={name} onChange={(e) => setName(e.target.value)} className="h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold italic focus:border-[#EB4898]/50 transition-all px-6" />
                    </div>
                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 italic ml-1">Cycle (Age)</Label>
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-white/70 italic ml-1">Cycle (Age)</Label>
                         <Input type="number" value={age} onChange={(e) => setAge(e.target.value ? Number(e.target.value) : '')} className="h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold italic focus:border-[#EB4898]/50 transition-all px-6 text-center" />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 italic ml-1">Spectrum</Label>
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-white/70 italic ml-1">Spectrum</Label>
                         <Select value={gender} onValueChange={setGender}>
                           <SelectTrigger className="h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold italic focus:border-[#EB4898]/50 transition-all px-6">
                             <SelectValue placeholder="Gender" />
@@ -325,7 +325,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
                          active ? "bg-[#EB4898]/10 border-[#EB4898] shadow-[0_10px_30px_rgba(235,72,152,0.1)]" : "bg-white/5 border-white/5 hover:bg-white/10"
                        )}
                      >
-                        <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-colors", active ? "bg-[#EB4898] text-white" : "bg-white/5 text-white/40")}>
+                        <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-colors", active ? "bg-[#EB4898] text-white" : "bg-white/5 text-white/70")}>
                            <Compass className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
@@ -333,7 +333,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
                               <span className="font-black italic uppercase tracking-tighter text-white group-hover:text-[#EB4898] transition-colors">{opt.label}</span>
                               {active && <Badge className="bg-[#EB4898] text-white text-[8px] font-black uppercase italic">Active</Badge>}
                            </div>
-                           <p className="text-[10px] font-medium uppercase tracking-widest text-white/30 italic">{opt.description}</p>
+                           <p className="text-[10px] font-medium uppercase tracking-widest text-white/60 italic">{opt.description}</p>
                         </div>
                         <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all", active ? "border-[#EB4898] bg-[#EB4898]" : "border-white/20")}>
                            {active && <Check className="w-3 h-3 text-white" />}
@@ -355,7 +355,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                     <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 italic ml-1">Region Control</Label>
+                     <Label className="text-[10px] font-black uppercase tracking-widest text-white/70 italic ml-1">Region Control</Label>
                      <Select value={country} onValueChange={handleCountryChange}>
                         <SelectTrigger className="h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold italic px-6 uppercase tracking-widest">
                            <SelectValue placeholder="Station Country" />
@@ -369,7 +369,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
                      </Select>
                   </div>
                   <div className="space-y-2">
-                     <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 italic ml-1">Sector (City)</Label>
+                     <Label className="text-[10px] font-black uppercase tracking-widest text-white/70 italic ml-1">Sector (City)</Label>
                      <Select value={city} onValueChange={handleCityChange} disabled={!country}>
                         <SelectTrigger className="h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold italic px-6 uppercase tracking-widest">
                            <SelectValue placeholder="City ID" />
@@ -398,7 +398,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
                     { label: 'Clen', val: cleanlinessLevel, set: setCleanlinessLevel, opts: CLEANLINESS_OPTIONS }
                   ].map((group) => (
                     <div key={group.label} className="space-y-2">
-                       <Label className="text-[10px] font-black uppercase tracking-widest text-white/40 italic ml-1">{group.label}</Label>
+                       <Label className="text-[10px] font-black uppercase tracking-widest text-white/70 italic ml-1">{group.label}</Label>
                        <Select value={group.val} onValueChange={group.set}>
                           <SelectTrigger className="h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold italic px-4 uppercase tracking-tighter">
                              <SelectValue />
@@ -420,7 +420,7 @@ function ClientProfileDialogComponent({ open, onOpenChange }: Props) {
            <Button 
              variant="ghost" 
              onClick={() => onOpenChange(false)}
-             className="h-14 px-8 rounded-2xl font-black italic uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5"
+             className="h-14 px-8 rounded-2xl font-black italic uppercase tracking-widest text-white/70 hover:text-white hover:bg-white/5"
            >
               Cancel
            </Button>

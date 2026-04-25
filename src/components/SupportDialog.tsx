@@ -155,7 +155,7 @@ export function SupportDialog({ isOpen, onClose, userRole }: SupportDialogProps)
                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-purple-500 italic">Neural Support</span>
               </div>
               <h2 className={cn("text-3xl font-black uppercase italic tracking-tighter leading-none", isLight ? "text-black" : "text-white")}>Customer Sync</h2>
-              <p className="text-sm font-medium opacity-40 leading-relaxed pt-1">
+              <p className="text-sm font-medium opacity-70 leading-relaxed pt-1">
                 Access help for account protocols, liquidations, or neural glitches.
               </p>
             </div>
@@ -174,7 +174,7 @@ export function SupportDialog({ isOpen, onClose, userRole }: SupportDialogProps)
           {/* Create New Ticket */}
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">New Protocol</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-70 italic">New Protocol</span>
               <div className="h-[1px] flex-1 bg-gradient-to-r from-muted-foreground/10 to-transparent" />
             </div>
 
@@ -242,7 +242,7 @@ export function SupportDialog({ isOpen, onClose, userRole }: SupportDialogProps)
               <Button
                 onClick={handleCreateTicket}
                 disabled={!newTicket.subject.trim() || !newTicket.message.trim() || createTicketMutation.isPending}
-                className="w-full h-16 rounded-[1.8rem] bg-purple-600 hover:bg-purple-500 text-white font-black uppercase italic tracking-widest shadow-2xl transition-all disabled:opacity-40"
+                className="w-full h-16 rounded-[1.8rem] bg-purple-600 hover:bg-purple-500 text-white font-black uppercase italic tracking-widest shadow-2xl transition-all disabled:opacity-70"
               >
                 <Send className="h-5 w-5 mr-3" />
                 {createTicketMutation.isPending ? 'Syncing...' : 'Initiate Ticket'}
@@ -253,16 +253,16 @@ export function SupportDialog({ isOpen, onClose, userRole }: SupportDialogProps)
           {/* Previous Tickets */}
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">Active Logs</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-70 italic">Active Logs</span>
               <div className="h-[1px] flex-1 bg-gradient-to-r from-muted-foreground/10 to-transparent" />
             </div>
             
             {ticketsLoading ? (
-              <div className="text-center py-12 opacity-30 text-[10px] font-black uppercase tracking-widest">
+              <div className="text-center py-12 opacity-70 text-[10px] font-black uppercase tracking-widest">
                 Retrieving data...
               </div>
             ) : tickets?.length === 0 ? (
-              <div className="text-center py-12 opacity-30 text-[10px] font-black uppercase tracking-widest">
+              <div className="text-center py-12 opacity-70 text-[10px] font-black uppercase tracking-widest">
                 No active protocols.
               </div>
             ) : (
@@ -283,7 +283,7 @@ export function SupportDialog({ isOpen, onClose, userRole }: SupportDialogProps)
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className={cn("text-[14px] font-black uppercase italic tracking-tight mb-1 truncate", isLight ? "text-black" : "text-white")}>{ticket.subject}</h4>
-                          <p className="text-[11px] font-medium opacity-40 line-clamp-2 leading-relaxed">
+                          <p className="text-[11px] font-medium opacity-70 line-clamp-2 leading-relaxed">
                             {ticket.message}
                           </p>
                           <div className="flex items-center gap-3 mt-4">
@@ -320,13 +320,13 @@ export function SupportDialog({ isOpen, onClose, userRole }: SupportDialogProps)
           )}>
              <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-purple-500/10 blur-[40px] rounded-full pointer-events-none" />
              <h4 className="text-[11px] font-black uppercase tracking-[0.3em] mb-3 italic">Emergency Relay</h4>
-             <p className="text-[12px] font-medium opacity-40 leading-relaxed mb-4">
+             <p className="text-[12px] font-medium opacity-70 leading-relaxed mb-4">
                For high-priority matrix failures, contact our direct uplink:
              </p>
              <div className="space-y-2">
                <div className="flex items-center gap-3">
                   <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center transition-all", isLight ? "bg-black/5" : "bg-white/5")}>
-                     <MessageCircle className="w-3.5 h-3.5 opacity-40" />
+                     <MessageCircle className="w-3.5 h-3.5 opacity-70" />
                   </div>
                   <p className={cn("text-[13px] font-black italic tracking-tight", isLight ? "text-black" : "text-white")}>support@swipess.app</p>
                </div>

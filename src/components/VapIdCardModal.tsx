@@ -97,7 +97,7 @@ export function VapIdCardModal({ isOpen, onClose }: VapIdProps) {
               <button onClick={cycleTheme} className="h-9 w-9 flex items-center justify-center rounded-full bg-white/10 border border-white/15">
                 <Droplets className="h-4 w-4 text-white/80" />
               </button>
-              <span className="text-[10px] font-medium text-white/40">{theme.name}</span>
+              <span className="text-[10px] font-medium text-white/70">{theme.name}</span>
               <button onClick={onClose} className="h-9 w-9 flex items-center justify-center rounded-full bg-white/10 border border-white/15">
                 <X className="h-4 w-4 text-white/80" />
               </button>
@@ -147,7 +147,7 @@ export function VapIdCardModal({ isOpen, onClose }: VapIdProps) {
 
                   <div className="flex items-center justify-between pt-6 border-t mt-auto" style={{ borderTopColor: theme.tagBorder }}>
                      <div className="flex flex-col">
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] opacity-30" style={{ color: theme.textTertiary }}>Identity Protocol</span>
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] opacity-70" style={{ color: theme.textTertiary }}>Identity Protocol</span>
                         <span className="text-[8px] font-bold uppercase tracking-[0.15em] opacity-50" style={{ color: theme.textTertiary }}>swipess.app</span>
                      </div>
                      <div className="rounded-xl p-3 bg-white shadow-2xl">

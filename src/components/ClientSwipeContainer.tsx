@@ -841,7 +841,7 @@ const ClientSwipeContainerComponent = ({
                   onClick={() => navigate(-1)}
                   className={cn(
                     "w-10 h-10 flex items-center justify-center transition-all rounded-full backdrop-blur-md border",
-                    isLight ? "bg-white/10 border-black/5 text-black/40 hover:text-black" : "bg-black/20 border-white/5 text-white/40 hover:text-white"
+                    isLight ? "bg-white/10 border-black/5 text-black/70 hover:text-black" : "bg-black/20 border-white/5 text-white/70 hover:text-white"
                   )}
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -951,7 +951,7 @@ const ClientSwipeContainerComponent = ({
                       "px-5 py-2.5 rounded-full transition-all duration-300 relative text-[10px] font-black uppercase tracking-[0.15em] italic",
                       isActive 
                         ? "text-primary bg-white/5 shadow-[0_0_40px_rgba(var(--color-brand-primary-rgb),0.2)]"
-                        : "text-white/30 hover:text-white/60"
+                        : "text-white/60 hover:text-white/60"
                     )}
                   >
                     {cat.label}
@@ -973,7 +973,7 @@ const ClientSwipeContainerComponent = ({
                    triggerHaptic('medium');
                    navigate('/owner/filters');
                  }}
-                 className="flex flex-col items-center opacity-40 hover:opacity-100 transition-opacity"
+                 className="flex flex-col items-center opacity-70 hover:opacity-100 transition-opacity"
                >
                  <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-primary drop-shadow-[0_0_8px_rgba(var(--color-brand-primary-rgb),0.5)]">INTELLIGENCE</span>
                </button>
@@ -985,7 +985,7 @@ const ClientSwipeContainerComponent = ({
                    triggerHaptic('medium');
                    navigate('/owner/filters');
                  }}
-                 className="flex flex-col items-center opacity-40 hover:opacity-100 transition-opacity"
+                 className="flex flex-col items-center opacity-70 hover:opacity-100 transition-opacity"
                >
                  <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-primary drop-shadow-[0_0_8px_rgba(var(--color-brand-primary-rgb),0.5)]">RADAR SCAN</span>
                </button>

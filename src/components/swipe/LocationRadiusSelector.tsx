@@ -76,7 +76,7 @@ export const LocationRadiusSelector = memo(({
           animate={{ rotate: expanded ? 180 : 0 }}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         >
-          <ChevronDown className="w-3 h-3 opacity-40" />
+          <ChevronDown className="w-3 h-3 opacity-70" />
         </motion.div>
       </motion.button>
 

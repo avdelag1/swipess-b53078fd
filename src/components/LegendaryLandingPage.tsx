@@ -130,7 +130,7 @@ const LandingView = memo(({
         <motion.p
           animate={{ opacity: [0.15, 0.4, 0.15] }}
           transition={{ duration: 3, repeat: Infinity }}
-          className="mt-2 text-[9px] uppercase tracking-[0.35em] font-bold text-white/30 italic"
+          className="mt-2 text-[9px] uppercase tracking-[0.35em] font-bold text-white/60 italic"
         >
           or swipe logo to enter →
         </motion.p>
@@ -277,7 +277,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
         
         <button
           onClick={() => { triggerHaptic('light'); isForgotPassword ? setIsForgotPassword(false) : onBack(); }}
-          className="absolute top-5 left-5 w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 border border-white/5 active:scale-90 transition-all z-20"
+          className="absolute top-5 left-5 w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-white/70 border border-white/5 active:scale-90 transition-all z-20"
           aria-label="Go back"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -308,7 +308,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                     "flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all",
                     isLogin
                       ? "bg-[#FF4D00] text-white shadow-lg"
-                      : "text-white/40 hover:text-white/60"
+                      : "text-white/70 hover:text-white/60"
                   )}
                 >
                   Sign In
@@ -320,7 +320,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                     "flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all",
                     !isLogin
                       ? "bg-[#FF4D00] text-white shadow-lg"
-                      : "text-white/40 hover:text-white/60"
+                      : "text-white/70 hover:text-white/60"
                   )}
                 >
                   Sign Up
@@ -338,14 +338,14 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
           {!isLogin && !isForgotPassword && (
             <div>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
                 <Input
                   value={name}
                   onChange={(e) => { setName(e.target.value); setFieldErrors(prev => ({ ...prev, name: '' })); }}
                   placeholder="Your Name"
                   autoComplete="name"
                   className={cn(
-                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/30 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
+                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/60 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
                     fieldErrors.name && "border-red-500/70 focus:border-red-500"
                   )}
                 />
@@ -356,7 +356,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
 
           <div>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
               <Input
                 type="email"
                 value={email}
@@ -364,7 +364,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                 placeholder="Email"
                 autoComplete="email"
                 className={cn(
-                  "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/30 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
+                  "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/60 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
                   fieldErrors.email && "border-red-500/70 focus:border-red-500"
                 )}
               />
@@ -375,7 +375,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
           {!isForgotPassword && (
             <div>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
                 <Input
                   type="password"
                   value={password}
@@ -383,7 +383,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   placeholder="Password"
                   autoComplete={isLogin ? "current-password" : "new-password"}
                   className={cn(
-                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/30 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
+                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/60 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
                     fieldErrors.password && "border-red-500/70 focus:border-red-500"
                   )}
                 />
@@ -395,7 +395,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
           {!isLogin && !isForgotPassword && (
             <div>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
                 <Input
                   type="password"
                   value={confirmPassword}
@@ -403,7 +403,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                   placeholder="Confirm Password"
                   autoComplete="new-password"
                   className={cn(
-                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/30 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
+                    "pl-11 h-[52px] bg-black/60 border-white/10 text-white placeholder:text-white/60 rounded-2xl focus:border-[#FF4D00]/50 transition-all font-semibold text-sm",
                     fieldErrors.confirmPassword && "border-red-500/70 focus:border-red-500"
                   )}
                 />
@@ -494,7 +494,7 @@ function LegendaryLandingPage() {
       </AnimatePresence>
 
       {/* 🛸 LEGAL FOOTER */}
-      <div className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-1.5 opacity-30 hover:opacity-80 transition-opacity">
+      <div className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-1.5 opacity-70 hover:opacity-80 transition-opacity">
         <div className="flex items-center gap-5 text-[9px] font-black uppercase tracking-[0.3em] text-white italic">
           <button onClick={() => setLegalModal('privacy')} className="hover:text-[#EB4898] transition-colors">Privacy</button>
           <div className="w-1 h-1 rounded-full bg-white/20" />

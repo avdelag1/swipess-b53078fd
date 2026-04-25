@@ -164,7 +164,7 @@ export function SharedProfileSection({
             </div>
             <div className="min-w-0">
               <h3 className={cn("font-black uppercase italic tracking-tight text-lg", isDark ? "text-white" : "text-gray-900")}>Share & Earn</h3>
-              <p className={cn("text-[10px] font-black uppercase tracking-widest opacity-40 mt-1", isDark ? "text-white" : "text-gray-900")}>
+              <p className={cn("text-[10px] font-black uppercase tracking-widest opacity-70 mt-1", isDark ? "text-white" : "text-gray-900")}>
                 Get free messages for referrals
               </p>
             </div>
@@ -174,7 +174,7 @@ export function SharedProfileSection({
           <div className="flex gap-3 mb-6">
             <div className={cn(
               "flex-1 px-5 py-4 border rounded-[1.5rem] text-[11px] font-black uppercase tracking-wider truncate flex items-center shadow-inner", 
-              isDark ? "bg-black/40 border-white/5 text-white/40" : "bg-black/5 border-black/5 text-black/40"
+              isDark ? "bg-black/40 border-white/5 text-white/70" : "bg-black/5 border-black/5 text-black/70"
             )}>
               {shareUrl}
             </div>
@@ -217,7 +217,7 @@ export function SharedProfileSection({
                 )}>
                   {btn.icon}
                 </div>
-                <span className={cn("text-[9px] font-black uppercase tracking-widest opacity-30 group-hover:opacity-100", isDark ? "text-white" : "text-black")}>{btn.label}</span>
+                <span className={cn("text-[9px] font-black uppercase tracking-widest opacity-70 group-hover:opacity-100", isDark ? "text-white" : "text-black")}>{btn.label}</span>
               </button>
             ))}
           </div>

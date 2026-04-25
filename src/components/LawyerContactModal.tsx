@@ -111,7 +111,7 @@ export function LawyerContactModal({ isOpen, onClose }: LawyerContactModalProps)
                             "px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border",
                             formData.category === cat 
                               ? "bg-amber-500 border-amber-500 text-black" 
-                              : "bg-white/5 border-white/5 text-white/40 hover:text-white/60"
+                              : "bg-white/5 border-white/5 text-white/70 hover:text-white/60"
                           )}
                         >
                           {cat}

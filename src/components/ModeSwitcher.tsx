@@ -63,7 +63,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
           "w-11 h-11 flex items-center justify-center transition-all duration-300 relative rounded-2xl",
           isClient 
             ? "opacity-100" 
-            : (isLight ? "opacity-70 hover:opacity-100" : "opacity-40 hover:opacity-100")
+            : (isLight ? "opacity-70 hover:opacity-100" : "opacity-70 hover:opacity-100")
         )}
 
         style={glassButtonStyle(isClient, '#f43f5e')}
@@ -83,7 +83,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
           "w-11 h-11 flex items-center justify-center transition-all duration-300 relative rounded-2xl",
           !isClient 
             ? "opacity-100" 
-            : (isLight ? "opacity-70 hover:opacity-100" : "opacity-40 hover:opacity-100")
+            : (isLight ? "opacity-70 hover:opacity-100" : "opacity-70 hover:opacity-100")
         )}
 
         style={glassButtonStyle(!isClient, '#f97316')}

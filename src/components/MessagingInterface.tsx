@@ -219,7 +219,7 @@ export const MessagingInterface = memo(({ conversationId, otherUser, listing, cu
                 </h3>
                 <div className="flex items-center gap-1.5">
                    <div className={cn("w-1 h-1 rounded-full", isOnline ? "bg-green-500 animate-pulse" : "bg-white/20")} />
-                   <span className={cn("text-[9px] font-black uppercase tracking-[0.2em] italic", isOnline ? "text-green-500" : "opacity-30")}>
+                   <span className={cn("text-[9px] font-black uppercase tracking-[0.2em] italic", isOnline ? "text-green-500" : "opacity-70")}>
                     {isOnline ? 'Online' : 'Offline'}
                   </span>
                 </div>
@@ -236,7 +236,7 @@ export const MessagingInterface = memo(({ conversationId, otherUser, listing, cu
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className={cn("w-10 h-10 rounded-2xl flex items-center justify-center transition-all", isThemeLight ? "bg-black/5 text-black" : "bg-white/5 text-white/40")}>
+                  <button className={cn("w-10 h-10 rounded-2xl flex items-center justify-center transition-all", isThemeLight ? "bg-black/5 text-black" : "bg-white/5 text-white/70")}>
                     <MoreVertical className="w-5 h-5" />
                   </button>
                 </DropdownMenuTrigger>
@@ -288,7 +288,7 @@ export const MessagingInterface = memo(({ conversationId, otherUser, listing, cu
             )}
 
             {messages.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-10 opacity-30">
+              <div className="h-full flex flex-col items-center justify-center text-center p-10 opacity-70">
                 <Sparkles className="w-12 h-12 mb-6 animate-pulse" />
                 <h3 className="text-xl font-black uppercase italic tracking-tighter">Start Chatting</h3>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] mt-3 max-w-[200px] leading-relaxed">System ready for messages. Send your first message now.</p>
@@ -333,7 +333,7 @@ export const MessagingInterface = memo(({ conversationId, otherUser, listing, cu
             <button
                 type="button"
                 onClick={() => setShowEmojiPicker(p => !p)}
-                className={cn("shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all border", isThemeLight ? "bg-black/5 border-black/5 text-black" : "bg-white/5 border-white/10 text-white/40")}
+                className={cn("shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all border", isThemeLight ? "bg-black/5 border-black/5 text-black" : "bg-white/5 border-white/10 text-white/70")}
             >
               <Smile className="w-5 h-5" />
             </button>

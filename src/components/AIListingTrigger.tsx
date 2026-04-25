@@ -109,7 +109,7 @@ export function AIListingTrigger({ glassPillStyle }: AIListingTriggerProps) {
                 <h2 className="text-[11px] font-black uppercase tracking-[0.5em] text-white/50">Swipess Intelligence</h2>
              </div>
              <DialogClose className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center transition-all group">
-                <X className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" />
+                <X className="w-4 h-4 text-white/70 group-hover:text-white transition-colors" />
              </DialogClose>
           </div>
 
@@ -118,7 +118,7 @@ export function AIListingTrigger({ glassPillStyle }: AIListingTriggerProps) {
              <h1 className="text-4xl font-black uppercase tracking-tighter mb-4 italic leading-none">
                Target Platform
              </h1>
-             <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 leading-relaxed">
+             <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-white/70 leading-relaxed">
                Select the deployment sector for your new Swipess artifact. Flagship intelligence will optimize for the target audience.
              </p>
           </div>
@@ -160,7 +160,7 @@ export function AIListingTrigger({ glassPillStyle }: AIListingTriggerProps) {
                         <span className="text-lg font-black uppercase tracking-tight italic">
                            {cat.label}
                         </span>
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/30 group-hover:text-white/60 transition-colors">
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white/60 transition-colors">
                            Deploy Protocol
                         </span>
                       </div>

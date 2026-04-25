@@ -225,7 +225,7 @@ export function CameraFiltersPanel({
 
                     {/* Blur Intensity Slider */}
                     <div className={`space-y-3 transition-opacity ${
-                      portraitConfig.enabled ? 'opacity-100' : 'opacity-40'
+                      portraitConfig.enabled ? 'opacity-100' : 'opacity-70'
                     }`}>
                       <div className="flex justify-between items-center">
                         <span className="text-white/80 text-sm">Blur Intensity</span>
@@ -249,7 +249,7 @@ export function CameraFiltersPanel({
 
                     {/* Focus Area Slider */}
                     <div className={`space-y-3 transition-opacity ${
-                      portraitConfig.enabled ? 'opacity-100' : 'opacity-40'
+                      portraitConfig.enabled ? 'opacity-100' : 'opacity-70'
                     }`}>
                       <div className="flex justify-between items-center">
                         <span className="text-white/80 text-sm">Focus Area</span>
@@ -271,7 +271,7 @@ export function CameraFiltersPanel({
                       />
                     </div>
 
-                    <p className="text-white/40 text-xs text-center">
+                    <p className="text-white/70 text-xs text-center">
                       Portrait mode simulates depth-of-field blur for professional-looking photos
                     </p>
                   </motion.div>
@@ -314,7 +314,7 @@ export function CameraFiltersPanel({
 
                     {/* Brightness Boost Slider */}
                     <div className={`space-y-3 transition-opacity ${
-                      nightConfig.enabled ? 'opacity-100' : 'opacity-40'
+                      nightConfig.enabled ? 'opacity-100' : 'opacity-70'
                     }`}>
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
@@ -341,7 +341,7 @@ export function CameraFiltersPanel({
 
                     {/* Noise Reduction Slider */}
                     <div className={`space-y-3 transition-opacity ${
-                      nightConfig.enabled ? 'opacity-100' : 'opacity-40'
+                      nightConfig.enabled ? 'opacity-100' : 'opacity-70'
                     }`}>
                       <div className="flex justify-between items-center">
                         <span className="text-white/80 text-sm">Noise Reduction</span>
@@ -363,7 +363,7 @@ export function CameraFiltersPanel({
                       />
                     </div>
 
-                    <p className="text-white/40 text-xs text-center">
+                    <p className="text-white/70 text-xs text-center">
                       Night mode enhances visibility in low-light conditions
                     </p>
                   </motion.div>

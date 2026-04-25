@@ -296,7 +296,7 @@ export const EventCard = memo(({
                   <div className={cn("flex items-start gap-3 p-3 rounded-2xl", isLight ? "bg-black/5" : "bg-white/5")}>
                     <Calendar className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
                     <div>
-                      <div className={cn("text-[10px] uppercase tracking-widest", isLight ? "text-black/40" : "text-white/40")}>Date</div>
+                      <div className={cn("text-[10px] uppercase tracking-widest", isLight ? "text-black/70" : "text-white/70")}>Date</div>
                       <div className={cn("text-sm font-bold", isLight ? "text-black" : "text-white")}>{formatDate(event.event_date)}</div>
                     </div>
                   </div>
@@ -305,7 +305,7 @@ export const EventCard = memo(({
                   <div className={cn("flex items-start gap-3 p-3 rounded-2xl", isLight ? "bg-black/5" : "bg-white/5")}>
                     <MapPin className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
                     <div>
-                      <div className={cn("text-[10px] uppercase tracking-widest", isLight ? "text-black/40" : "text-white/40")}>Location</div>
+                      <div className={cn("text-[10px] uppercase tracking-widest", isLight ? "text-black/70" : "text-white/70")}>Location</div>
                       <div className={cn("text-sm font-bold", isLight ? "text-black" : "text-white")}>{event.location}</div>
                     </div>
                   </div>

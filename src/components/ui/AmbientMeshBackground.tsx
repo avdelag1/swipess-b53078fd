@@ -85,7 +85,7 @@ export function AmbientMeshBackground({ color = '#f97316', intensity = 0.15, spe
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute -inset-[30%] opacity-40"
+            className="absolute -inset-[30%] opacity-70"
             style={{
               background: gradients[2],
               filter: 'blur(120px)'

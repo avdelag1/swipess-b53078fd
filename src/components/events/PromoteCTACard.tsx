@@ -48,7 +48,7 @@ export const PromoteCTACard = memo(({ onPromote }: { onPromote: () => void }) =>
           {[['15k+', 'Users'], ['120k+', 'Views/mo'], ['89%', 'Engagement']].map(([val, label]) => (
             <div key={label} className="text-center">
               <div className={cn("font-black text-lg", isLight ? "text-black" : "text-white")}>{val}</div>
-              <div className={cn("text-[10px] font-bold uppercase tracking-wider", isLight ? "text-black/40" : "text-white/40")}>{label}</div>
+              <div className={cn("text-[10px] font-bold uppercase tracking-wider", isLight ? "text-black/70" : "text-white/70")}>{label}</div>
             </div>
           ))}
         </div>

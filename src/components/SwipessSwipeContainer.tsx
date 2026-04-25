@@ -1188,7 +1188,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
               <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               
               <div className="flex flex-col items-start">
-                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-0.5">Active Sector</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/70 mb-0.5">Active Sector</span>
                 <span className="text-[15px] font-black uppercase tracking-wider text-white flex items-center gap-2">
                   {storeActiveCategory?.replace(/-/g, ' ') || 'All Sectors'}
                   <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--color-brand-primary-rgb),0.8)]" />
@@ -1210,7 +1210,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                      triggerHaptic('medium');
                      setFilterDialogOpen(true);
                   }}
-                  className="opacity-40 hover:opacity-100 transition-opacity"
+                  className="opacity-70 hover:opacity-100 transition-opacity"
                 >
                   <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-white/80">INTELLIGENCE NEXUS</span>
                 </button>
@@ -1222,7 +1222,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                      triggerHaptic('medium');
                      navigate(userRole === 'owner' ? '/owner/filters' : '/client/filters');
                   }}
-                  className="opacity-40 hover:opacity-100 transition-opacity"
+                  className="opacity-70 hover:opacity-100 transition-opacity"
                 >
                   <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-primary">RADAR SCAN</span>
                 </button>

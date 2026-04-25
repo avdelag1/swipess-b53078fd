@@ -200,7 +200,7 @@ export function AIListingWizard() {
                 <div>
                   <h2 className="text-base font-black uppercase tracking-[0.1em] text-white italic">Swipess {t('topbar.intelligence')}</h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[10px] opacity-40 font-bold uppercase tracking-widest leading-none">{t('topbar.autonomousLayer')}</span>
+                    <span className="text-[10px] opacity-70 font-bold uppercase tracking-widest leading-none">{t('topbar.autonomousLayer')}</span>
                     <div className="w-1 h-1 bg-cyan-500 rounded-full animate-pulse" />
                   </div>
                 </div>
@@ -209,7 +209,7 @@ export function AIListingWizard() {
                 onClick={handleClose} 
                 className="w-11 h-11 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-2xl transition-all border border-white/5"
               >
-                <X className="w-5 h-5 text-white/40" />
+                <X className="w-5 h-5 text-white/70" />
               </button>
             </div>
 
@@ -267,7 +267,7 @@ export function AIListingWizard() {
                     >
                       <button 
                         onClick={() => setStep('category')}
-                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-cyan-400 opacity-40 hover:opacity-100 transition-opacity"
+                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-cyan-400 opacity-70 hover:opacity-100 transition-opacity"
                       >
                         <ArrowLeft className="w-4 h-4" />
                         Re-target Platform
@@ -275,7 +275,7 @@ export function AIListingWizard() {
 
                       <div className="space-y-4">
                         <h3 className="text-3xl font-black tracking-tighter text-white uppercase italic leading-none">Visual Proof</h3>
-                        <p className="text-[11px] text-white/30 leading-relaxed uppercase tracking-[0.2em]">Upload high-fidelity imagery of the asset. swipess.appputer vision will extract secondary attributes.</p>
+                        <p className="text-[11px] text-white/60 leading-relaxed uppercase tracking-[0.2em]">Upload high-fidelity imagery of the asset. swipess.appputer vision will extract secondary attributes.</p>
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -302,9 +302,9 @@ export function AIListingWizard() {
                               className="aspect-square rounded-[2rem] border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-3 hover:bg-cyan-500/5 hover:border-cyan-500/40 transition-all group shadow-inner"
                             >
                               <div className="p-3 rounded-2xl bg-white/5 border border-white/5 group-hover:bg-cyan-500/20 group-hover:border-cyan-400/30 transition-all">
-                                <Camera className="w-6 h-6 text-cyan-400 opacity-40 group-hover:opacity-100" />
+                                <Camera className="w-6 h-6 text-cyan-400 opacity-70 group-hover:opacity-100" />
                               </div>
-                              <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-30 text-white">Add Intel</span>
+                              <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-70 text-white">Add Intel</span>
                             </button>
                       </div>
 
@@ -331,7 +331,7 @@ export function AIListingWizard() {
                     >
                       <button 
                         onClick={() => setStep('photos')}
-                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-cyan-400 opacity-40 hover:opacity-100 transition-opacity"
+                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-cyan-400 opacity-70 hover:opacity-100 transition-opacity"
                       >
                         <ArrowLeft className="w-4 h-4" />
                         Modify Visual Proof
@@ -339,15 +339,15 @@ export function AIListingWizard() {
 
                       <div className="space-y-4">
                         <h3 className="text-3xl font-black tracking-tighter text-white uppercase italic leading-none">Intel Stream</h3>
-                        <p className="text-[11px] text-white/30 leading-relaxed uppercase tracking-[0.2em]">Provide the core metrics and narrative. AI will synthesize and optimize for maximum conversion.</p>
+                        <p className="text-[11px] text-white/60 leading-relaxed uppercase tracking-[0.2em]">Provide the core metrics and narrative. AI will synthesize and optimize for maximum conversion.</p>
                       </div>
 
                       <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                            <div className="space-y-3">
-                              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">Market Price</label>
+                              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 ml-2">Market Price</label>
                               <div className="relative">
-                                 <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400 opacity-40" />
+                                 <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400 opacity-70" />
                                  <input
                                     type="text"
                                     value={price}
@@ -358,9 +358,9 @@ export function AIListingWizard() {
                               </div>
                            </div>
                            <div className="space-y-3">
-                              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">City Node</label>
+                              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 ml-2">City Node</label>
                               <div className="relative">
-                                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400 opacity-40" />
+                                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400 opacity-70" />
                                  <input
                                     type="text"
                                     value={location}
@@ -377,7 +377,7 @@ export function AIListingWizard() {
                            {category === 'property' && (
                               <>
                                  <div className="space-y-3">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">Total Beds</label>
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 ml-2">Total Beds</label>
                                     <input
                                        type="number"
                                        onChange={(e) => setAiResult((prev: any) => ({ ...prev, beds: Number(e.target.value) }))}
@@ -386,7 +386,7 @@ export function AIListingWizard() {
                                     />
                                  </div>
                                  <div className="space-y-3">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">Bathrooms</label>
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 ml-2">Bathrooms</label>
                                     <input
                                        type="number"
                                        onChange={(e) => setAiResult((prev: any) => ({ ...prev, baths: Number(e.target.value) }))}
@@ -399,7 +399,7 @@ export function AIListingWizard() {
                            {(category === 'motorcycle' || category === 'bicycle') && (
                               <>
                                  <div className="space-y-3">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">Brand / Maker</label>
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 ml-2">Brand / Maker</label>
                                     <input
                                        type="text"
                                        onChange={(e) => setAiResult((prev: any) => ({ ...prev, brand: e.target.value }))}
@@ -408,7 +408,7 @@ export function AIListingWizard() {
                                     />
                                  </div>
                                  <div className="space-y-3">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">Model Year</label>
+                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 ml-2">Model Year</label>
                                     <input
                                        type="text"
                                        onChange={(e) => setAiResult((prev: any) => ({ ...prev, year: e.target.value }))}
@@ -420,7 +420,7 @@ export function AIListingWizard() {
                            )}
                            {category === 'worker' && (
                               <div className="col-span-2 space-y-3">
-                                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">Service Field</label>
+                                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 ml-2">Service Field</label>
                                  <input
                                     type="text"
                                     onChange={(e) => setAiResult((prev: any) => ({ ...prev, service_category: e.target.value }))}
@@ -520,7 +520,7 @@ export function AIListingWizard() {
                     >
                       <div className="space-y-3">
                         <h3 className="text-3xl font-black tracking-tighter text-white uppercase italic leading-none">Target Manifested</h3>
-                        <p className="text-[11px] text-white/40 leading-relaxed uppercase tracking-[0.2em]">Autonomous refinement complete. Validate the synthesized data before final deployment.</p>
+                        <p className="text-[11px] text-white/70 leading-relaxed uppercase tracking-[0.2em]">Autonomous refinement complete. Validate the synthesized data before final deployment.</p>
                       </div>
 
                       <div className={cn(
@@ -561,9 +561,9 @@ export function AIListingWizard() {
                         <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
                            <div className="flex items-center gap-2">
                               <div className="w-2 h-2 bg-cyan-500 rounded-full animate-pulse" />
-                              <span className="text-[9px] font-black uppercase tracking-widest text-white/40">Market Ready</span>
+                              <span className="text-[9px] font-black uppercase tracking-widest text-white/70">Market Ready</span>
                            </div>
-                           <span className="text-[9px] font-black uppercase tracking-widest text-white/40">v4.0.0 Sentinel</span>
+                           <span className="text-[9px] font-black uppercase tracking-widest text-white/70">v4.0.0 Sentinel</span>
                         </div>
                       </div>
 

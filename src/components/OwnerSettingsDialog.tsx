@@ -48,7 +48,7 @@ export function OwnerSettingsDialog({ open, onOpenChange }: OwnerSettingsDialogP
             {/* Security Section */}
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">Identity Protocol</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-70 italic">Identity Protocol</span>
                 <div className="h-[1px] flex-1 bg-gradient-to-r from-muted-foreground/10 to-transparent" />
               </div>
 
@@ -63,7 +63,7 @@ export function OwnerSettingsDialog({ open, onOpenChange }: OwnerSettingsDialogP
             {/* Legal Section */}
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">Legal & Privacy</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-70 italic">Legal & Privacy</span>
                 <div className="h-[1px] flex-1 bg-gradient-to-r from-muted-foreground/10 to-transparent" />
               </div>
               
@@ -77,7 +77,7 @@ export function OwnerSettingsDialog({ open, onOpenChange }: OwnerSettingsDialogP
                   onClick={() => { onOpenChange(false); navigate('/legal'); }}
                 >
                   <div className="flex items-center gap-4">
-                    <FileText className="w-5 h-5 opacity-40" />
+                    <FileText className="w-5 h-5 opacity-70" />
                     <span>Terms of Protocol</span>
                   </div>
                   <ExternalLink className="w-4 h-4 opacity-20" />
@@ -92,7 +92,7 @@ export function OwnerSettingsDialog({ open, onOpenChange }: OwnerSettingsDialogP
                   onClick={() => { onOpenChange(false); navigate('/legal'); }}
                 >
                   <div className="flex items-center gap-4">
-                    <Shield className="w-5 h-5 opacity-40" />
+                    <Shield className="w-5 h-5 opacity-70" />
                     <span>Privacy Logs</span>
                   </div>
                   <ExternalLink className="w-4 h-4 opacity-20" />
@@ -103,7 +103,7 @@ export function OwnerSettingsDialog({ open, onOpenChange }: OwnerSettingsDialogP
             {/* Danger Zone */}
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-destructive opacity-40 italic">Termination Protocol</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-destructive opacity-70 italic">Termination Protocol</span>
                 <div className="h-[1px] flex-1 bg-gradient-to-r from-destructive/10 to-transparent" />
               </div>
               <div className={cn(

@@ -229,7 +229,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
     return (
       <div className={cn("w-full transition-colors duration-500 min-h-[50vh] flex flex-col items-center justify-center gap-6", isLight ? "bg-white" : "bg-black")}>
           <div className="w-16 h-16 border-t-2 border-indigo-500 rounded-full animate-spin shadow-2xl" />
-          <p className={cn("text-[10px] font-black uppercase tracking-[0.4em] italic opacity-30", isLight ? "text-black" : "text-white")}>Synchronizing Listings...</p>
+          <p className={cn("text-[10px] font-black uppercase tracking-[0.4em] italic opacity-70", isLight ? "text-black" : "text-white")}>Synchronizing Listings...</p>
       </div>
     );
   }
@@ -257,7 +257,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
             </div>
             <div>
               <h1 className={cn("text-3xl font-black tracking-tighter uppercase italic leading-none", isLight ? "text-black" : "text-white")}>Listing Control</h1>
-              <p className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-40 italic mt-2", isLight ? "text-black" : "text-white")}>Real-time Asset Management Protocol</p>
+              <p className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-70 italic mt-2", isLight ? "text-black" : "text-white")}>Real-time Asset Management Protocol</p>
             </div>
           </div>
 
@@ -281,7 +281,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
         {/* 🛸 ASSET CONTROLS */}
         <div className="flex flex-col lg:flex-row gap-6 px-6">
             <div className="relative flex-1 group">
-                <Search className={cn("absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40 z-10", isLight ? "text-black" : "text-white")} />
+                <Search className={cn("absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-70 z-10", isLight ? "text-black" : "text-white")} />
                 <Input
                     placeholder="SEARCH ASSETS..."
                     value={searchTerm}
@@ -305,12 +305,12 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
                             "flex items-center gap-3 px-6 h-14 rounded-[2rem] transition-all whitespace-nowrap",
                             activeTab === tab.id
                                 ? (isLight ? "bg-black text-white shadow-2xl" : "bg-white text-black shadow-2xl")
-                                : isLight ? "text-black/60 hover:bg-black/10" : "text-white/30 hover:bg-white/5"
+                                : isLight ? "text-black/60 hover:bg-black/10" : "text-white/60 hover:bg-white/5"
                         )}
                     >
                         <tab.icon className="w-4 h-4" />
                         <span className="text-[10px] font-black uppercase tracking-widest italic">{tab.label}</span>
-                        {tab.count > 0 && <span className="text-[9px] font-black opacity-30">[{tab.count}]</span>}
+                        {tab.count > 0 && <span className="text-[9px] font-black opacity-70">[{tab.count}]</span>}
                     </button>
                 ))}
             </div>
@@ -387,7 +387,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
                             ${listing.price?.toLocaleString() || '---'}
                           </span>
                           {listing.mode === 'rent' && (
-                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-2 italic">/mo</span>
+                            <span className="text-[10px] font-black text-white/70 uppercase tracking-widest ml-2 italic">/mo</span>
                           )}
                         </div>
                       </div>
@@ -398,7 +398,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
                       <div>
                         <h3 className={cn("text-xl font-black tracking-tighter uppercase italic line-clamp-1", isLight ? "text-black" : "text-white")}>{listing.title}</h3>
                         {(listing.address || listing.city) && (
-                          <div className="flex items-center gap-2 mt-2 opacity-40">
+                          <div className="flex items-center gap-2 mt-2 opacity-70">
                             <MapPin className={cn("w-3 h-3", isLight ? "text-black" : "text-white")} />
                             <span className={cn("text-[10px] font-black uppercase tracking-widest truncate", isLight ? "text-black" : "text-white")}>
                               {listing.address || listing.city || listing.neighborhood}
@@ -409,7 +409,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
 
                       {/* 🛸 TELEMETRY SELECTOR */}
                       <div className={cn("pt-4 border-t", isLight ? 'border-black/5' : 'border-white/5')}>
-                        <p className={cn("text-[9px] font-black uppercase tracking-widest opacity-30 mb-3", isLight ? "text-black" : "text-white")}>Availability Status</p>
+                        <p className={cn("text-[9px] font-black uppercase tracking-widest opacity-70 mb-3", isLight ? "text-black" : "text-white")}>Availability Status</p>
                         <select
                           value={availabilityStatus[listing.id] || listing.status || 'active'}
                           onChange={(e) => handleAvailabilityChange(listing, e.target.value)}
@@ -480,7 +480,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
                           )}>
                             <AlertDialogHeader>
                               <AlertDialogTitle className={cn("text-3xl font-black uppercase italic tracking-tighter", isLight ? "text-black" : "text-white")}>Purge Listing?</AlertDialogTitle>
-                              <AlertDialogDescription className={cn("text-[14px] font-bold leading-relaxed italic opacity-40", isLight ? "text-black" : "text-white")}>
+                              <AlertDialogDescription className={cn("text-[14px] font-bold leading-relaxed italic opacity-70", isLight ? "text-black" : "text-white")}>
                                 This action will permanently remove <span className="text-rose-500">"{listing.title}"</span> from the global ecosystem. This cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
@@ -524,7 +524,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
               <h3 className={cn("font-black text-3xl tracking-tighter uppercase italic mb-4", isLight ? "text-black" : "text-white")}>
                 {searchTerm ? 'Scan Negative' : 'Gallery Empty'}
               </h3>
-              <p className={cn("text-[14px] font-bold leading-relaxed italic opacity-30 max-w-xs mx-auto mb-12", isLight ? "text-black" : "text-white")}>
+              <p className={cn("text-[14px] font-bold leading-relaxed italic opacity-70 max-w-xs mx-auto mb-12", isLight ? "text-black" : "text-white")}>
                 {searchTerm
                   ? 'No assets found matching current scan parameters. Adjust filters.'
                   : 'Your asset inventory is currently offline. Deploy your first listing to begin broadcast.'}

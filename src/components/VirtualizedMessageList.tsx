@@ -66,8 +66,8 @@ const MessageBubble = memo(({
           {message.message_text}
         </p>
         <div className={cn(
-            "text-[8px] mt-2 font-black uppercase tracking-widest opacity-30 text-right italic",
-            isMyMessage ? "text-white/80" : (isThemeLight ? "text-slate-500" : "text-white/40")
+            "text-[8px] mt-2 font-black uppercase tracking-widest opacity-70 text-right italic",
+            isMyMessage ? "text-white/80" : (isThemeLight ? "text-slate-500" : "text-white/70")
         )}>
           {formatDistanceToNow(new Date(message.created_at), { addSuffix: false })}
         </div>

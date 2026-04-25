@@ -120,11 +120,11 @@ export function AccountSecurity({ userRole }: AccountSecurityProps) {
           "w-12 h-12 rounded-[1rem] flex items-center justify-center transition-all border",
           isLight ? "bg-white/50 border-black/5" : "bg-black/50 border-white/5"
         )}>
-          <Icon className="w-5 h-5 opacity-40" />
+          <Icon className="w-5 h-5 opacity-70" />
         </div>
         <div className="space-y-0.5">
           <h4 className={cn("text-[14px] font-black uppercase italic tracking-tight", isLight ? "text-black" : "text-white")}>{title}</h4>
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">{description}</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">{description}</p>
         </div>
       </div>
       <Switch 
@@ -195,11 +195,11 @@ export function AccountSecurity({ userRole }: AccountSecurityProps) {
               "w-12 h-12 rounded-[1rem] flex items-center justify-center transition-all border",
               isLight ? "bg-white/50 border-black/5" : "bg-black/50 border-white/5"
             )}>
-              <Lock className="w-5 h-5 opacity-40" />
+              <Lock className="w-5 h-5 opacity-70" />
             </div>
             <div className="text-left space-y-0.5">
               <h4 className={cn("text-[14px] font-black uppercase italic tracking-tight", isLight ? "text-black" : "text-white")}>Access Key</h4>
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">Rotate your security credentials</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Rotate your security credentials</p>
             </div>
           </div>
           <ChevronRight className="w-5 h-5 opacity-20" />
@@ -215,7 +215,7 @@ export function AccountSecurity({ userRole }: AccountSecurityProps) {
             <div className="space-y-8">
               <div className="space-y-2">
                  <h3 className={cn("text-2xl font-black uppercase italic tracking-tighter", isLight ? "text-black" : "text-white")}>Rotate Credentials</h3>
-                 <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">Confirm identity to modify access</p>
+                 <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Confirm identity to modify access</p>
               </div>
 
               <div className="space-y-4">
@@ -234,7 +234,7 @@ export function AccountSecurity({ userRole }: AccountSecurityProps) {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 opacity-70"
                     onClick={() => setShowPasswords(!showPasswords)}
                   >
                     {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

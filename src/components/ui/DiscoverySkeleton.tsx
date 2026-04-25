@@ -34,7 +34,7 @@ export const DiscoverySkeleton = memo(({ count = 3 }: { count?: number }) => {
               : "bg-black/40 border-white/10",
             i === 1 && "opacity-80",
             i === 2 && "opacity-60",
-            i >= 3 && "opacity-40"
+            i >= 3 && "opacity-70"
           )}
         >
           {/* Main Visual Placeholder */}

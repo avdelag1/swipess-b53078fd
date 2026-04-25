@@ -125,7 +125,7 @@ function RadioMiniPlayerInner() {
           )}
         >
           <div className="relative w-8 h-8 rounded-full overflow-hidden flex items-center justify-center">
-            <Radio className={cn("w-4 h-4", isLight ? "text-slate-400" : "text-white/40", state.isPlaying && "animate-pulse")} />
+            <Radio className={cn("w-4 h-4", isLight ? "text-slate-400" : "text-white/70", state.isPlaying && "animate-pulse")} />
             <m.div 
                animate={state.isPlaying ? { rotate: 360 } : {}} 
                transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
@@ -214,13 +214,13 @@ function RadioMiniPlayerInner() {
             <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
               <button
                 onClick={handleMinimize}
-                className={cn("text-[10px] font-black uppercase tracking-[0.2em] transition-colors", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/30 hover:text-white/60")}
+                className={cn("text-[10px] font-black uppercase tracking-[0.2em] transition-colors", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/60 hover:text-white/60")}
               >
                 Minimize
               </button>
               <button
                 onClick={handleClose}
-                className={cn("w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90", isLight ? "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900" : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white")}
+                className={cn("w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90", isLight ? "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900" : "bg-white/5 text-white/70 hover:bg-white/10 hover:text-white")}
               >
                 <X className="w-4 h-4" strokeWidth={2.5} />
               </button>
@@ -233,7 +233,7 @@ function RadioMiniPlayerInner() {
                   <img src={station.albumArt} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div className={cn("w-full h-full flex items-center justify-center", isLight ? "bg-slate-100" : "bg-gradient-to-br from-blue-500/20 to-purple-600/20")}>
-                    <Radio className={cn("w-6 h-6", isLight ? "text-slate-300" : "text-white/40")} />
+                    <Radio className={cn("w-6 h-6", isLight ? "text-slate-300" : "text-white/70")} />
                   </div>
                 )}
                 {state.isPlaying && (
@@ -254,7 +254,7 @@ function RadioMiniPlayerInner() {
             <div className="flex items-center justify-between px-4 pb-5 pt-1">
               <button
                 onClick={handleMute}
-                className={cn("w-10 h-10 rounded-full flex items-center justify-center transition-colors active:scale-90", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/30 hover:text-white")}
+                className={cn("w-10 h-10 rounded-full flex items-center justify-center transition-colors active:scale-90", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/60 hover:text-white")}
               >
                 {state.volume > 0 ? (
                   <Volume2 className="w-4.5 h-4.5" />
@@ -266,7 +266,7 @@ function RadioMiniPlayerInner() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePrev}
-                  className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/40 hover:text-white")}
+                  className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/70 hover:text-white")}
                 >
                   <SkipBack className="w-5 h-5 fill-current" />
                 </button>
@@ -288,7 +288,7 @@ function RadioMiniPlayerInner() {
 
                 <button
                   onClick={handleNext}
-                  className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/40 hover:text-white")}
+                  className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/70 hover:text-white")}
                 >
                   <SkipForward className="w-5 h-5 fill-current" />
                 </button>

@@ -122,7 +122,7 @@ export const SwipeExhaustedState = ({
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="absolute w-[800px] h-[2px] bg-gradient-to-r from-transparent via-primary/10 to-transparent opacity-30"
+            className="absolute w-[800px] h-[2px] bg-gradient-to-r from-transparent via-primary/10 to-transparent opacity-70"
           />
           <div 
             className="absolute w-[600px] h-[600px] rounded-full blur-[160px] opacity-10"
@@ -167,7 +167,7 @@ export const SwipeExhaustedState = ({
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 className="absolute inset-0 opacity-10 bg-[url('/noise.png')] bg-repeat"
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-transparent opacity-40" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-transparent opacity-70" />
               
               {/* RADAR SWEEP LINE */}
               <motion.div 
@@ -234,7 +234,7 @@ export const SwipeExhaustedState = ({
                 <span className={cn("text-[10px] font-black uppercase tracking-[0.3em] mb-1 opacity-50", isLight ? "text-white" : "text-black")}>Discovery Protocol</span>
                 <span className="text-[16px] font-black uppercase tracking-wider">Change Sector</span>
               </div>
-              <Search className="w-6 h-6 opacity-30 group-hover:opacity-100 transition-all group-hover:scale-110 z-10" />
+              <Search className="w-6 h-6 opacity-70 group-hover:opacity-100 transition-all group-hover:scale-110 z-10" />
               {/* Inner Glow */}
               <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
@@ -276,7 +276,7 @@ export const SwipeExhaustedState = ({
                 resetMutation.mutate(activeCategory as any || 'all');
               }}
               className={cn(
-                "w-full h-12 rounded-[1.2rem] flex items-center justify-center gap-2 transition-all opacity-40 hover:opacity-100 active:scale-95",
+                "w-full h-12 rounded-[1.2rem] flex items-center justify-center gap-2 transition-all opacity-70 hover:opacity-100 active:scale-95",
                 isLight ? "text-black" : "text-white"
               )}
             >
@@ -287,7 +287,7 @@ export const SwipeExhaustedState = ({
         </div>
 
         {/* BOTTOM DECOR */}
-        <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-2 opacity-30 pointer-events-none">
+        <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-2 opacity-70 pointer-events-none">
           <div className="w-12 h-[2px] bg-primary/50 rounded-full" />
           <p className={cn("text-[7px] font-black uppercase tracking-[0.8em] italic", isLight ? "text-black/60" : "text-white")}>Sector Logic Verified</p>
         </div>
