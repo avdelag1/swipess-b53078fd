@@ -360,7 +360,20 @@ export function useSmartClientMatching(
                 if (results.length < 5 && page === 0) {
                     logger.info('[SmartClientMatching] Appending high-fidelity demo cards');
                     const existingDemoIds = new Set(results.map(r => r.id));
-                    const newDemos = DEMO_CLIENTS.filter(c => !existingDemoIds.has(c.user_id)).map(c => ({
+                    let demoCandidates = DEMO_CLIENTS.filter(c => !existingDemoIds.has(c.user_id));
+
+                    // Filter demo clients by client_type if a specific category was selected
+                    if (_category && ['buyers', 'renters', 'hire'].includes(_category)) {
+                        const clientTypeMap: Record<string, string> = {
+                            'buyers': 'buyer',
+                            'renters': 'renter',
+                            'hire': 'hire'
+                        };
+                        const targetType = clientTypeMap[_category];
+                        demoCandidates = demoCandidates.filter(c => c.client_type === targetType);
+                    }
+
+                    const newDemos = demoCandidates.map(c => ({
                         id: c.user_id,
                         user_id: c.user_id,
                         name: c.full_name,
