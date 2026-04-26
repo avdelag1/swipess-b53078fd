@@ -69,9 +69,12 @@ interface FilterState {
   
   filterVersion: number;
   lastChangedAt: number;
-  
+
+  kmHudExpanded: boolean;
+
   // ACTIONS
   setActiveCategory: (category: QuickFilterCategory | null) => void;
+  setKmHudExpanded: (v: boolean) => void;
   toggleCategory: (category: QuickFilterCategory) => void;
   setCategories: (categories: QuickFilterCategory[]) => void;
   setListingType: (type: QuickFilterListingType) => void;
@@ -150,7 +153,11 @@ export const useFilterStore = create<FilterState>()(
     filterVersion: 0,
     lastChangedAt: Date.now(),
 
+    kmHudExpanded: false,
+
     // ACTIONS
+    setKmHudExpanded: (v) => set({ kmHudExpanded: v }),
+
     setRadiusKm: (radius) => {
       console.info('[FilterStore] radiusKm changed to:', radius);
       set((state) => ({
