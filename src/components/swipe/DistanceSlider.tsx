@@ -54,8 +54,8 @@ export const DistanceSlider = ({ radiusKm, onRadiusChange, onDetectLocation, det
   const _thumbLeft = useTransform(springPct, (v) => `${v}%`);
 
   return (
-    <motion.div 
-      className="w-full max-w-xs mx-auto mt-2 px-4 py-2"
+    <motion.div
+      className="w-full max-w-xs mx-auto mt-2 px-4 py-2 pointer-events-auto"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
@@ -81,11 +81,12 @@ export const DistanceSlider = ({ radiusKm, onRadiusChange, onDetectLocation, det
               {localKm} <span className="text-[10px] opacity-60 italic">km</span>
             </span>
           </div>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={onDetectLocation}
             disabled={detecting}
             className={cn(
-              "flex items-center gap-1.5 h-8 px-3 rounded-xl text-[10px] font-black uppercase tracking-tight border transition-all active:scale-95",
+              "flex items-center gap-1.5 h-8 px-3 rounded-xl text-[10px] font-black uppercase tracking-tight border transition-all",
               detected
                 ? "bg-primary border-primary text-white shadow-[0_0_15px_rgba(236,72,153,0.3)] animate-gps-pulse"
                 : "bg-background border-border text-muted-foreground hover:border-primary/50"
@@ -94,12 +95,12 @@ export const DistanceSlider = ({ radiusKm, onRadiusChange, onDetectLocation, det
           >
             <Navigation className={cn("w-3 h-3", detecting && "animate-spin")} />
             {detecting ? '…' : detected ? 'FIXED' : 'AUTO'}
-          </button>
+          </motion.button>
         </div>
       </motion.div>
       
-      <motion.div 
-        className="relative h-12 flex items-center group"
+      <motion.div
+        className="relative h-12 flex items-center group pointer-events-auto"
         initial={{ opacity: 0, scaleX: 0.7 }}
         animate={{ opacity: 1, scaleX: 1 }}
         transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}

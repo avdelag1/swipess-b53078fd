@@ -900,20 +900,21 @@ const ClientSwipeContainerComponent = ({
               </div>
 
               {/* Advanced Filters Trigger */}
-              <button
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={() => {
                   triggerHaptic('medium');
                   navigate('/owner/filters');
                 }}
                 className={cn(
                   "w-11 h-11 flex items-center justify-center transition-all rounded-full backdrop-blur-3xl border shadow-2xl",
-                  isLight 
-                    ? "bg-white/90 border-black/5 text-black" 
+                  isLight
+                    ? "bg-white/90 border-black/5 text-black"
                     : "bg-black/40 border-white/10 text-white shadow-black/20"
                 )}
               >
                 <SlidersHorizontal className="w-5 h-5" />
-              </button>
+              </motion.button>
           </div>
           
           {/* Sector Badge Indicator */}
@@ -1050,7 +1051,8 @@ const ClientSwipeContainerComponent = ({
 
             {/* Sub Controls: Intel & Radar */}
             <div className="flex gap-4 pointer-events-auto">
-               <button
+               <motion.button
+                 whileTap={{ scale: 0.95 }}
                  onClick={() => {
                    triggerHaptic('medium');
                    navigate('/owner/filters');
@@ -1058,11 +1060,12 @@ const ClientSwipeContainerComponent = ({
                  className="flex flex-col items-center opacity-70 hover:opacity-100 transition-opacity"
                >
                  <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-primary drop-shadow-[0_0_8px_rgba(var(--color-brand-primary-rgb),0.5)]">INTELLIGENCE</span>
-               </button>
+               </motion.button>
 
                <div className="w-[1px] h-3 bg-white/10 self-center" />
 
-               <button
+               <motion.button
+                 whileTap={{ scale: 0.95 }}
                  onClick={() => {
                    triggerHaptic('medium');
                    navigate('/owner/filters');
@@ -1070,7 +1073,7 @@ const ClientSwipeContainerComponent = ({
                  className="flex flex-col items-center opacity-70 hover:opacity-100 transition-opacity"
                >
                  <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-primary drop-shadow-[0_0_8px_rgba(var(--color-brand-primary-rgb),0.5)]">RADAR SCAN</span>
-               </button>
+               </motion.button>
             </div>
           </div>
         </div>

@@ -45,7 +45,7 @@ export const LocationRadiusSelector = memo(({
   const nearbyCount = nodes.length;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 pointer-events-auto">
       <motion.div
         layout
         className={cn(
@@ -107,7 +107,7 @@ export const LocationRadiusSelector = memo(({
             exit={{ opacity: 0, y: 12, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className={cn(
-              "absolute top-14 right-0 w-72 rounded-[2.5rem] border backdrop-blur-3xl p-5 z-[100] shadow-[0_30px_60px_rgba(0,0,0,0.5)]",
+              "absolute top-14 right-0 w-72 rounded-[2.5rem] border backdrop-blur-3xl p-5 z-[100] shadow-[0_30px_60px_rgba(0,0,0,0.5)] pointer-events-auto",
               isLight
                 ? "bg-white border-black/5"
                 : "bg-[#0a0a0a] border-white/10"
@@ -125,12 +125,13 @@ export const LocationRadiusSelector = memo(({
               detected={detected}
             />
             <div className="mt-4 pt-4 border-t border-white/5">
-                <button 
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setExpanded(false)}
                   className="w-full py-3 rounded-2xl bg-white/5 text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-colors"
                 >
                   Close Sensor
-                </button>
+                </motion.button>
             </div>
           </motion.div>
         )}
