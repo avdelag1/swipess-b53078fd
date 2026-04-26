@@ -109,6 +109,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
   const [detecting, setDetecting] = useState(false);
   const [detected, setDetected] = useState(!!lat && !!lng);
+  const [kmExpanded, setKmExpanded] = useState(false);
   
   const radarNodes = useMemo(() => (clientProfiles || []).map(p => ({
     id: p.user_id || p.id,
@@ -266,6 +267,8 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               variant="minimal"
               nodes={radarNodes}
               title={activeCategory ? activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1) : "Clients"}
+              expanded={kmExpanded}
+              onExpandedChange={setKmExpanded}
             />
           </div>
         </div>,

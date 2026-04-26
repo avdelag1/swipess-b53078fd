@@ -16,6 +16,8 @@ interface LocationRadiusSelectorProps {
   variant?: 'minimal' | 'full';
   nodes?: { id: string; lat: number; lng: number; label: string }[];
   title?: string;
+  expanded?: boolean;
+  onExpandedChange?: (v: boolean) => void;
 }
 
 /**
@@ -35,14 +37,23 @@ export const LocationRadiusSelector = memo(({
   lng: _lng,
   variant: _variant = 'minimal',
   nodes = [],
+  expanded: expandedProp,
+  onExpandedChange,
 }: LocationRadiusSelectorProps) => {
   const { isLight } = useAppTheme();
-  const [expanded, setExpanded] = useState(false);
+  const [internalExpanded, setInternalExpanded] = useState(false);
 
+  const isControlled = expandedProp !== undefined;
+  const expanded = isControlled ? expandedProp : internalExpanded;
 
   const toggleExpand = useCallback(() => {
-    setExpanded(prev => !prev);
-  }, []);
+    const next = !expanded;
+    if (isControlled) {
+      onExpandedChange?.(next);
+    } else {
+      setInternalExpanded(next);
+    }
+  }, [expanded, isControlled, onExpandedChange]);
 
   return (
     <div className="relative flex items-center justify-center gap-2 pointer-events-auto" style={{ pointerEvents: 'auto' }}>
@@ -131,7 +142,7 @@ export const LocationRadiusSelector = memo(({
             <div className={cn("mt-5 pt-5 border-t", isLight ? "border-black/10" : "border-white/10")}>
                 <motion.button
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setExpanded(false)}
+                  onClick={() => isControlled ? onExpandedChange?.(false) : setInternalExpanded(false)}
                   className={cn(
                     "w-full py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-colors",
                     isLight
