@@ -44,7 +44,7 @@ export const SwipeExhaustedState = ({
   const ownerCategories = [
     { id: 'buyers', label: 'Buyers' },
     { id: 'renters', label: 'Renters' },
-    { id: 'hire', label: 'Workers' },
+    { id: 'hire', label: 'Services' },
   ];
 
   const categories = role === 'owner' ? ownerCategories : clientCategories;
@@ -55,7 +55,7 @@ export const SwipeExhaustedState = ({
         {/* Message */}
         <div className="space-y-2">
           <p className={cn(
-            "text-[10px] font-black uppercase tracking-[0.3em] mb-1 italic", 
+            "text-[10px] font-black uppercase tracking-[0.3em] mb-1 italic",
             isLoading ? (isLight ? "text-black/40" : "text-white/40") : "text-primary drop-shadow-[0_0_10px_rgba(236,72,153,0.3)]"
           )}>
             {isLoading ? `Initializing Sector Scan...` : `No ${categoryName} Found Nearby`}
@@ -108,7 +108,7 @@ export const SwipeExhaustedState = ({
             <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-50", isLight ? "text-black" : "text-white")}>
               Or try another
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className={cn("grid gap-2", role === 'owner' ? 'grid-cols-3' : 'grid-cols-2')}>
               {categories.map((cat) => (
                 <button
                   key={cat.id}

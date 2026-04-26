@@ -1,33 +1,27 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useOwnerClientPreferences } from '@/hooks/useOwnerClientPreferences';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { OwnerInsightsDashboard } from '@/components/OwnerInsightsDashboard';
 import { OwnerAllDashboard } from '@/components/swipe/OwnerAllDashboard';
-import { SwipeExhaustedState } from '@/components/swipe/SwipeExhaustedState';
 import { triggerHaptic } from '@/utils/haptics';
 import type { QuickFilterCategory } from '@/types/filters';
 import useAppTheme from '@/hooks/useAppTheme';
-import { useTranslation } from 'react-i18next';
 import type { ClientFilters } from '@/hooks/smartMatching/types';
 import { AtmosphericLayer } from '@/components/AtmosphericLayer';
 
 interface EnhancedOwnerDashboardProps {
   onClientInsights?: (clientId: string) => void;
   onMessageClick?: () => void;
-  filters?: any; 
+  filters?: any;
 }
 
 const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: EnhancedOwnerDashboardProps) => {
-  const navigate = useNavigate();
   const { theme } = useAppTheme();
   const isLight = theme === 'light';
   const [viewMode] = useState<'discovery' | 'insights'>('discovery');
@@ -83,8 +77,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     return { ...filters, ...clientFilters };
   }, [filters, clientFilters]);
 
-  // Use activeCategory from filterStore which is set by ClientSwipeContainer (buyers/renters/hire)
-  // This ensures demo fallback triggers when a category is selected
   const { data: clientProfiles = [], isLoading, error } = useSmartClientMatching(
     user?.id,
     activeCategory as any,
@@ -102,47 +94,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     onClientInsights?.(clientId);
   }, [onClientInsights]);
 
-  const { radiusKm, setRadiusKm, lat, lng } = useFilterStore(useShallow(s => ({
-    radiusKm: s.radiusKm,
-    setRadiusKm: s.setRadiusKm,
-    lat: s.lat,
-    lng: s.lng
-  })));
-
-  const [detecting, setDetecting] = useState(false);
-  const [detected, setDetected] = useState(!!lat && !!lng);
-  
-  const radarNodes = useMemo(() => (clientProfiles || []).map(p => ({
-    id: p.user_id || p.id,
-    lat: p.latitude || 0,
-    lng: p.longitude || 0,
-    label: p.name || 'Found'
-  })), [clientProfiles]);
-
-  const handleDetectLocation = useCallback(() => {
-    setDetecting(true);
-    triggerHaptic('medium');
-    
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          useFilterStore.getState().setLocation(latitude, longitude);
-          setDetecting(false);
-          setDetected(true);
-          triggerHaptic('success');
-        },
-        (error) => {
-          console.error('Error detecting location:', error);
-          setDetecting(false);
-          triggerHaptic('warning');
-        }
-      );
-    } else {
-      setDetecting(false);
-    }
-  }, []);
-
   const handleCardSelect = useCallback((card: any) => {
     triggerHaptic('medium');
     // For owner intent cards, use card.id (buyers/renters/hire/all-clients) as the category
@@ -156,9 +107,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     if (card.listingType) setListingType(card.listingType as any);
   }, [setClientType, setListingType, setActiveCategory, setCategories]);
 
-  // 🛰️ LOADING STATE — HUD PERSISTENCE
-  // We keep the main container alive so HUD elements (Radar/Radius) don't flicker or unmount
-  // Only show skeletons during INITIAL load, not on subsequent reloads
   const initialLoading = isAuthLoading || isPrefsLoading;
   const showSkeletons = activeCategory === null && initialLoading;
 
@@ -197,17 +145,17 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             <OwnerInsightsDashboard />
           </motion.div>
         ) : phase === 'cards' ? (
-          <motion.div 
+          <motion.div
             key="owner-dash-fan"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="relative flex-1 flex flex-col items-center w-full overflow-hidden z-10"
-            style={{ 
+            style={{
               paddingTop: 'calc(var(--top-bar-height) + var(--safe-top))',
               paddingBottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom) + 20px)',
-              willChange: 'transform, opacity' 
+              willChange: 'transform, opacity'
             }}
           >
             <div className="flex-1 w-full relative z-10 flex flex-col justify-center">
@@ -215,22 +163,19 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             </div>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             key="owner-dash-swipe"
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -30, scale: 0.98 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="flex-1 min-h-0 relative z-10 flex flex-col w-full h-full"
-            style={{ 
+            style={{
               willChange: 'transform, opacity',
               paddingTop: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px))',
               paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px))'
             }}
           >
-            {/* 📡 HUD is now managed inside ClientSwipeContainer to maintain parity with Client side discovery */}
-
-
             <div className="flex-1 min-h-0">
               <ClientSwipeContainer
                 onClientTap={handleClientTap}
@@ -249,29 +194,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
       </AnimatePresence>
 
       <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
-
-      {/* 📡 Distance Radius Control — Centered overlay during swipe mode, matching client side layout */}
-      {phase === 'swipe' && (
-        <div className="fixed inset-0 z-[10005] pointer-events-none flex items-center justify-center" style={{ top: 'var(--top-bar-height, 64px)' }}>
-          <div className="pointer-events-auto">
-            <SwipeExhaustedState
-              radiusKm={radiusKm}
-              onRadiusChange={setRadiusKm as any}
-              onDetectLocation={handleDetectLocation}
-              detecting={detecting}
-              detected={detected}
-              categoryName="clients"
-              isLoading={isLoading}
-              activeCategory={activeCategory || 'all-clients'}
-              onCategoryChange={(cat) => {
-                setActiveCategory(cat as any);
-              }}
-              onOpenFilters={() => navigate('/owner/filters')}
-              role="owner"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
