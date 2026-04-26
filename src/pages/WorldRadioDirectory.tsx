@@ -60,85 +60,91 @@ export default function WorldRadioDirectory() {
       isDark ? "bg-[#050505] text-white" : "bg-white text-slate-900"
     )}>
       <AtmosphericLayer variant="primary" />
-      
-      <main className="flex-1 p-6 pb-10 relative z-10 pt-[calc(env(safe-area-inset-top)+20px)]">
-        <div className="mb-8">
-           <div className="flex items-center mb-6 gap-4">
-              <button 
-                onClick={() => navigate('/radio')}
-                className={cn(
-                  "w-10 h-10 flex items-center justify-center rounded-full transition-colors",
-                  isDark ? "bg-white/10 hover:bg-white/20" : "bg-black/5 hover:bg-black/10"
-                )}
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <div className="flex flex-col">
-                <h1 className="text-3xl font-black tracking-tighter italic uppercase">
-                  World <span className="text-primary">Radio</span>
-                </h1>
-                <div className="flex items-center gap-1.5 opacity-40">
-                  <Globe size={10} className="animate-spin-slow" />
-                  <span className="text-[9px] font-black tracking-widest uppercase">Global Frequency Network</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Search Bar */}
-            <div className="relative group mb-6">
-              <div className={cn(
-                "absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors",
-                isDark ? "text-white/30" : "text-black/30"
-              )}>
-                <Search size={18} />
-              </div>
-              <input 
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search stations, genres, cities..."
-                className={cn(
-                  "w-full h-14 border rounded-2xl pl-14 pr-6 text-sm font-bold transition-all focus:outline-none focus:border-primary/50",
-                  isDark 
-                    ? "bg-white/5 border-white/10 placeholder:text-white/20 text-white" 
-                    : "bg-black/5 border-black/10 placeholder:text-black/20 text-black"
-                )}
-              />
+      {/* 🛸 STICKY HEADER — Stays on top, doesn't overlap cards */}
+      <div className={cn(
+        "sticky top-0 z-50 pt-[calc(env(safe-area-inset-top)+12px)] pb-4 px-6 backdrop-blur-xl border-b transition-colors",
+        isDark ? "bg-[#050505]/80 border-white/5" : "bg-white/80 border-black/5"
+      )}>
+        <div className="flex items-center mb-4 gap-4">
+          <button
+            onClick={() => navigate('/radio')}
+            className={cn(
+              "w-10 h-10 flex items-center justify-center rounded-full transition-colors hover:scale-105",
+              isDark ? "bg-white/10 hover:bg-white/20" : "bg-black/5 hover:bg-black/10"
+            )}
+            title="Back to Radio"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="flex flex-col flex-1">
+            <h1 className="text-2xl font-black tracking-tighter italic uppercase">
+              World <span className="text-primary">Radio</span>
+            </h1>
+            <div className="flex items-center gap-1.5 opacity-40">
+              <Globe size={10} className="animate-spin-slow" />
+              <span className="text-[9px] font-black tracking-widest uppercase">Global Frequency Network</span>
             </div>
-
-            {/* City Filter scroller */}
-            <div className="flex gap-2.5 overflow-x-auto no-scrollbar -mx-2 px-2">
-              <button
-                onClick={() => setSelectedCity('all')}
-                className={cn(
-                  "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 transition-all border",
-                  selectedCity === 'all'
-                    ? "bg-primary text-black border-primary shadow-lg shadow-primary/20"
-                    : isDark 
-                      ? "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
-                      : "bg-black/5 border-black/5 text-black/40 hover:border-black/10"
-                )}
-              >
-                All Cities
-              </button>
-              {cities.map(city => (
-                <button
-                  key={city.id}
-                  onClick={() => setSelectedCity(city.id as CityLocation)}
-                  className={cn(
-                    "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 transition-all border",
-                    selectedCity === city.id
-                      ? (isDark ? "bg-white text-black border-white" : "bg-black text-white border-black") + " shadow-lg"
-                      : isDark 
-                        ? "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
-                        : "bg-black/5 border-black/5 text-black/40 hover:border-black/10"
-                  )}
-                >
-                  {city.name}
-                </button>
-              ))}
-            </div>
+          </div>
         </div>
+
+        {/* Search Bar */}
+        <div className="relative group mb-4">
+          <div className={cn(
+            "absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors",
+            isDark ? "text-white/30" : "text-black/30"
+          )}>
+            <Search size={18} />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search stations, genres, cities..."
+            className={cn(
+              "w-full h-12 border rounded-2xl pl-14 pr-6 text-sm font-bold transition-all focus:outline-none focus:border-primary/50",
+              isDark
+                ? "bg-white/5 border-white/10 placeholder:text-white/20 text-white"
+                : "bg-black/5 border-black/10 placeholder:text-black/20 text-black"
+            )}
+          />
+        </div>
+
+        {/* City Filter scroller */}
+        <div className="flex gap-2.5 overflow-x-auto no-scrollbar -mx-2 px-2">
+          <button
+            onClick={() => setSelectedCity('all')}
+            className={cn(
+              "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 transition-all border",
+              selectedCity === 'all'
+                ? "bg-primary text-black border-primary shadow-lg shadow-primary/20"
+                : isDark
+                  ? "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
+                  : "bg-black/5 border-black/5 text-black/40 hover:border-black/10"
+            )}
+          >
+            All Cities
+          </button>
+          {cities.map(city => (
+            <button
+              key={city.id}
+              onClick={() => setSelectedCity(city.id as CityLocation)}
+              className={cn(
+                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 transition-all border",
+                selectedCity === city.id
+                  ? (isDark ? "bg-white text-black border-white" : "bg-black text-white border-black") + " shadow-lg"
+                  : isDark
+                    ? "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
+                    : "bg-black/5 border-black/5 text-black/40 hover:border-black/10"
+              )}
+            >
+              {city.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <main className="flex-1 p-6 pb-10 relative z-10 overflow-y-auto">
         {/* 🛸 STATION GRID — Simplified and always visible */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <AnimatePresence mode="popLayout">
