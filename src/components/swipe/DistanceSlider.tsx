@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useFilterStore } from '@/state/filterStore';
 import { MapPin, Navigation } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
@@ -20,7 +21,9 @@ export interface DistanceSliderProps {
  */
 export const DistanceSlider = ({ radiusKm, onRadiusChange, onDetectLocation, detecting, detected }: DistanceSliderProps) => {
   const maxKm = 100;
-  
+  const clientType = useFilterStore(s => s.clientType);
+  const activeCategory = useFilterStore(s => s.activeCategory);
+
   // Local value drives the visual (thumb, fill, label) instantly.
   const [localKm, setLocalKm] = useState(radiusKm);
   
@@ -71,8 +74,14 @@ export const DistanceSlider = ({ radiusKm, onRadiusChange, onDetectLocation, det
             <MapPin className="w-4 h-4 text-primary" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] leading-none mb-1">Coverage</span>
-            <span className="text-xs font-bold text-foreground leading-none">Search Radius</span>
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] leading-none mb-1">Scanning</span>
+            <span className="text-xs font-black text-primary leading-none uppercase italic tracking-wider">
+              {clientType === 'buy' ? 'Buyers' : 
+               clientType === 'rent' ? 'Renters' : 
+               clientType === 'hire' ? 'Workers' : 
+               clientType === 'all' ? 'Everyone' : 
+               activeCategory ? activeCategory : 'Clients'}
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-2">

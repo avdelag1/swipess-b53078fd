@@ -44,7 +44,7 @@ export const LocationRadiusSelector = memo(({
   }, []);
 
   return (
-    <div className="relative flex items-center gap-2 pointer-events-auto" style={{ pointerEvents: 'auto' }}>
+    <div className="relative flex items-center justify-center gap-2 pointer-events-auto" style={{ pointerEvents: 'auto' }}>
       <motion.div
         layout
         style={{ pointerEvents: 'auto' }}
@@ -110,7 +110,7 @@ export const LocationRadiusSelector = memo(({
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             style={{ pointerEvents: 'auto' }}
             className={cn(
-              "absolute top-16 right-0 w-80 rounded-[2.5rem] border backdrop-blur-3xl p-6 z-[100] shadow-[0_30px_60px_rgba(0,0,0,0.5)]",
+              "absolute top-16 left-1/2 -translate-x-1/2 w-80 rounded-[2.5rem] border backdrop-blur-3xl p-6 z-[100] shadow-[0_30px_60px_rgba(0,0,0,0.5)]",
               isLight
                 ? "bg-white border-black/5"
                 : "bg-[#0a0a0a] border-white/10"

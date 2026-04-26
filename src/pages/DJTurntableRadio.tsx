@@ -98,11 +98,22 @@ export default function DJTurntableRadio() {
       <div className="flex-1 flex flex-col items-center justify-between px-4 pb-32">
         
         {/* Info cluster */}
-        <div className="flex flex-col items-center text-center">
-          <p className={cn("text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 flex items-center gap-2", isDark ? "text-white" : "text-black")}>
-            <span className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isDark ? "bg-blue-400" : "bg-primary")} />
-            Live from {state.currentCity || 'Mars'}
+        <div className="flex flex-col items-center text-center relative w-full">
+          <p className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-60 flex items-center gap-2", isDark ? "text-white" : "text-black")}>
+            <span className={cn("w-2 h-2 rounded-full animate-pulse", isDark ? "bg-blue-400" : "bg-primary")} />
+            Live from {state.currentCity || 'Miami'}
           </p>
+
+          <button
+            onClick={() => { navigate('/radio/directory'); triggerHaptic('medium'); }}
+            className={cn(
+              "absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90",
+              isDark ? "bg-white/5 text-white/70 hover:bg-white/10" : "bg-black/5 text-black/70 hover:bg-black/10"
+            )}
+            title="Radio Directory"
+          >
+            <ListMusic className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Large Frequency Display */}
