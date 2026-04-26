@@ -263,6 +263,9 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               categoryName="clients"
               isLoading={isLoading}
               activeCategory={activeCategory || 'all-clients'}
+              onCategoryChange={(cat) => {
+                setActiveCategory(cat as any);
+              }}
               onOpenFilters={() => navigate('/owner/filters')}
               role="owner"
             />
