@@ -196,13 +196,11 @@ export function useScrollDirection({
     return () => {
       document.removeEventListener('scroll', handleScroll, { capture: true });
       window.removeEventListener('scroll', handleScroll);
-      document.removeEventListener('touchstart', resetOnInteraction, { capture: true });
-      document.removeEventListener('mousedown', resetOnInteraction, { capture: true });
-      
+
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
-      
+
       if (rebindIntervalRef.current) {
         clearInterval(rebindIntervalRef.current);
       }
