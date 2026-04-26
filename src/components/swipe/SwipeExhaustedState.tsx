@@ -54,11 +54,14 @@ export const SwipeExhaustedState = ({
       <div className="flex flex-col items-center text-center w-full max-w-md gap-6">
         {/* Message */}
         <div className="space-y-2">
-          <p className={cn("text-xs font-bold uppercase tracking-wider", isLight ? "text-black/50" : "text-white/50")}>
-            {isLoading ? `Searching ${categoryName}...` : `No ${categoryName} found nearby`}
+          <p className={cn(
+            "text-[10px] font-black uppercase tracking-[0.3em] mb-1 italic", 
+            isLoading ? (isLight ? "text-black/40" : "text-white/40") : "text-primary drop-shadow-[0_0_10px_rgba(236,72,153,0.3)]"
+          )}>
+            {isLoading ? `Initializing Sector Scan...` : `No ${categoryName} Found Nearby`}
           </p>
-          <h2 className={cn("text-2xl font-black tracking-tight", isLight ? "text-black" : "text-white")}>
-            {isLoading ? 'Finding results' : 'Adjust your distance'}
+          <h2 className={cn("text-3xl font-black tracking-tight uppercase italic", isLight ? "text-black" : "text-white")}>
+            {isLoading ? 'Scanning...' : 'Adjust Radius'}
           </h2>
         </div>
 

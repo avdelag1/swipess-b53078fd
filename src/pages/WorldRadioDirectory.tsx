@@ -56,20 +56,31 @@ export default function WorldRadioDirectory() {
 
   return (
     <div className={cn(
-      "min-h-screen flex flex-col relative",
+      "h-[100dvh] overflow-y-auto overflow-x-hidden flex flex-col relative",
       isDark ? "bg-[#050505] text-white" : "bg-white text-slate-900"
     )}>
-      {/* 🛸 HUD INTEGRATED: AtmosphericLayer handled by AppLayout */}
+      <AtmosphericLayer variant="primary" />
       
-      <main className="flex-1 p-6 pb-32">
+      <main className="flex-1 p-6 pb-10 relative z-10 pt-[calc(env(safe-area-inset-top)+20px)]">
         <div className="mb-8">
-           <div className="flex flex-col mb-6">
-              <h1 className="text-3xl font-black tracking-tighter italic uppercase">
-                World <span className="text-primary">Radio</span>
-              </h1>
-              <div className="flex items-center gap-1.5 opacity-40">
-                <Globe size={10} className="animate-spin-slow" />
-                <span className="text-[9px] font-black tracking-widest uppercase">Global Frequency Network</span>
+           <div className="flex items-center mb-6 gap-4">
+              <button 
+                onClick={() => navigate('/radio')}
+                className={cn(
+                  "w-10 h-10 flex items-center justify-center rounded-full transition-colors",
+                  isDark ? "bg-white/10 hover:bg-white/20" : "bg-black/5 hover:bg-black/10"
+                )}
+              >
+                <ArrowLeft size={18} />
+              </button>
+              <div className="flex flex-col">
+                <h1 className="text-3xl font-black tracking-tighter italic uppercase">
+                  World <span className="text-primary">Radio</span>
+                </h1>
+                <div className="flex items-center gap-1.5 opacity-40">
+                  <Globe size={10} className="animate-spin-slow" />
+                  <span className="text-[9px] font-black tracking-widest uppercase">Global Frequency Network</span>
+                </div>
               </div>
             </div>
 

@@ -34,14 +34,14 @@ import { useNavigate } from 'react-router-dom';
 import { logger } from '@/utils/prodLogger';
 import { SwipeExhaustedState } from './swipe/SwipeExhaustedState';
 import { Home, RefreshCw, ChevronLeft, SlidersHorizontal } from 'lucide-react';
-import { LocationRadiusSelector } from './swipe/LocationRadiusSelector';
+
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 
 // FIX: Lazy-load modals via portal 
 const ShareDialog = lazy(() => import('./ShareDialog').then(m => ({ default: m.ShareDialog })));
 const MessageConfirmationDialog = lazy(() => import('./MessageConfirmationDialog').then(m => ({ default: m.MessageConfirmationDialog })));
-import { OWNER_INTENT_CARDS } from './swipe/SwipeConstants';
+import { OWNER_INTENT_CARDS } from './swipe/CardData';
 
 
 
@@ -81,7 +81,10 @@ const ClientSwipeContainerComponent = ({
       case 'bicycle': return { singular: 'Bicycle', plural: 'Bicycles', searchText: 'Searching for Bicycles', Icon: Bike, color: 'text-rose-500' };
       case 'motorcycle': return { singular: 'Motorcycle', plural: 'Motorcycles', searchText: 'Searching for Motorcycles', Icon: MotorcycleIcon, color: 'text-orange-500' };
       case 'services':
-      case 'worker': return { singular: 'Job', plural: 'Jobs', searchText: 'Searching for Jobs', Icon: Wrench, color: 'text-purple-500' };
+      case 'worker':
+      case 'hire': return { singular: 'Job', plural: 'Workers', searchText: 'Searching for Workers', Icon: Wrench, color: 'text-purple-500' };
+      case 'buyers': return { singular: 'Buyer', plural: 'Buyers', searchText: 'Searching for Buyers', Icon: Users, color: 'text-pink-500' };
+      case 'renters': return { singular: 'Renter', plural: 'Renters', searchText: 'Searching for Renters', Icon: Users, color: 'text-orange-500' };
       default: return { singular: 'Client', plural: 'Clients', searchText: 'Searching for Clients', Icon: Users, color: 'text-pink-500' };
     }
   };
@@ -203,6 +206,13 @@ const ClientSwipeContainerComponent = ({
   // Sync state with ref on mount
   useEffect(() => {
     setCurrentIndex(currentIndexRef.current);
+  }, []);
+
+  // FLICKER FIX: Track whether we've given the query a chance to start fetching.
+  const isMountSettledRef = useRef(false);
+  useEffect(() => {
+    const t = setTimeout(() => { isMountSettledRef.current = true; }, 400);
+    return () => clearTimeout(t);
   }, []);
 
   // PERF FIX: Create stable filter signature for deck versioning
@@ -781,17 +791,18 @@ const ClientSwipeContainerComponent = ({
   // isReady means we've fully initialized at least once - skip loading UI on return
   const hasHydratedData = isOwnerHydrated(category) || isOwnerReady(category) || deckQueue.length > 0;
 
-  const showLoadingSkeleton = !hasHydratedData && isLoading;
+  // Loading skeleton - only show if we have NO data and we are either actually loading OR just mounted
+  const showLoadingSkeleton = !hasHydratedData && (isLoading || !isMountSettledRef.current);
 
   // "All Caught Up" — user has swiped through every card in the current deck
   // Only true once past initial load and topCard is exhausted
-  const _isDeckFinished = !showLoadingSkeleton && topCard === null && (hasHydratedData || !isLoading);
+  const _isDeckFinished = !showLoadingSkeleton && topCard === null && (hasHydratedData || !isLoading || isMountSettledRef.current);
 
   // showInitialError: Only show if we have NO cards and a hard error occurred during initial load
   const _showInitialError = !hasHydratedData && error && deckQueue.length === 0;
 
   // showEmptyState: Only show if loading is DONE and we still have no cards
-  const _showEmptyState = !isLoading && deckQueue.length === 0 && !error;
+  const _showEmptyState = !isLoading && deckQueue.length === 0 && !error && isMountSettledRef.current;
 
   // ========================================
   // 🔥 SINGLE RETURN BLOCK - SAFE ORDER
@@ -802,6 +813,8 @@ const ClientSwipeContainerComponent = ({
   if (showLoadingSkeleton) {
     return (
       <div className="relative w-full h-full flex-1 flex flex-col">
+        {/* 📡 Radar HUD removed from skeleton to prevent double-render flash */}
+
         <div className="relative flex-1 w-full">
           <div className="absolute inset-0 rounded-3xl overflow-hidden bg-muted/30 animate-pulse">
             <div className="absolute inset-0 bg-gradient-to-br from-muted/50 via-muted/30 to-muted/50">
@@ -853,77 +866,32 @@ const ClientSwipeContainerComponent = ({
         {/* Static ambient background */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10" />
 
-        {/* Top Controls — Centered HUB (Flagship Moscow Standard) */}
-        <div className="absolute top-0 left-0 right-0 z-50 w-full flex flex-col items-center pointer-events-none pt-10 px-6">
-          <div className="w-full max-w-[700px] flex items-center justify-between pointer-events-auto">
-              {/* Back to Sectors (Flagship Glass Button) */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => {
-                  if (!canClickBack) return; // Prevent accidental clicks during animation
-                  triggerHaptic('light');
-                  setActiveCategory(null);
-                }}
-                disabled={!canClickBack}
-                className={cn(
-                  "w-11 h-11 flex items-center justify-center transition-all rounded-full backdrop-blur-3xl border shadow-2xl",
-                  isLight
-                    ? "bg-white/90 border-black/5 text-black"
-                    : "bg-black/40 border-white/10 text-white shadow-black/20",
-                  !canClickBack && "opacity-50 cursor-not-allowed"
-                )}
-                title="Back to Sectors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </motion.button>
-
-              {/* Center Radar Cluster */}
-              {topCard && (
-                <div className="flex items-center gap-3">
-                  <LocationRadiusSelector
-                    radiusKm={radiusKm}
-                    onRadiusChange={setRadiusKm as any}
-                    onDetectLocation={detectLocation}
-                    detecting={locationDetecting}
-                    detected={locationDetected}
-                    lat={userLatitude}
-                    lng={userLongitude}
-                    variant="minimal"
-                    nodes={radarNodes}
-                  />
-                </div>
-              )}
-
-              {/* Advanced Filters Trigger */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => {
-                  triggerHaptic('medium');
-                  navigate('/owner/filters');
-                }}
-                className={cn(
-                  "w-11 h-11 flex items-center justify-center transition-all rounded-full backdrop-blur-3xl border shadow-2xl",
-                  isLight
-                    ? "bg-white/90 border-black/5 text-black"
-                    : "bg-black/40 border-white/10 text-white shadow-black/20"
-                )}
-              >
-                <SlidersHorizontal className="w-5 h-5" />
-              </motion.button>
-          </div>
-          
-          {/* Sector Badge Indicator */}
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 px-5 py-2 rounded-full backdrop-blur-3xl border border-white/10 bg-black/20 shadow-2xl flex items-center gap-2"
+        {/* Header Controls — Unified with Swipess Standard */}
+        <div className="absolute top-3 left-4 z-[70] flex items-center gap-3 pointer-events-auto">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={() => {
+              if (!canClickBack) return;
+              triggerHaptic('light');
+              setActiveCategory(null);
+            }}
+            disabled={!canClickBack}
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-full border transition-all active:scale-90",
+              isLight ? "bg-white border-black/10 text-black" : "bg-black/80 border-white/20 text-white",
+              !canClickBack && "opacity-50 cursor-not-allowed"
+            )}
+            title="Back to Sectors"
           >
-            <labels.Icon className={cn("w-3 h-3", labels.color)} />
-            <span className="text-[9px] font-black uppercase tracking-[0.2em] italic text-white/90">
-              {labels.plural}
-            </span>
-          </motion.div>
+            <ChevronLeft className="w-5 h-5" />
+          </motion.button>
+          <span className={cn("text-sm font-black uppercase tracking-wider", isLight ? "text-black" : "text-white")}>
+            {labels.plural}
+          </span>
         </div>
+
+        {/* 📡 Radar HUD removed from here — now managed at the Dashboard level for persistence */}
+
         <div className="flex-1 relative flex flex-col items-center justify-center px-1.5 pt-1 z-10 min-h-0">
         <div className="w-full h-full flex items-center justify-center pointer-events-auto">
           <AnimatePresence mode="popLayout" initial={false}>
@@ -988,7 +956,7 @@ const ClientSwipeContainerComponent = ({
                   detecting={locationDetecting}
                   detected={locationDetected}
                   categoryName={labels.plural}
-                  isLoading={isLoading}
+                  isLoading={isLoading || !isMountSettledRef.current}
                   activeCategory={storeActiveCategory || category}
                   onCategoryChange={(cat) => {
                     setActiveCategory(cat as any);

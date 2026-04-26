@@ -44,7 +44,7 @@ import { DirectMessageDialog } from './DirectMessageDialog';
 import { isDirectMessagingListing } from '@/utils/directMessaging';
 import { useQueryClient } from '@tanstack/react-query';
 import { SwipeAllDashboard } from './swipe/SwipeAllDashboard';
-import { LocationRadiusSelector } from './swipe/LocationRadiusSelector';
+
 import { ReportDialog } from './ReportDialog';
 
 
@@ -1087,25 +1087,6 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
           {currentCategoryName}
         </span>
       </div>
-
-      {/* Radar — visible only when cards are present */}
-      {hasCards && (
-        <div className="absolute top-0 right-0 z-[60] pointer-events-none px-4 pt-3">
-          <div className="pointer-events-auto">
-            <LocationRadiusSelector
-              radiusKm={radiusKm}
-              onRadiusChange={setRadiusKm as any}
-              onDetectLocation={detectLocation}
-              detecting={locationDetecting}
-              detected={locationDetected}
-              lat={userLatitude}
-              lng={userLongitude}
-              variant="minimal"
-              nodes={radarNodes}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Card area — flex-1 fills remaining space; overflow-hidden here keeps swipe cards contained */}
       <div className={cn(

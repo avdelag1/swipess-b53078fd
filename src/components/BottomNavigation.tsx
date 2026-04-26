@@ -136,6 +136,7 @@ export const BottomNavigation = memo(({
     { id: 'likes', icon: Flame, label: 'Likes', path: '/owner/liked-clients' },
     { id: 'listings', icon: Building2, label: 'Listings', path: '/owner/properties' },
     { id: 'messages', icon: MessageCircle, label: 'Messages', path: '/messages' },
+    { id: 'radio', icon: Radio, label: 'Radio', path: '/radio' },
     { id: 'ai', icon: Sparkles, label: 'AI Bot', onClick: openAIChat, isSpecial: true },
     { id: 'promote', icon: Megaphone, label: 'Promote', path: '/client/advertise' },
     { id: 'filters', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },

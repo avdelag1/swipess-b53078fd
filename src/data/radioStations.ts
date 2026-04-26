@@ -176,7 +176,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'miami-2',
-    name: 'Revolution Radio',
+    name: 'Miami Electronic',
     frequency: '93.5',
     streamUrl: 'https://ice1.somafm.com/sf1033-128-mp3',
     city: 'miami',
@@ -262,7 +262,7 @@ export const radioStations: RadioStation[] = [
   // New York - 10 Stations
   {
     id: 'ny-1',
-    name: 'WNYC Public',
+    name: 'Empire State Radio',
     frequency: '93.9',
     streamUrl: 'https://fm939.wnyc.org/wnycfm.mp3',
     city: 'new-york',
@@ -271,7 +271,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'ny-2',
-    name: 'WKCR Jazz',
+    name: 'NY Jazz Radio',
     frequency: '89.9',
     streamUrl: 'https://ice1.somafm.com/sonicuniverse-128-mp3',
     city: 'new-york',
@@ -345,7 +345,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'ny-10',
-    name: 'Rinse FM',
+    name: 'NY Underground',
     frequency: '106.8',
     streamUrl: 'https://ice1.somafm.com/missioncontrol-128-mp3',
     city: 'new-york',
@@ -356,7 +356,7 @@ export const radioStations: RadioStation[] = [
   // Ibiza - 10 Stations
   {
     id: 'ibiza-1',
-    name: 'Ibiza Global Live',
+    name: 'Ibiza Global House',
     frequency: '97.6',
     streamUrl: 'https://ice1.somafm.com/cliqhop-128-mp3',
     city: 'ibiza',
@@ -366,7 +366,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'ibiza-2',
-    name: 'Ibiza Sonica',
+    name: 'Ibiza House Beats',
     frequency: '92.4',
     streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
     city: 'ibiza',
@@ -376,7 +376,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'ibiza-3',
-    name: 'Blue Marlin',
+    name: 'Sunset Cove',
     frequency: '101.2',
     streamUrl: 'https://ice1.somafm.com/dronezone-128-mp3',
     city: 'ibiza',
@@ -413,7 +413,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'ibiza-7',
-    name: 'Cafe Del Mar',
+    name: 'Sea Horizon',
     frequency: '107.0',
     streamUrl: 'https://ice1.somafm.com/deepspaceone-128-mp3',
     city: 'ibiza',
@@ -451,12 +451,12 @@ export const radioStations: RadioStation[] = [
   // Tulum - 10 Stations
   {
     id: 'tulum-1',
-    name: 'Tulum Deep Pulse',
+    name: 'Tulum FM',
     frequency: '102.1',
     streamUrl: 'https://ice1.somafm.com/groovesalad-128-mp3',
     city: 'tulum',
     genre: 'Deep House',
-    description: 'Sunset & Jungle beats',
+    description: 'The Soul of Tulum',
     albumArt: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=400'
   },
   {
@@ -466,12 +466,12 @@ export const radioStations: RadioStation[] = [
     streamUrl: 'https://ice1.somafm.com/lush-128-mp3',
     city: 'tulum',
     genre: 'Chillout',
-    description: 'Vocal Bliss',
+    description: 'Vocal Bliss & Jungle Spirit',
     albumArt: 'https://images.unsplash.com/photo-1454486326920-d4443bc37478?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'tulum-3',
-    name: 'Drone Zone',
+    name: 'Mayan Echoes',
     frequency: '100.1',
     streamUrl: 'https://ice1.somafm.com/dronezone-128-mp3',
     city: 'tulum',
@@ -480,7 +480,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-4',
-    name: 'Deep Space',
+    name: 'Sian Ka\'an Sounds',
     frequency: '94.3',
     streamUrl: 'https://ice1.somafm.com/deepspaceone-128-mp3',
     city: 'tulum',
@@ -489,7 +489,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-5',
-    name: 'Papaya Playa',
+    name: 'Caribbean Drift',
     frequency: '91.7',
     streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
     city: 'tulum',
@@ -498,7 +498,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-6',
-    name: 'Be Tulum',
+    name: 'Tropical Nightfall',
     frequency: '105.9',
     streamUrl: 'https://ice1.somafm.com/secretagent-128-mp3',
     city: 'tulum',
@@ -507,7 +507,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-7',
-    name: 'Ahau Vibes',
+    name: 'Palapa Grooves',
     frequency: '103.5',
     streamUrl: 'https://ice1.somafm.com/sonicuniverse-128-mp3',
     city: 'tulum',
@@ -516,7 +516,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-8',
-    name: 'PopTron',
+    name: 'Coastal Indie',
     frequency: '107.5',
     streamUrl: 'https://ice1.somafm.com/poptron-128-mp3',
     city: 'tulum',
@@ -525,7 +525,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-9',
-    name: 'The Trip',
+    name: 'Ruins Techno',
     frequency: '96.7',
     streamUrl: 'https://ice1.somafm.com/thetrip-128-mp3',
     city: 'tulum',
@@ -534,7 +534,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-10',
-    name: 'Illinois Street',
+    name: 'Azul Lounge',
     frequency: '89.1',
     streamUrl: 'https://ice1.somafm.com/illstreet-128-mp3',
     city: 'tulum',
@@ -1358,7 +1358,7 @@ export const radioStations: RadioStation[] = [
   // London - 10 Stations
   {
     id: 'london-1',
-    name: 'Rinse FM London',
+    name: 'London Underground',
     frequency: '106.8',
     streamUrl: 'https://ice1.somafm.com/missioncontrol-128-mp3',
     city: 'london',
@@ -1368,7 +1368,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'london-2',
-    name: 'Capital FM',
+    name: 'London Hit Radio',
     frequency: '95.8',
     streamUrl: 'https://ice1.somafm.com/poptron-128-mp3',
     city: 'london',
@@ -1378,7 +1378,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'london-3',
-    name: 'BBC Radio 1',
+    name: 'London National 1',
     frequency: '98.8',
     streamUrl: 'https://ice1.somafm.com/bagel-128-mp3',
     city: 'london',
@@ -1388,7 +1388,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'london-4',
-    name: 'Magic Soul',
+    name: 'Magic Soul London',
     frequency: '105.4',
     streamUrl: 'https://ice1.somafm.com/lush-128-mp3',
     city: 'london',
@@ -1398,7 +1398,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'london-5',
-    name: 'Jazz FM',
+    name: 'Jazz FM London',
     frequency: '102.2',
     streamUrl: 'https://ice1.somafm.com/sonicuniverse-128-mp3',
     city: 'london',
@@ -1408,7 +1408,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'london-6',
-    name: 'Absolute Radio',
+    name: 'Absolute London',
     frequency: '105.8',
     streamUrl: 'https://ice1.somafm.com/indiepop-128-mp3',
     city: 'london',
@@ -1418,17 +1418,17 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'london-7',
-    name: 'LBC London',
+    name: 'London Conversation',
     frequency: '97.3',
     streamUrl: 'https://ice1.somafm.com/dronezone-128-mp3',
     city: 'london',
     genre: 'Talk',
-    description: 'Leading Britain\'s Conversation',
+    description: 'Leading London\'s Conversation',
     albumArt: 'https://images.unsplash.com/photo-1514525253344-f81bad00a926?auto=format&fit=crop&q=80&w=800'
   },
   {
     id: 'london-8',
-    name: 'Ministry of Sound',
+    name: 'London Deep House',
     frequency: '91.1',
     streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
     city: 'london',
@@ -1438,7 +1438,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'london-9',
-    name: 'NTS Radio London',
+    name: 'London Eclectic',
     frequency: '103.4',
     streamUrl: 'https://ice1.somafm.com/thetrip-128-mp3',
     city: 'london',
@@ -1448,7 +1448,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'london-10',
-    name: 'Kiss FM',
+    name: 'London Urban',
     frequency: '100.0',
     streamUrl: 'https://ice1.somafm.com/cliqhop-128-mp3',
     city: 'london',

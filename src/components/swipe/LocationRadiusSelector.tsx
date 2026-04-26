@@ -15,6 +15,7 @@ interface LocationRadiusSelectorProps {
   lng?: number | null;
   variant?: 'minimal' | 'full';
   nodes?: { id: string; lat: number; lng: number; label: string }[];
+  title?: string;
 }
 
 /**
@@ -118,7 +119,7 @@ export const LocationRadiusSelector = memo(({
           >
              <div className="mb-4">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">Sector Depth</h4>
-                <p className="text-xs font-bold italic opacity-80">Adjust scanning radius</p>
+                <p className="text-xs font-bold italic opacity-80">{title ? `Looking for ${title}` : 'Adjust scanning radius'}</p>
              </div>
             <DistanceSlider
               radiusKm={radiusKm}

@@ -109,8 +109,11 @@ export function AppLayout({ children }: AppLayoutProps) {
   }, [location.pathname]);
 
   const isFullScreen = useMemo(() => {
-    return isCameraRoute || showAIChat;
-  }, [isCameraRoute, showAIChat]);
+    const path = location.pathname;
+    const isRadio = path.startsWith('/radio');
+    const isCamera = path.startsWith('/camera');
+    return isCamera || isRadio || showAIChat;
+  }, [location.pathname, showAIChat]);
 
   const isRootTab = useMemo(() => {
     return [
@@ -151,7 +154,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <NotificationSystem />
       </Suspense>
   
-      {!isAuthRoute && !isFullScreen && (!isPublicPreview || !!user) && (
+      {!isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && (!isPublicPreview || !!user) && (
         <SentientHud side="top" className="fixed top-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container">
           <TopBar
             userRole={userRole}
@@ -190,7 +193,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
 
 
-      {!isAuthRoute && !isFullScreen && (!isPublicPreview || !!user) && isRootTab && (
+      {!isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && (!isPublicPreview || !!user) && isRootTab && (
         <SentientHud side="bottom" alwaysVisible={true} className="fixed bottom-0 left-0 right-0 z-[9999]" scrollTargetSelector="#dashboard-scroll-container">
           <BottomNavigation
             userRole={userRole}
@@ -200,8 +203,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         </SentientHud>
       )}
 
-      {/* 📻 CONNECTED RADIO: Floating player bubble */}
-      <RadioMiniPlayer />
+      {/* 📻 CONNECTED RADIO: Floating player bubble - Hidden on radio/full-screen routes */}
+      {!isFullScreen && <RadioMiniPlayer />}
     </div>
   );
 }

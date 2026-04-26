@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
@@ -108,6 +109,13 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
   const [detecting, setDetecting] = useState(false);
   const [detected, setDetected] = useState(!!lat && !!lng);
+  
+  const radarNodes = useMemo(() => (clientProfiles || []).map(p => ({
+    id: p.user_id || p.id,
+    lat: p.latitude || 0,
+    lng: p.longitude || 0,
+    label: p.name || 'Found'
+  })), [clientProfiles]);
 
   const handleDetectLocation = useCallback(() => {
     setDetecting(true);
@@ -148,7 +156,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
   // 🛰️ LOADING STATE — HUD PERSISTENCE
   // We keep the main container alive so HUD elements (Radar/Radius) don't flicker or unmount
-  const showSkeletons = isAuthLoading || isPrefsLoading || isLoading;
+  const showSkeletons = isAuthLoading || isPrefsLoading;
 
   return (
     <div className={cn("flex flex-col h-full w-full relative transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
@@ -209,21 +217,15 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -30, scale: 0.98 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex-1 min-h-0 relative z-10 flex flex-col"
-            style={{ willChange: 'transform, opacity' }}
+            className="flex-1 min-h-0 relative z-10 flex flex-col w-full h-full"
+            style={{ 
+              willChange: 'transform, opacity',
+              paddingTop: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px))',
+              paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px))'
+            }}
           >
-            {/* 📡 HUD: RADIUS SENSOR — Only shown in swipe phase */}
-            <div className="relative z-[20] w-full px-4 mb-2 flex justify-center" style={{ marginTop: 'calc(var(--top-bar-height) + var(--safe-top) + 10px)' }}>
-              <LocationRadiusSelector 
-                radiusKm={radiusKm}
-                onRadiusChange={setRadiusKm}
-                onDetectLocation={handleDetectLocation}
-                detecting={detecting}
-                detected={detected}
-                lat={lat}
-                lng={lng}
-              />
-            </div>
+            {/* 📡 HUD is now managed inside ClientSwipeContainer to maintain parity with Client side discovery */}
+
 
             <div className="flex-1 min-h-0">
               <ClientSwipeContainer
@@ -243,6 +245,27 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
       </AnimatePresence>
 
       <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
+
+      {/* 📡 Radar HUD — Managed at the Dashboard level for absolute persistence and parity */}
+      {typeof document !== 'undefined' && document.body && !showSkeletons && createPortal(
+        <div className="fixed top-[calc(var(--safe-top)+12px)] left-1/2 -translate-x-1/2 z-[10010] pointer-events-none">
+          <div className="pointer-events-auto">
+            <LocationRadiusSelector 
+              radiusKm={radiusKm}
+              onRadiusChange={setRadiusKm as any}
+              onDetectLocation={handleDetectLocation}
+              detecting={detecting}
+              detected={detected}
+              lat={lat}
+              lng={lng}
+              variant="minimal"
+              nodes={radarNodes}
+              title={activeCategory ? activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1) : "Clients"}
+            />
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

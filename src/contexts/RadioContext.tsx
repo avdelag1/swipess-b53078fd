@@ -342,8 +342,9 @@ export function RadioProvider({ children }: { children: React.ReactNode }) {
         savePreferences({ currentStation: targetStation, currentCity: targetStation.city });
       }
 
-      // 📡 TURBO TIMEOUT: 7s is plenty for modern streams
+      // 📡 TURBO TIMEOUT: 10s for slower connections
       loadTimeoutRef.current = setTimeout(() => {
+        console.warn(`[RadioPlayer] Station ${targetStation.id} (${targetStation.name}) timeout after 10s, skipping...`);
         logger.warn(`[RadioPlayer] Station ${targetStation.id} timeout, skipping`);
         failedStationsRef.current.add(targetStation.id);
         setTimeout(() => failedStationsRef.current.delete(targetStation.id), 20000);
@@ -352,7 +353,7 @@ export function RadioProvider({ children }: { children: React.ReactNode }) {
           setError(null);
           changeStationRef.current('next');
         }, 300);
-      }, 7000);
+      }, 10000);
 
       try {
         // ⚡ TURBO ENGINE: Immediate AudioContext creation on first play
