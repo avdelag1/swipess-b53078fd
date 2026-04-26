@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
-import { LocationRadiusSelector } from '@/components/swipe/LocationRadiusSelector';
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
@@ -30,30 +28,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
   const activeCategory = useFilterStore(s => s.activeCategory);
   const { setCategories, setClientType, setListingType, setActiveCategory } = useFilterActions();
-  
-  // 🛰️ LOCATION & RADIUS HUD STATE
-  const radiusKm = useFilterStore((s) => s.radiusKm);
-  const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
-  const setUserLocation = useFilterStore((s) => s.setUserLocation);
-  const [locationDetecting, setLocationDetecting] = useState(false);
-  const [locationDetected, setLocationDetected] = useState(false);
-
-  const detectLocation = useCallback(() => {
-    if (!navigator.geolocation) return;
-    setLocationDetecting(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLocation(pos.coords.latitude, pos.coords.longitude);
-        setRadiusKm(5); 
-        setLocationDetected(true);
-        setLocationDetecting(false);
-      },
-      () => {
-        setLocationDetecting(false);
-      },
-      { timeout: 8000, maximumAge: 60000 }
-    );
-  }, [setUserLocation, setRadiusKm]);
 
   // Derive phase directly from activeCategory — no intermediate state, no race conditions
   const phase = activeCategory ? 'swipe' : 'cards';
@@ -213,11 +187,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
                 insightsOpen={false}
                 category={activeCategory || 'default'}
                 filters={mergedFilters}
-                radiusKm={radiusKm}
-                onRadiusChange={setRadiusKm}
-                onDetectLocation={detectLocation}
-                detecting={locationDetecting}
-                detected={locationDetected}
               />
             </div>
           </motion.div>

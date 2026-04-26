@@ -55,11 +55,6 @@ interface ClientSwipeContainerProps {
   insightsOpen?: boolean; // Whether insights modal is open - hides action buttons
   category?: string; // Category for owner deck persistence (property, moto, etc.)
   filters?: any; // Filters from parent (quick filters + advanced filters)
-  radiusKm?: number;
-  onRadiusChange?: (km: number) => void;
-  onDetectLocation?: () => void;
-  detecting?: boolean;
-  detected?: boolean;
 }
 
 const ClientSwipeContainerComponent = ({
@@ -72,11 +67,6 @@ const ClientSwipeContainerComponent = ({
   insightsOpen: _insightsOpen = false,
   category = 'default',
   filters,
-  radiusKm = 5,
-  onRadiusChange,
-  onDetectLocation,
-  detecting = false,
-  detected = false,
 }: ClientSwipeContainerProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -969,10 +959,10 @@ const ClientSwipeContainerComponent = ({
               >
                 <SwipeExhaustedState
                   radiusKm={radiusKm}
-                  onRadiusChange={onRadiusChange}
-                  onDetectLocation={onDetectLocation}
-                  detecting={detecting}
-                  detected={detected}
+                  onRadiusChange={setRadiusKm as any}
+                  onDetectLocation={detectLocation}
+                  detecting={locationDetecting}
+                  detected={locationDetected}
                   categoryName={labels.plural}
                   isLoading={isLoading || !isMountSettledRef.current}
                   activeCategory={storeActiveCategory || category}
