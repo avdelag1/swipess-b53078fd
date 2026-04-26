@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,13 +12,13 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { OwnerInsightsDashboard } from '@/components/OwnerInsightsDashboard';
 import { OwnerAllDashboard } from '@/components/swipe/OwnerAllDashboard';
+import { SwipeExhaustedState } from '@/components/swipe/SwipeExhaustedState';
 import { triggerHaptic } from '@/utils/haptics';
 import type { QuickFilterCategory } from '@/types/filters';
 import useAppTheme from '@/hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
 import type { ClientFilters } from '@/hooks/smartMatching/types';
 import { AtmosphericLayer } from '@/components/AtmosphericLayer';
-import { LocationRadiusSelector } from '@/components/swipe/LocationRadiusSelector';
 
 interface EnhancedOwnerDashboardProps {
   onClientInsights?: (clientId: string) => void;
@@ -26,6 +27,7 @@ interface EnhancedOwnerDashboardProps {
 }
 
 const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: EnhancedOwnerDashboardProps) => {
+  const navigate = useNavigate();
   const { theme } = useAppTheme();
   const isLight = theme === 'light';
   const [viewMode] = useState<'discovery' | 'insights'>('discovery');
@@ -109,17 +111,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
   const [detecting, setDetecting] = useState(false);
   const [detected, setDetected] = useState(!!lat && !!lng);
-  const kmExpanded = useFilterStore(s => s.kmHudExpanded);
-  const setKmExpanded = useFilterStore(s => s.setKmHudExpanded);
-
-  // Auto-open the km panel when entering swipe mode, auto-close when leaving
-  useEffect(() => {
-    if (phase === 'swipe') {
-      setKmExpanded(true);
-    } else {
-      setKmExpanded(false);
-    }
-  }, [phase, setKmExpanded]);
   
   const radarNodes = useMemo(() => (clientProfiles || []).map(p => ({
     id: p.user_id || p.id,
@@ -259,30 +250,24 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
       <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
 
-      {/* 📡 Radar HUD — Show only during swipe phase (not card selection), but use Zustand state so it survives Suspense */}
-      {phase === 'swipe' && createPortal(
-        <div
-          className="fixed left-1/2 -translate-x-1/2 z-[10010] pointer-events-none"
-          style={{ top: 'calc(var(--safe-top, 0px) + 12px)' }}
-        >
+      {/* 📡 Distance Radius Control — Centered overlay during swipe mode, matching client side layout */}
+      {phase === 'swipe' && (
+        <div className="fixed inset-0 z-[10005] pointer-events-none flex items-center justify-center" style={{ top: 'var(--top-bar-height, 64px)' }}>
           <div className="pointer-events-auto">
-            <LocationRadiusSelector
+            <SwipeExhaustedState
               radiusKm={radiusKm}
               onRadiusChange={setRadiusKm as any}
               onDetectLocation={handleDetectLocation}
               detecting={detecting}
               detected={detected}
-              lat={lat}
-              lng={lng}
-              variant="minimal"
-              nodes={radarNodes}
-              title={activeCategory ? activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1) : "Clients"}
-              expanded={kmExpanded}
-              onExpandedChange={setKmExpanded}
+              categoryName="clients"
+              isLoading={isLoading}
+              activeCategory={activeCategory || 'all-clients'}
+              onOpenFilters={() => navigate('/owner/filters')}
+              role="owner"
             />
           </div>
-        </div>,
-        document.body
+        </div>
       )}
     </div>
   );
