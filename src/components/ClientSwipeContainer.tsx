@@ -92,6 +92,7 @@ const ClientSwipeContainerComponent = ({
   const storeActiveCategory = useFilterStore((s) => s.activeCategory);
   const setActiveCategory = useFilterStore((s) => s.setActiveCategory);
 
+
   const handleMapCategorySelect = useCallback((nextCategory: 'property' | 'motorcycle' | 'bicycle' | 'services') => {
     setActiveCategory(nextCategory);
   }, [setActiveCategory]);
