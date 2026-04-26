@@ -93,6 +93,13 @@ const ClientSwipeContainerComponent = ({
   const setActiveCategory = useFilterStore((s) => s.setActiveCategory);
 
 
+  // DEBUG: Monitor if activeCategory changes unexpectedly
+  useEffect(() => {
+    if (storeActiveCategory && storeActiveCategory !== category) {
+      console.warn('[ClientSwipeContainer] Store activeCategory differs from component category:', { storeActiveCategory, componentCategory: category });
+    }
+  }, [storeActiveCategory, category]);
+
   const handleMapCategorySelect = useCallback((nextCategory: 'property' | 'motorcycle' | 'bicycle' | 'services') => {
     setActiveCategory(nextCategory);
   }, [setActiveCategory]);
@@ -104,6 +111,13 @@ const ClientSwipeContainerComponent = ({
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const cardRef = useRef<SimpleOwnerSwipeCardRef>(null);
+
+  // Prevent accidental back button clicks within 1.5 seconds of mount
+  const [canClickBack, setCanClickBack] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setCanClickBack(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // PERF: Use selective subscriptions to prevent re-renders on unrelated store changes
   // Only subscribe to actions (stable references) - NOT to ownerDecks object
@@ -866,14 +880,17 @@ const ClientSwipeContainerComponent = ({
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => {
+                  if (!canClickBack) return; // Prevent accidental clicks during animation
                   triggerHaptic('light');
                   setActiveCategory(null);
                 }}
+                disabled={!canClickBack}
                 className={cn(
                   "w-11 h-11 flex items-center justify-center transition-all rounded-full backdrop-blur-3xl border shadow-2xl",
-                  isLight 
-                    ? "bg-white/90 border-black/5 text-black" 
-                    : "bg-black/40 border-white/10 text-white shadow-black/20"
+                  isLight
+                    ? "bg-white/90 border-black/5 text-black"
+                    : "bg-black/40 border-white/10 text-white shadow-black/20",
+                  !canClickBack && "opacity-50 cursor-not-allowed"
                 )}
                 title="Back to Sectors"
               >
