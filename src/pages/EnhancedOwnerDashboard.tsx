@@ -154,19 +154,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     <div className={cn("flex flex-col h-full w-full relative transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
       <AtmosphericLayer variant="primary" />
 
-      {/* 📡 HUD: RADIUS SENSOR — Always alive */}
-      <div className="relative z-[20] w-full px-4 mb-2" style={{ marginTop: 'calc(var(--top-bar-height) + var(--safe-top) + 10px)' }}>
-          <LocationRadiusSelector 
-            radiusKm={radiusKm}
-            onRadiusChange={setRadiusKm}
-            onDetectLocation={handleDetectLocation}
-            detecting={detecting}
-            detected={detected}
-            lat={lat}
-            lng={lng}
-          />
-      </div>
-
       <AnimatePresence mode="wait">
         {showSkeletons ? (
           <motion.div
@@ -206,11 +193,12 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="relative flex-1 flex flex-col items-center w-full overflow-hidden z-10"
             style={{ 
-              paddingBottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom))',
+              paddingTop: 'calc(var(--top-bar-height) + var(--safe-top))',
+              paddingBottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom) + 20px)',
               willChange: 'transform, opacity' 
             }}
           >
-            <div className="flex-1 w-full relative z-10 flex flex-col">
+            <div className="flex-1 w-full relative z-10 flex flex-col justify-center">
               <OwnerAllDashboard onCardSelect={handleCardSelect} />
             </div>
           </motion.div>
@@ -221,20 +209,35 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -30, scale: 0.98 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex-1 min-h-0 relative z-10"
+            className="flex-1 min-h-0 relative z-10 flex flex-col"
             style={{ willChange: 'transform, opacity' }}
           >
-            <ClientSwipeContainer
-              onClientTap={handleClientTap}
-              onInsights={handleInsights}
-              onMessageClick={onMessageClick}
-              profiles={clientProfiles}
-              isLoading={isLoading}
-              error={error}
-              insightsOpen={false}
-              category={activeCategory || 'default'}
-              filters={mergedFilters}
-            />
+            {/* 📡 HUD: RADIUS SENSOR — Only shown in swipe phase */}
+            <div className="relative z-[20] w-full px-4 mb-2 flex justify-center" style={{ marginTop: 'calc(var(--top-bar-height) + var(--safe-top) + 10px)' }}>
+              <LocationRadiusSelector 
+                radiusKm={radiusKm}
+                onRadiusChange={setRadiusKm}
+                onDetectLocation={handleDetectLocation}
+                detecting={detecting}
+                detected={detected}
+                lat={lat}
+                lng={lng}
+              />
+            </div>
+
+            <div className="flex-1 min-h-0">
+              <ClientSwipeContainer
+                onClientTap={handleClientTap}
+                onInsights={handleInsights}
+                onMessageClick={onMessageClick}
+                profiles={clientProfiles}
+                isLoading={isLoading}
+                error={error}
+                insightsOpen={false}
+                category={activeCategory || 'default'}
+                filters={mergedFilters}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
