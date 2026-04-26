@@ -156,7 +156,9 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
   // 🛰️ LOADING STATE — HUD PERSISTENCE
   // We keep the main container alive so HUD elements (Radar/Radius) don't flicker or unmount
-  const showSkeletons = isAuthLoading || isPrefsLoading;
+  // Only show skeletons during INITIAL load, not on subsequent reloads
+  const initialLoading = isAuthLoading || isPrefsLoading;
+  const showSkeletons = activeCategory === null && initialLoading;
 
   return (
     <div className={cn("flex flex-col h-full w-full relative transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
@@ -247,7 +249,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
       <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
 
       {/* 📡 Radar HUD — Managed at the Dashboard level for absolute persistence and parity */}
-      {typeof document !== 'undefined' && document.body && !showSkeletons && createPortal(
+      {typeof document !== 'undefined' && document.body && phase === 'swipe' && createPortal(
         <div className="fixed top-[calc(var(--safe-top)+12px)] left-1/2 -translate-x-1/2 z-[10010] pointer-events-none">
           <div className="pointer-events-auto">
             <LocationRadiusSelector 
