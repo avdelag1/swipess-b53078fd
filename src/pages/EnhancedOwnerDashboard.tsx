@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
+import { LocationRadiusSelector } from '@/components/swipe/LocationRadiusSelector';
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
@@ -28,6 +30,30 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
   const activeCategory = useFilterStore(s => s.activeCategory);
   const { setCategories, setClientType, setListingType, setActiveCategory } = useFilterActions();
+  
+  // 🛰️ LOCATION & RADIUS HUD STATE
+  const radiusKm = useFilterStore((s) => s.radiusKm);
+  const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
+  const setUserLocation = useFilterStore((s) => s.setUserLocation);
+  const [locationDetecting, setLocationDetecting] = useState(false);
+  const [locationDetected, setLocationDetected] = useState(false);
+
+  const detectLocation = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setLocationDetecting(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation(pos.coords.latitude, pos.coords.longitude);
+        setRadiusKm(5); 
+        setLocationDetected(true);
+        setLocationDetecting(false);
+      },
+      () => {
+        setLocationDetecting(false);
+      },
+      { timeout: 8000, maximumAge: 60000 }
+    );
+  }, [setUserLocation, setRadiusKm]);
 
   // Derive phase directly from activeCategory — no intermediate state, no race conditions
   const phase = activeCategory ? 'swipe' : 'cards';
@@ -195,6 +221,23 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* 🛰️ PERSISTENT HUD: Location Radius Selector — Mirroring Client side parity */}
+      {typeof document !== 'undefined' && document.body && !showSkeletons && createPortal(
+        <div className="fixed top-[calc(var(--safe-top)+12px)] left-1/2 -translate-x-1/2 z-[10010] pointer-events-none">
+          <div className="pointer-events-auto">
+            <LocationRadiusSelector 
+              radiusKm={radiusKm}
+              onRadiusChange={(km) => setRadiusKm(km)}
+              onDetectLocation={detectLocation}
+              detecting={locationDetecting}
+              detected={locationDetected}
+              title={activeCategory ? activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1) : "Clients"}
+            />
+          </div>
+        </div>,
+        document.body
+      )}
 
       <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
     </div>
