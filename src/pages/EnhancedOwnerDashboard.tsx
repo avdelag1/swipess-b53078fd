@@ -250,8 +250,8 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
       <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
 
-      {/* 📡 Radar HUD — Always mounted so expanded state is never reset by loading changes */}
-      {createPortal(
+      {/* 📡 Radar HUD — Show only during swipe phase (not card selection), but use Zustand state so it survives Suspense */}
+      {phase === 'swipe' && createPortal(
         <div
           className="fixed left-1/2 -translate-x-1/2 z-[10010] pointer-events-none"
           style={{ top: 'calc(var(--safe-top, 0px) + 12px)' }}
