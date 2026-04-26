@@ -16,6 +16,7 @@ import useAppTheme from '@/hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
 import type { ClientFilters } from '@/hooks/smartMatching/types';
 import { AtmosphericLayer } from '@/components/AtmosphericLayer';
+import { LocationRadiusSelector } from '@/components/swipe/LocationRadiusSelector';
 
 interface EnhancedOwnerDashboardProps {
   onClientInsights?: (clientId: string) => void;
@@ -98,6 +99,40 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     onClientInsights?.(clientId);
   }, [onClientInsights]);
 
+  const { radiusKm, setRadiusKm, lat, lng } = useFilterStore(useShallow(s => ({
+    radiusKm: s.radiusKm,
+    setRadiusKm: s.setRadiusKm,
+    lat: s.lat,
+    lng: s.lng
+  })));
+
+  const [detecting, setDetecting] = useState(false);
+  const [detected, setDetected] = useState(!!lat && !!lng);
+
+  const handleDetectLocation = useCallback(() => {
+    setDetecting(true);
+    triggerHaptic('medium');
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          useFilterStore.getState().setLocation(latitude, longitude);
+          setDetecting(false);
+          setDetected(true);
+          triggerHaptic('success');
+        },
+        (error) => {
+          console.error('Error detecting location:', error);
+          setDetecting(false);
+          triggerHaptic('warning');
+        }
+      );
+    } else {
+      setDetecting(false);
+    }
+  }, []);
+
   const handleCardSelect = useCallback((card: any) => {
     triggerHaptic('medium');
     // For owner intent cards, use card.id (buyers/renters/hire/all-clients) as the category
@@ -111,46 +146,47 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     if (card.listingType) setListingType(card.listingType as any);
   }, [setClientType, setListingType, setActiveCategory, setCategories]);
 
-  if (isAuthLoading || isPrefsLoading) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-transparent">
-         <div className="relative">
-            <div className="w-24 h-24 rounded-[2.5rem] border-[6px] border-primary/10 border-t-primary animate-spin shadow-2xl" />
-            <div className="absolute inset-0 m-auto w-8 h-8 bg-primary/40 rounded-full animate-pulse" />
-         </div>
-         <p className="text-[11px] font-black uppercase italic tracking-[0.4em] text-primary mt-10 animate-pulse">Syncing Owner Logic...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full h-full flex items-center justify-center p-8 text-center bg-transparent">
-        <div className="max-w-sm space-y-10">
-          <div className="w-24 h-24 bg-red-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto border border-red-500/20 shadow-2xl">
-            <div className="w-10 h-10 bg-red-500 rounded-full animate-bounce" />
-          </div>
-          <div className="space-y-4">
-            <h2 className={cn("text-3xl font-black italic tracking-tighter uppercase leading-none", isLight ? "text-black" : "text-white")}>Connection Lost</h2>
-            <p className="text-[11px] font-black uppercase tracking-widest opacity-40 leading-relaxed">The owner matching engine is temporarily unreachable. Attempting re-sync.</p>
-          </div>
-          <Button 
-            onClick={() => { triggerHaptic('medium'); window.location.reload(); }}
-            className="w-full h-18 rounded-[2rem] bg-primary text-black font-black uppercase italic tracking-widest shadow-2xl active:scale-95"
-          >
-            Reconnect Terminal
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // 🛰️ LOADING STATE — HUD PERSISTENCE
+  // We keep the main container alive so HUD elements (Radar/Radius) don't flicker or unmount
+  const showSkeletons = isAuthLoading || isPrefsLoading || isLoading;
 
   return (
     <div className={cn("flex flex-col h-full w-full relative transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
       <AtmosphericLayer variant="primary" />
 
+      {/* 📡 HUD: RADIUS SENSOR — Always alive */}
+      <div className="relative z-[20] w-full px-4 mb-2" style={{ marginTop: 'calc(var(--top-bar-height) + var(--safe-top) + 10px)' }}>
+          <LocationRadiusSelector 
+            radiusKm={radiusKm}
+            onRadiusChange={setRadiusKm}
+            onDetectLocation={handleDetectLocation}
+            detecting={detecting}
+            detected={detected}
+            lat={lat}
+            lng={lng}
+          />
+      </div>
+
       <AnimatePresence mode="wait">
-        {viewMode === 'insights' ? (
+        {showSkeletons ? (
+          <motion.div
+            key="loading-skeletons"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex-1 flex flex-col items-center justify-center p-8 space-y-6 z-10"
+          >
+             <div className="relative">
+                <div className="w-20 h-20 rounded-[2.2rem] border-[4px] border-primary/10 border-t-primary animate-spin shadow-2xl" />
+                <div className="absolute inset-0 m-auto w-6 h-6 bg-primary/40 rounded-full animate-pulse" />
+             </div>
+             <p className="text-[10px] font-black uppercase italic tracking-[0.4em] text-primary/60 animate-pulse">Synchronizing Swipess Logic...</p>
+             <div className="w-full max-w-sm space-y-3 pt-8">
+                <div className="h-24 w-full bg-white/5 rounded-3xl animate-pulse" />
+                <div className="h-24 w-full bg-white/5 rounded-3xl animate-pulse opacity-50" />
+             </div>
+          </motion.div>
+        ) : viewMode === 'insights' ? (
           <motion.div
             key="owner-insights"
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
@@ -168,9 +204,8 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="relative flex flex-col items-center w-full h-full overflow-hidden z-10"
+            className="relative flex-1 flex flex-col items-center w-full overflow-hidden z-10"
             style={{ 
-              paddingTop: 'calc(var(--top-bar-height) + var(--safe-top) + 20px)',
               paddingBottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom))',
               willChange: 'transform, opacity' 
             }}

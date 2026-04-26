@@ -18,7 +18,10 @@ export type CityLocation =
   | 'arabic'
   | 'persian'
   | 'meditation'
-  | 'bongs';
+  | 'bongs'
+  | 'london'
+  | 'american-retro'
+  | 'sound-healing';
 
 export interface RadioStation {
   id: string;

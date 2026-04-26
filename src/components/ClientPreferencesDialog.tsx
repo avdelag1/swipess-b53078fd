@@ -952,7 +952,7 @@ export function ClientPreferencesDialog({ open, onOpenChange }: ClientPreference
     </Dialog>
     )}
 
-    {/* 🛸 TARGETING NEXUS: SCANNING OVERLAY */}
+    {/* 🛸 TARGETING SWIPESS: SCANNING OVERLAY */}
     {isScanning && (
       <motion.div
         initial={{ opacity: 0 }}
@@ -1011,7 +1011,7 @@ export function ClientPreferencesDialog({ open, onOpenChange }: ClientPreference
               transition={{ duration: 1.5, repeat: Infinity }}
               className="text-2xl font-black italic uppercase tracking-[0.3em] text-primary"
             >
-              Radar Nexus
+              Radar Swipess
             </motion.h2>
             <div className="flex gap-2">
                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">Calibrating Intelligence</span>

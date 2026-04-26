@@ -36,7 +36,7 @@ const OwnerProfile = () => {
   return (
     <div className="w-full relative overflow-x-hidden min-h-screen bg-[#030308] text-white">
 
-      {/* Nexus Grid Background */}
+      {/* Swipess Grid Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute inset-0 opacity-[0.035]"
@@ -55,11 +55,11 @@ const OwnerProfile = () => {
 
       <div className="w-full max-w-7xl mx-auto p-6 pt-24 pb-12 space-y-10 relative z-10">
 
-        {/* NEXUS OPERATOR BADGE */}
+        {/* SWIPESS OPERATOR BADGE */}
         <div className="flex items-center justify-center">
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/20 bg-cyan-500/5">
             <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-400">Nexus Operator</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-400">Swipess Operator</span>
           </div>
         </div>
 
@@ -113,7 +113,7 @@ const OwnerProfile = () => {
           </div>
         </div>
 
-        {/* NEXUS METRIC GRID */}
+        {/* SWIPESS METRIC GRID */}
         <div className="grid grid-cols-3 gap-3">
           {[
             { label: 'Network', value: stats?.likedClientsCount ?? 0, icon: Flame, color: 'text-cyan-400', border: 'border-cyan-500/15', glow: 'rgba(0,212,255,0.15)' },

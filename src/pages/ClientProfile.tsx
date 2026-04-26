@@ -56,7 +56,7 @@ const ClientProfile = () => {
   return (
     <div className="w-full relative overflow-x-hidden min-h-screen bg-[#030308] text-white">
 
-      {/* Nexus Grid Background */}
+      {/* Swipess Grid Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute inset-0 opacity-[0.035]"
@@ -75,11 +75,11 @@ const ClientProfile = () => {
 
       <div className="w-full max-w-7xl mx-auto p-6 pt-24 pb-12 space-y-10 relative z-10">
 
-        {/* NEXUS MEMBER BADGE */}
+        {/* SWIPESS MEMBER BADGE */}
         <div className="flex items-center justify-center">
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-violet-500/20 bg-violet-500/5">
             <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-violet-400">Nexus Member</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-violet-400">Swipess Member</span>
           </div>
         </div>
 

@@ -158,7 +158,7 @@ export function AdvancedFilters({ isOpen, onClose, userRole, onApplyFilters, cur
                   "text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mt-1.5",
                   isDark ? "text-white" : "text-slate-900"
                 )}>
-                  {userRole === 'owner' ? 'Discovery Parameters' : 'Nexus Preferences'}
+                  {userRole === 'owner' ? 'Discovery Parameters' : 'Swipess Preferences'}
                 </p>
               </div>
             </div>

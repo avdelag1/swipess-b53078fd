@@ -91,39 +91,11 @@ export default function DJTurntableRadio() {
       className={cn("relative w-full h-full flex flex-col overflow-hidden transition-colors duration-500", isDark ? "bg-[#0A0A0A]" : "bg-white")}
       id="main-radio-content"
     >
-      <AtmosphericLayer />
-
-      {/* ── Top Bar ── */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2 z-20 relative gap-3">
-        {/* Back button */}
-        <button
-          onClick={() => { triggerHaptic('medium'); navigate(-1); }}
-          className={cn('w-11 h-11 flex shrink-0 items-center justify-center rounded-full', neumBtn, neumBtnActive)}
-          aria-label="Go back"
-        >
-          <ArrowLeft className={cn("w-5 h-5", isDark ? "text-white" : "text-black")} />
-        </button>
-
-        {/* Station info */}
-        <div className="flex flex-col flex-1 min-w-0">
-          <p className={cn("text-[10px] font-black uppercase tracking-[0.3em]", isDark ? "text-blue-400" : "text-primary")}>
-            {state.currentStation?.frequency || '93.1'} FM
-          </p>
-          <h2 className={cn("text-xl font-black truncate tracking-tighter", isDark ? "text-white" : "text-black")}>
-            {state.currentStation?.name || 'Radio'}
-          </h2>
-        </div>
-
-        <button
-          onClick={() => { triggerHaptic('medium'); setShowDrawer(true); }}
-          className={cn('w-12 h-12 flex shrink-0 items-center justify-center rounded-2xl', neumBtn, neumBtnActive)}
-        >
-          <ListMusic className={cn("w-6 h-6", isDark ? "text-white" : "text-black")} />
-        </button>
-      </div>
+      <AtmosphericLayer variant="primary" />
+      <div className="h-[calc(var(--top-bar-height)+10px)]" />
 
       {/* ── Main Content ── */}
-      <div className="flex-1 flex flex-col items-center justify-between px-4">
+      <div className="flex-1 flex flex-col items-center justify-between px-4 pb-32">
         
         {/* Info cluster */}
         <div className="flex flex-col items-center text-center">

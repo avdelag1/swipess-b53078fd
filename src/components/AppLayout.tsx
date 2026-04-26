@@ -109,19 +109,21 @@ export function AppLayout({ children }: AppLayoutProps) {
   }, [location.pathname]);
 
   const isFullScreen = useMemo(() => {
-    return isCameraRoute || showAIChat || isRadioRoute;
-  }, [isCameraRoute, showAIChat, isRadioRoute]);
+    return isCameraRoute || showAIChat;
+  }, [isCameraRoute, showAIChat]);
 
   const isRootTab = useMemo(() => {
     return [
       '/client/dashboard', '/owner/dashboard', '/admin/dashboard',
       '/client/liked-properties', '/owner/liked-clients', '/owner/interested-clients',
       '/client/properties', '/owner/properties',
-      '/messages',
+      '/messages', '/radio',
+      '/client/profile', '/owner/profile',
       '/client/filters', '/owner/filters',
       '/client/discovery', '/owner/discovery',
-      '/explore/roommates', '/explore/eventos'
-    ].some(path => location.pathname === path || location.pathname === path + '/');
+      '/explore/roommates', '/explore/eventos',
+      '/radio/directory'
+    ].some(path => location.pathname.startsWith(path));
   }, [location.pathname]);
 
   const handleFilterClick = () => {
@@ -189,7 +191,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
 
       {!isAuthRoute && !isFullScreen && (!isPublicPreview || !!user) && isRootTab && (
-        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[9999]" scrollTargetSelector="#dashboard-scroll-container">
+        <SentientHud side="bottom" alwaysVisible={true} className="fixed bottom-0 left-0 right-0 z-[9999]" scrollTargetSelector="#dashboard-scroll-container">
           <BottomNavigation
             userRole={userRole}
             onFilterClick={handleFilterClick}

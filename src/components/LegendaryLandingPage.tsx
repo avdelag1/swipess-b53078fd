@@ -531,7 +531,7 @@ function LegendaryLandingPage() {
             <div className="flex-1 overflow-y-auto pr-2 space-y-6 text-white/80 scrollbar-none pb-12">
                {legalModal === 'terms' ? (
                  <div className="space-y-5">
-                    <p className="text-sm font-bold leading-relaxed text-white">By initializing the Swipess nexus, you agree to be bound by these Legal Protocols. Access is denied to non-compliant entities.</p>
+                    <p className="text-sm font-bold leading-relaxed text-white">By initializing the Swipess experience, you agree to be bound by these Legal Protocols. Access is denied to non-compliant entities.</p>
                     <div className="h-px bg-white/10 my-6" />
                     
                     <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#EB4898] mb-2">01 — Entity Eligibility</h3>

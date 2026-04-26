@@ -59,101 +59,77 @@ export default function WorldRadioDirectory() {
       "min-h-screen flex flex-col relative",
       isDark ? "bg-[#050505] text-white" : "bg-white text-slate-900"
     )}>
-      <AtmosphericLayer />
-      {/* ── HEADER ── */}
-      <header className={cn(
-        "sticky top-0 z-30 pt-[env(safe-area-inset-top,20px)] px-6 pb-6 backdrop-blur-2xl border-b",
-        isDark ? "bg-black/80 border-white/5" : "bg-white/90 border-black/5"
-      )}>
-        <div className="flex items-center justify-between mb-6">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => navigate(-1)}
-            className={cn(
-              "w-10 h-10 rounded-2xl flex items-center justify-center border transition-all active:scale-90",
-              isDark ? "bg-white/5 border-white/10" : "bg-black/5 border-black/10"
-            )}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </motion.button>
-          
-          <div className="flex flex-col items-center">
-            <h1 className="text-xl font-black tracking-tighter italic uppercase">
-              World Radio <span className="text-primary">Stations</span>
-            </h1>
-            <div className="flex items-center gap-1.5 opacity-40">
-              <Globe size={10} className="animate-spin-slow" />
-              <span className="text-[9px] font-black tracking-widest uppercase">Global Frequency Network</span>
-            </div>
-          </div>
-
-          <div className="w-10" />
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative group">
-          <div className={cn(
-            "absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors",
-            isDark ? "text-white/30" : "text-black/30"
-          )}>
-            <Search size={18} />
-          </div>
-          <input 
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search stations, genres, cities..."
-            className={cn(
-              "w-full h-14 border rounded-2xl pl-14 pr-6 text-sm font-bold transition-all focus:outline-none focus:border-primary/50",
-              isDark 
-                ? "bg-white/5 border-white/10 placeholder:text-white/20 text-white" 
-                : "bg-black/5 border-black/10 placeholder:text-black/20 text-black"
-            )}
-          />
-        </div>
-
-        {/* City Filter scroller */}
-        <div className="flex gap-2.5 overflow-x-auto pt-4 no-scrollbar -mx-2 px-2">
-          <button
-            onClick={() => setSelectedCity('all')}
-            className={cn(
-              "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 transition-all border",
-              selectedCity === 'all'
-                ? "bg-primary text-black border-primary shadow-lg shadow-primary/20"
-                : isDark 
-                  ? "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
-                  : "bg-black/5 border-black/5 text-black/40 hover:border-black/10"
-            )}
-          >
-            All Cities
-          </button>
-          {cities.map(city => (
-            <button
-              key={city.id}
-              onClick={() => setSelectedCity(city.id as CityLocation)}
-              className={cn(
-                "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 transition-all border",
-                selectedCity === city.id
-                  ? (isDark ? "bg-white text-black border-white" : "bg-black text-white border-black") + " shadow-lg"
-                  : isDark 
-                    ? "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
-                    : "bg-black/5 border-black/5 text-black/40 hover:border-black/10"
-              )}
-            >
-              {city.name}
-            </button>
-          ))}
-        </div>
-      </header>
-
-      {/* ── MAIN CONTENT ── */}
+      {/* 🛸 HUD INTEGRATED: AtmosphericLayer handled by AppLayout */}
+      
       <main className="flex-1 p-6 pb-32">
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-        >
+        <div className="mb-8">
+           <div className="flex flex-col mb-6">
+              <h1 className="text-3xl font-black tracking-tighter italic uppercase">
+                World <span className="text-primary">Radio</span>
+              </h1>
+              <div className="flex items-center gap-1.5 opacity-40">
+                <Globe size={10} className="animate-spin-slow" />
+                <span className="text-[9px] font-black tracking-widest uppercase">Global Frequency Network</span>
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative group mb-6">
+              <div className={cn(
+                "absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors",
+                isDark ? "text-white/30" : "text-black/30"
+              )}>
+                <Search size={18} />
+              </div>
+              <input 
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search stations, genres, cities..."
+                className={cn(
+                  "w-full h-14 border rounded-2xl pl-14 pr-6 text-sm font-bold transition-all focus:outline-none focus:border-primary/50",
+                  isDark 
+                    ? "bg-white/5 border-white/10 placeholder:text-white/20 text-white" 
+                    : "bg-black/5 border-black/10 placeholder:text-black/20 text-black"
+                )}
+              />
+            </div>
+
+            {/* City Filter scroller */}
+            <div className="flex gap-2.5 overflow-x-auto no-scrollbar -mx-2 px-2">
+              <button
+                onClick={() => setSelectedCity('all')}
+                className={cn(
+                  "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 transition-all border",
+                  selectedCity === 'all'
+                    ? "bg-primary text-black border-primary shadow-lg shadow-primary/20"
+                    : isDark 
+                      ? "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
+                      : "bg-black/5 border-black/5 text-black/40 hover:border-black/10"
+                )}
+              >
+                All Cities
+              </button>
+              {cities.map(city => (
+                <button
+                  key={city.id}
+                  onClick={() => setSelectedCity(city.id as CityLocation)}
+                  className={cn(
+                    "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shrink-0 transition-all border",
+                    selectedCity === city.id
+                      ? (isDark ? "bg-white text-black border-white" : "bg-black text-white border-black") + " shadow-lg"
+                      : isDark 
+                        ? "bg-white/5 border-white/5 text-white/40 hover:border-white/20"
+                        : "bg-black/5 border-black/5 text-black/40 hover:border-black/10"
+                  )}
+                >
+                  {city.name}
+                </button>
+              ))}
+            </div>
+        </div>
+        {/* 🛸 STATION GRID — Simplified and always visible */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <AnimatePresence mode="popLayout">
             {filteredStations.map((station) => {
               const isPlaying = state.currentStation?.id === station.id && state.isPlaying;
@@ -163,8 +139,11 @@ export default function WorldRadioDirectory() {
               return (
                 <motion.div
                   key={station.id}
-                  variants={itemAnim}
-                  exit={{ opacity: 0, scale: 0.95 }}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   className={cn(
                     "group relative overflow-hidden rounded-[2.5rem] p-5 border transition-all duration-500",
                     isPlaying 
@@ -266,13 +245,21 @@ export default function WorldRadioDirectory() {
               );
             })}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
+        {/* 🛰️ EMPTY STATE */}
         {filteredStations.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 gap-4 opacity-30">
-            <Radio size={48} strokeWidth={1} />
-            <p className="font-black text-xs tracking-[0.3em] uppercase">No Signals Found</p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex-1 flex flex-col items-center justify-center py-20 text-center"
+          >
+            <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-6 border border-white/10">
+              <Radio className="w-10 h-10 opacity-20" />
+            </div>
+            <h3 className="text-xl font-black italic uppercase tracking-widest opacity-40">No Signals Found</h3>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-25 mt-2">Adjust your frequency filters</p>
+          </motion.div>
         )}
       </main>
 
