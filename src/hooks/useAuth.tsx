@@ -2,11 +2,12 @@ import { useState, useEffect, createContext, useContext, ReactNode, useRef, useM
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { appToast } from '@/utils/appNotification';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from './useAppNavigate';
 import { useProfileSetup, resetProfileCreationLock } from './useProfileSetup';
 import { useAccountLinking } from './useAccountLinking';
 import { useQueryClient } from '@tanstack/react-query';
 import { logger } from '@/utils/prodLogger';
+
 
 
 interface AuthContextType {
@@ -27,7 +28,7 @@ export function AuthProvider({ children, authPromise }: { children: ReactNode, a
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false); // TRUE after first auth check
-  const navigate = useNavigate();
+  const { navigate } = useAppNavigate();
   const queryClient = useQueryClient();
   const { createProfileIfMissing } = useProfileSetup();
   const { handleOAuthUserSetup: linkOAuthAccount, checkExistingAccount } = useAccountLinking();

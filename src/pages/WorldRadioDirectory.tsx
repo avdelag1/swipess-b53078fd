@@ -151,6 +151,7 @@ export default function WorldRadioDirectory() {
             {filteredStations.map((station) => {
               const isPlaying = state.currentStation?.id === station.id && state.isPlaying;
               const isFav = isStationFavorite(station.id);
+              const isOffline = state.deadStationIds?.includes(station.id);
               const theme = cityThemes[station.city as CityLocation] || cityThemes['miami'];
 
               return (
@@ -163,11 +164,19 @@ export default function WorldRadioDirectory() {
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   className={cn(
                     "group relative overflow-hidden rounded-[2.5rem] p-5 border transition-all duration-500",
+                    isOffline ? "opacity-40 grayscale-[0.5] scale-[0.98] pointer-events-none" : "opacity-100",
                     isPlaying 
                       ? (isDark ? "bg-white/10 border-white/20" : "bg-black/10 border-black/20")
                       : (isDark ? "bg-white/[0.03] border-white/5 hover:bg-white/[0.06]" : "bg-black/[0.03] border-black/5 hover:bg-black/[0.06]")
                   )}
                 >
+                  {isOffline && (
+                    <div className="absolute top-4 right-6 z-20">
+                      <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-500 text-[8px] font-black uppercase tracking-widest border border-red-500/20">
+                        Offline
+                      </span>
+                    </div>
+                  )}
                   <div 
                     className="absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-10"
                     style={{ backgroundColor: theme.primaryColor }}

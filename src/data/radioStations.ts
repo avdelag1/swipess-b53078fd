@@ -156,6 +156,15 @@ export const cityThemes: Record<CityLocation, CityTheme> = {
     accentColor: '#ffffff',
     gradient: 'linear-gradient(135deg, #001146 0%, #cc0000 100%)',
     description: 'Capital of Sound'
+  },
+  'moscow': {
+    id: 'moscow',
+    name: 'Moscow',
+    primaryColor: '#cc0000',
+    secondaryColor: '#000000',
+    accentColor: '#ffffff',
+    gradient: 'linear-gradient(135deg, #cc0000 0%, #000000 100%)',
+    description: 'Red Square rhythms'
   }
 };
 
@@ -264,7 +273,7 @@ export const radioStations: RadioStation[] = [
     id: 'ny-1',
     name: 'Empire State Radio',
     frequency: '93.9',
-    streamUrl: 'https://fm939.wnyc.org/wnycfm.mp3',
+    streamUrl: 'https://stream.wnyc.org/wnycfm-mobile.aac',
     city: 'new-york',
     genre: 'Talk',
     description: 'Public Radio'
@@ -1455,9 +1464,49 @@ export const radioStations: RadioStation[] = [
     genre: 'Dance/Urban',
     description: 'The Beat of London',
     albumArt: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'moscow-1',
+    name: 'Red Square Beats',
+    frequency: '92.4',
+    streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
+    city: 'moscow',
+    genre: 'Electronic',
+    description: 'Techno from the heart of Russia',
+    albumArt: 'https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'moscow-2',
+    name: 'Kremlin Chill',
+    frequency: '101.1',
+    streamUrl: 'https://ice1.somafm.com/groovesalad-128-mp3',
+    city: 'moscow',
+    genre: 'Chillout',
+    description: 'Sophisticated Russian lounge',
+    albumArt: 'https://images.unsplash.com/photo-1520106212299-d99c443e4568?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'moscow-3',
+    name: 'Secret Agent Moscow',
+    frequency: '105.2',
+    streamUrl: 'https://ice1.somafm.com/secretagent-128-mp3',
+    city: 'moscow',
+    genre: 'Retro',
+    description: 'Espionage soundtracks',
+    albumArt: 'https://images.unsplash.com/photo-1547448415-e9f5b28e570d?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'moscow-4',
+    name: 'Siberian Deep',
+    frequency: '98.8',
+    streamUrl: 'https://ice1.somafm.com/deepspaceone-128-mp3',
+    city: 'moscow',
+    genre: 'Ambient',
+    description: 'Atmospheric Russian soundscapes',
+    albumArt: 'https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?auto=format&fit=crop&q=80&w=800'
   }
-
 ];
+
 
 export function getStationsByCity(city: CityLocation): RadioStation[] {
   return radioStations.filter(station => station.city === city);

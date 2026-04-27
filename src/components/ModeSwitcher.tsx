@@ -58,7 +58,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
         }}
         disabled={!canSwitchMode || isSwitching}
         className={cn(
-          "w-10 h-10 flex items-center justify-center transition-all duration-300 relative rounded-xl",
+          "w-9 h-9 flex items-center justify-center transition-all duration-300 relative rounded-xl",
           isClient 
             ? "opacity-100" 
             : (isLight ? "opacity-70 hover:opacity-100" : "opacity-70 hover:opacity-100")
@@ -78,7 +78,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
         }}
         disabled={!canSwitchMode || isSwitching}
         className={cn(
-          "w-10 h-10 flex items-center justify-center transition-all duration-300 relative rounded-xl",
+          "w-9 h-9 flex items-center justify-center transition-all duration-300 relative rounded-xl",
           !isClient 
             ? "opacity-100" 
             : (isLight ? "opacity-70 hover:opacity-100" : "opacity-70 hover:opacity-100")

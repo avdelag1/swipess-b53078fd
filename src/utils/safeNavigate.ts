@@ -1,6 +1,6 @@
 import { NavigateFunction } from 'react-router-dom';
 import { User } from '@supabase/supabase-js';
-import { toast } from '@/components/ui/sonner';
+import { appToast } from '@/utils/appNotification';
 import { logger } from '@/utils/prodLogger';
 
 interface SafeNavigateOptions {
@@ -18,28 +18,6 @@ interface SafeNavigateOptions {
  * - Prevents silent navigation failures when user is logged out
  * - Provides visible error messages when navigation fails
  * - Ensures consistent auth checking across all navigation
- *
- * USAGE:
- * ```typescript
- * const navigate = useNavigate();
- * const { user } = useAuth();
- * const safeNavigate = createSafeNavigate(navigate, user);
- *
- * // Navigate with auth check (default)
- * safeNavigate('/client/dashboard');
- *
- * // Navigate without auth check (e.g., to login page)
- * safeNavigate('/login', { requiresAuth: false });
- *
- * // Navigate with state
- * safeNavigate('/messages', { state: { userId: '123' } });
- * ```
- *
- * BENEFITS:
- * - Fixes "dead button" bugs where buttons do nothing
- * - Shows user-friendly error messages
- * - Prevents blank screens from failed navigation
- * - Centralizes navigation safety logic
  */
 export function createSafeNavigate(
   navigate: NavigateFunction,
@@ -50,11 +28,7 @@ export function createSafeNavigate(
 
     // Auth check
     if (requiresAuth && !user) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please log in to continue.',
-        variant: 'destructive',
-      });
+      appToast.error('Authentication Required', 'Please log in to continue.');
       navigate('/', { replace: true });
       return false;
     }
@@ -65,14 +39,11 @@ export function createSafeNavigate(
       return true;
     } catch (error) {
       logger.error('[SafeNavigate] Navigation error:', error);
-      toast({
-        title: 'Navigation Failed',
-        description: 'Unable to navigate. Please try again.',
-        variant: 'destructive',
-      });
+      appToast.error('Navigation Failed', 'Unable to navigate. Please try again.');
       return false;
     }
   };
 }
+
 
 

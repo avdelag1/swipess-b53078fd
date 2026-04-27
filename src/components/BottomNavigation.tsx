@@ -37,10 +37,10 @@ import { useFilterStore } from '@/state/filterStore';
 import { useModalStore } from '@/state/modalStore';
 import { useActiveMode } from '@/hooks/useActiveMode';
 
-const ICON_SIZE = 21;
+const ICON_SIZE = 20;
 const ICON_SIZE_COMPACT = 18;
 const ICON_SIZE_TABLET = 26;
-const TOUCH_TARGET = 44;
+const TOUCH_TARGET = 40;
 const TOUCH_TARGET_TABLET = 54;
 
 interface BottomNavigationProps {
@@ -320,10 +320,10 @@ export const BottomNavigation = memo(({
                   'touch-manipulation focus-visible:outline-none transform-gpu active:bg-[var(--hud-active-bg)]',
                 )}
                 style={{
-                  minWidth: isTablet ? '100px' : (isNarrow ? '48px' : '56px'),
+                  minWidth: isTablet ? '100px' : (isNarrow ? '44px' : '52px'),
                   scrollSnapAlign: 'start',
                   minHeight: isTablet ? TOUCH_TARGET_TABLET : TOUCH_TARGET,
-                  padding: isTablet ? '8px 12px' : (isNarrow ? '5px 6px' : '6px 8px'),
+                  padding: isTablet ? '8px 12px' : (isNarrow ? '4px 5px' : '5px 6px'),
                   borderRadius: '3rem',
                   cursor: 'pointer',
                   flexShrink: 0,

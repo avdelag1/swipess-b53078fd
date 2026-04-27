@@ -26,7 +26,7 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
   return (
     <div
       className={cn(
-        "flex-1 flex flex-col relative w-full h-full",
+        "flex-1 flex flex-col relative w-full min-h-0",
         isLight ? "bg-white" : "bg-[#020202]"
       )}
       style={{
@@ -34,6 +34,7 @@ export default function ClientDashboard({ onMessageClick }: ClientDashboardProps
         paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px))',
       }}
     >
+
       <SwipessSwipeContainer
         onListingTap={() => {}}
         onInsights={() => {}}

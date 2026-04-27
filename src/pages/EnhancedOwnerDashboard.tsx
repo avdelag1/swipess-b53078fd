@@ -150,7 +150,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
   const showSkeletons = activeCategory === null && initialLoading;
 
   return (
-    <div className={cn("flex flex-col h-full w-full relative transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
+    <div className={cn("flex flex-col flex-1 min-h-0 w-full relative transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
       <AtmosphericLayer variant="primary" />
 
       <AnimatePresence mode="wait">
@@ -208,7 +208,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, x: -100, filter: 'blur(10px)' }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex-1 min-h-0 relative z-20 flex flex-col w-full h-full"
+            className="flex-1 min-h-0 relative z-20 flex flex-col w-full"
             style={{
               paddingTop: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px))',
               paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px))'
@@ -241,7 +241,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -40, scale: 0.98 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="flex-1 min-h-0 relative z-10 flex flex-col w-full h-full"
+            className="flex-1 min-h-0 relative z-10 flex flex-col w-full"
             style={{
               willChange: 'transform, opacity',
               paddingTop: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px))',

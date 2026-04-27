@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigate } from '@/hooks/useAppNavigate';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, ChevronLeft, ChevronRight, Search, RotateCcw, Home, Bike, Briefcase, Zap, Radar
@@ -22,7 +22,8 @@ interface ClientFiltersProps {
 }
 
 export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProps) {
-  const navigate = useNavigate();
+  const { navigate } = useAppNavigate();
+
   const queryClient = useQueryClient();
   const { isLight } = useAppTheme();
   
