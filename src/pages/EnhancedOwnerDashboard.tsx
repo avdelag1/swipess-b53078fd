@@ -42,6 +42,38 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     }
   }, [activeCategory, ownerPhase, setOwnerPhase]);
 
+  // 🛰️ LOCATION & RADIUS HUD STATE
+  const radiusKm = useFilterStore((s) => s.radiusKm);
+  const setRadiusKm = useFilterStore((s) => s.setRadiusKm);
+  const setUserLocation = useFilterStore((s) => s.setUserLocation);
+  const [locationDetecting, setLocationDetecting] = useState(false);
+  const [locationDetected, setLocationDetected] = useState(false);
+
+  const detectLocation = useCallback(async () => {
+    setLocationDetecting(true);
+    triggerHaptic('light');
+    try {
+      if (!navigator.geolocation) {
+        setLocationDetecting(false);
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          setLocationDetected(true);
+          setLocationDetecting(false);
+          triggerHaptic('medium');
+        },
+        () => {
+          setLocationDetecting(false);
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+    } catch (e) {
+      setLocationDetecting(false);
+    }
+  }, [setUserLocation]);
+
   const { user, loading: isAuthLoading } = useAuth();
 
   // Hydrate owner filter store from DB on mount
