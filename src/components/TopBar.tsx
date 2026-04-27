@@ -104,7 +104,7 @@ function TopBarComponent({
             <motion.button
               whileTap={{ scale: 0.9 }}
                onClick={() => { haptics.tap(); onBack(); }}
-              className="w-11 h-11 flex shrink-0 items-center justify-center rounded-full"
+              className="w-10 h-10 flex shrink-0 items-center justify-center rounded-full"
               style={glassPillStyle}
             >
               <ChevronLeft className="w-5 h-5" style={{ color: isLight ? '#000000' : 'var(--hud-text)' }} />
@@ -117,11 +117,11 @@ function TopBarComponent({
                   haptics.tap();
                   navigate(isOwner ? '/owner/profile' : '/client/profile');
                 }}
-              className="flex shrink-0 items-center gap-3 px-2.5 py-2 pr-4 rounded-2xl"
+              className="flex shrink-0 items-center gap-3 px-2.5 py-1.5 pr-4 rounded-2xl"
               style={glassPillStyle}
             >
               {/* Rounded Square avatar — 'window' style */}
-              <div className="w-8 h-8 rounded-[0.7rem] overflow-hidden shrink-0 flex items-center justify-center relative"
+              <div className="w-7.5 h-7.5 rounded-[0.6rem] overflow-hidden shrink-0 flex items-center justify-center relative"
                 style={{
                   background: profile?.avatar_url ? 'transparent' : (isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)'),
                   border: isLight ? '1.5px solid rgba(0,0,0,0.06)' : '1.5px solid rgba(255,255,255,0.1)',

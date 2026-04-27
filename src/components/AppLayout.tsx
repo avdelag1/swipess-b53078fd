@@ -129,7 +129,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className={cn(
-      "w-full min-h-screen flex flex-col relative selection:bg-brand-primary/30", 
+      "w-full h-[100dvh] flex flex-col relative selection:bg-brand-primary/30 overflow-hidden", 
       "bg-background",
       theme === 'Swipess-style' && "Swipess-style"
     )}>
@@ -163,8 +163,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         id="main-content"
         className={cn(
           "w-full flex-1 relative z-0 flex flex-col",
-          // 🛡️ RADIO PROTECTION: Ensure Radio/Camera routes are always fixed/fullscreen
-          isFullScreen && "h-[100dvh] overflow-hidden fixed inset-0"
+          // 🛡️ ZENITH PROTECTION: Ensure Dashboards are never double-scrollable
+          (isImmersive || isFullScreen) ? "h-full overflow-hidden" : "overflow-y-auto scroll-area-momentum"
         )}
       >
         <div className="w-full flex-1 flex flex-col">

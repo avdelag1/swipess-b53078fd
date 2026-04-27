@@ -210,9 +210,7 @@ body {
   min-height: 100dvh;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  /* CRITICAL: Allow body to scroll */
-  overflow-y: visible !important; 
-  overflow-x: hidden;
+  overflow: hidden;
   position: relative;
 }
 

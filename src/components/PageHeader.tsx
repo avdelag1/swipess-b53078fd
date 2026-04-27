@@ -45,7 +45,7 @@ export function PageHeader({
           <motion.button
             onClick={handleBack}
             whileTap={{ scale: 0.9, transition: { type: 'spring', stiffness: 400, damping: 17 } }}
-            className="shrink-0 flex items-center justify-center gap-1.5 px-4 h-11 rounded-2xl text-[10px] font-black uppercase tracking-widest italic transition-all duration-300 active:scale-95 backdrop-blur-[40px]"
+            className="shrink-0 flex items-center justify-center gap-1.5 px-4 h-10 rounded-2xl text-[10px] font-black uppercase tracking-widest italic transition-all duration-300 active:scale-95 backdrop-blur-[40px]"
             style={isLight ? {
               color: '#000000',
               background: 'rgba(255, 255, 255, 0.7)',

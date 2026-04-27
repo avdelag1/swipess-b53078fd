@@ -37,10 +37,10 @@ import { useFilterStore } from '@/state/filterStore';
 import { useModalStore } from '@/state/modalStore';
 import { useActiveMode } from '@/hooks/useActiveMode';
 
-const ICON_SIZE = 23;
-const ICON_SIZE_COMPACT = 20;
+const ICON_SIZE = 21;
+const ICON_SIZE_COMPACT = 18;
 const ICON_SIZE_TABLET = 26;
-const TOUCH_TARGET = 46;
+const TOUCH_TARGET = 44;
 const TOUCH_TARGET_TABLET = 54;
 
 interface BottomNavigationProps {
