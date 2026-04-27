@@ -1,5 +1,6 @@
 import { lazyWithRetry } from '@/utils/lazyRetry';
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useMemo } from 'react';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { TokensModal } from './TokensModal';
 import { useModalStore } from '@/state/modalStore';
 import { SmartSuspense } from './SmartSuspense';
@@ -32,46 +33,65 @@ const AIListingWizard = lazyWithRetry(() => import('@/components/AIListingWizard
 const ConciergeChat = lazyWithRetry(() => import('@/components/ConciergeChat').then(m => ({ default: m.ConciergeChat })));
 const ReportDialog = lazyWithRetry(() => import('@/components/ReportDialog').then(m => ({ default: m.ReportDialog })));
 
-const ConciergeChatFallback = memo(() => (
-  <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-xl flex items-end md:items-center justify-center">
-    <div className="relative w-full h-full md:max-w-3xl md:h-[90vh] md:rounded-[3rem] border border-[#FF3D00]/20 flex flex-col overflow-hidden bg-[#050505] shadow-[0_0_50px_rgba(255,61,0,0.1)]">
-      {/* 🛸 Ambient Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#FF3D00]/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full" />
-      </div>
+const ConciergeChatFallback = memo(() => {
+  const { isLight, theme } = useAppTheme();
+  const isSwipess = theme === 'dark' || theme === 'black-matte' || theme === 'grey-matte';
 
-      {/* Header Skeleton */}
-      <div className="h-20 flex items-center justify-between px-6 border-b border-white/5 bg-black/40 backdrop-blur-3xl relative z-10">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 animate-pulse" />
-          <div className="space-y-2">
-            <div className="h-3 w-32 rounded-full bg-white/10 animate-pulse" />
-            <div className="h-2 w-20 rounded-full bg-white/5 animate-pulse" />
+  return (
+    <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-xl flex items-end md:items-center justify-center">
+      <div className={cn(
+        "relative w-full h-full md:max-w-3xl md:h-[90vh] md:rounded-[3rem] border flex flex-col overflow-hidden transition-all duration-700",
+        isSwipess ? "bg-[#050505] border-[#FF3D00]/20 shadow-[0_0_50px_rgba(255,61,0,0.1)]" : "bg-white border-slate-200 shadow-[0_40px_100px_rgba(0,0,0,0.2)]"
+      )}>
+        {/* 🛸 Ambient Background */}
+        {isSwipess && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#FF3D00]/10 blur-[120px] rounded-full" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full" />
+          </div>
+        )}
+
+        {/* Header Skeleton */}
+        <div className={cn(
+          "h-20 flex items-center justify-between px-6 border-b backdrop-blur-3xl relative z-10",
+          isSwipess ? "border-white/5 bg-black/40" : "border-slate-200 bg-white/80"
+        )}>
+          <div className="flex items-center gap-4">
+            <div className={cn("w-12 h-12 rounded-2xl animate-pulse border", isSwipess ? "bg-white/5 border-white/5" : "bg-slate-100 border-slate-200")} />
+            <div className="space-y-2">
+              <div className={cn("h-3 w-32 rounded-full animate-pulse", isSwipess ? "bg-white/10" : "bg-slate-200")} />
+              <div className={cn("h-2 w-20 rounded-full animate-pulse", isSwipess ? "bg-white/5" : "bg-slate-100")} />
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className={cn("h-12 w-32 rounded-2xl animate-pulse border", isSwipess ? "bg-white/5 border-white/5" : "bg-slate-100 border-slate-200")} />
+            <div className={cn("h-12 w-12 rounded-2xl animate-pulse border", isSwipess ? "bg-white/5 border-white/5" : "bg-slate-100 border-slate-200")} />
           </div>
         </div>
-        <div className="flex gap-3">
-          <div className="h-12 w-32 rounded-2xl bg-white/5 border border-white/5 animate-pulse" />
-          <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/5 animate-pulse" />
+        
+        {/* Content Skeleton */}
+        <div className="flex-1 p-8 space-y-10 overflow-hidden relative z-10 flex flex-col items-center justify-center">
+          <div className={cn(
+            "w-24 h-24 rounded-[3rem] border flex items-center justify-center animate-pulse",
+            isSwipess ? "border-primary/10 bg-primary/5" : "border-slate-200 bg-slate-50"
+          )} />
+          <div className="space-y-3 text-center">
+             <div className={cn("h-4 w-48 rounded-full animate-pulse", isSwipess ? "bg-white/10" : "bg-slate-200")} />
+             <div className={cn("h-2 w-32 rounded-full animate-pulse", isSwipess ? "bg-white/5" : "bg-slate-100")} />
+          </div>
         </div>
-      </div>
-      
-      {/* Content Skeleton */}
-      <div className="flex-1 p-8 space-y-10 overflow-hidden relative z-10 flex flex-col items-center justify-center">
-        <div className="w-24 h-24 rounded-[3rem] border border-primary/10 flex items-center justify-center bg-primary/5 animate-pulse" />
-        <div className="space-y-3 text-center">
-           <div className="h-4 w-48 rounded-full bg-white/10 mx-auto animate-pulse" />
-           <div className="h-2 w-32 rounded-full bg-white/5 mx-auto animate-pulse" />
+        
+        {/* Input Skeleton */}
+        <div className={cn(
+          "p-8 border-t pb-[calc(env(safe-area-inset-bottom,0px)+32px)] backdrop-blur-xl relative z-10",
+          isSwipess ? "border-white/5 bg-black/40" : "border-slate-100 bg-slate-50/50"
+        )}>
+          <div className={cn("h-16 w-full rounded-[2.2rem] animate-pulse border", isSwipess ? "bg-white/5 border-white/5" : "bg-white border-slate-200")} />
         </div>
-      </div>
-      
-      {/* Input Skeleton */}
-      <div className="p-8 border-t border-white/5 pb-[calc(env(safe-area-inset-bottom,0px)+32px)] bg-black/40 backdrop-blur-xl relative z-10">
-        <div className="h-16 w-full rounded-[2.2rem] bg-white/5 border border-white/5 animate-pulse" />
       </div>
     </div>
-  </div>
-));
+  );
+});
 
 ConciergeChatFallback.displayName = 'ConciergeChatFallback';
 

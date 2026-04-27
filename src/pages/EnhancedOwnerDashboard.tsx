@@ -230,6 +230,8 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               onDetectLocation={detectLocation}
               detecting={locationDetecting}
               detected={locationDetected}
+              // Pass the full card for better labeling
+              activeCard={OWNER_INTENT_CARDS.find(c => c.id === activeCategory)}
             />
           </motion.div>
         ) : (
@@ -277,7 +279,8 @@ const OwnerKilometerView = ({
   onRadiusChange, 
   onDetectLocation, 
   detecting, 
-  detected 
+  detected,
+  activeCard
 }: any) => {
   const { isLight } = useAppTheme();
   
@@ -288,7 +291,7 @@ const OwnerKilometerView = ({
     'all-clients': 'Everyone',
   };
 
-  const title = labels[category] || 'Discovery';
+  const title = activeCard?.label || labels[category] || 'Discovery';
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-8">
@@ -299,13 +302,13 @@ const OwnerKilometerView = ({
             onClick={onBack}
             className={cn(
               "w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90 border",
-              isLight ? "bg-white border-black/10 text-black" : "bg-white/10 border-white/10 text-white"
+              isLight ? "bg-white border-black/10 text-black shadow-sm" : "bg-white/10 border-white/10 text-white"
             )}
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-          <div>
-            <h2 className="text-3xl font-black uppercase italic tracking-tighter leading-none">{title}</h2>
+          <div className="flex-1">
+            <h2 className={cn("text-3xl font-black uppercase italic tracking-tighter leading-none", isLight ? "text-black" : "text-white")}>{title}</h2>
             <p className={cn("text-[10px] font-black uppercase tracking-[0.3em] mt-1", isLight ? "text-black/40" : "text-white/40")}>Kilometer Detector</p>
           </div>
         </div>
@@ -321,10 +324,10 @@ const OwnerKilometerView = ({
           )}
         >
           <div className="mb-8">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 mb-3">Sector Depth</h4>
+            <h4 className={cn("text-[10px] font-black uppercase tracking-[0.5em] opacity-40 mb-3", isLight ? "text-black" : "text-white")}>Sector Depth</h4>
             <div className="flex items-baseline gap-2">
               <span className="text-5xl font-black italic tracking-tighter text-primary">{radiusKm}</span>
-              <span className="text-xl font-black italic opacity-40 uppercase">Kilometers</span>
+              <span className={cn("text-xl font-black italic opacity-40 uppercase", isLight ? "text-black" : "text-white")}>Kilometers</span>
             </div>
             <p className={cn("text-[11px] font-bold uppercase tracking-widest mt-2", isLight ? "text-black/50" : "text-white/50")}>
               Scanning {title.toLowerCase()} in your vicinity
@@ -351,8 +354,8 @@ const OwnerKilometerView = ({
             "w-full h-20 rounded-[2.5rem] bg-primary font-black uppercase italic tracking-[0.2em] text-xl shadow-[0_20px_50px_rgba(236,72,153,0.3)] flex items-center justify-center gap-3 text-black",
           )}
         >
-          <span>Initiate Scan</span>
-          <ChevronRight className="w-6 h-6" />
+          <span className="text-black">Initiate Scan</span>
+          <ChevronRight className="w-6 h-6 text-black" />
         </motion.button>
 
         <p className={cn("text-center text-[10px] font-bold uppercase tracking-widest opacity-40", isLight ? "text-black" : "text-white")}>

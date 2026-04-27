@@ -206,7 +206,7 @@ export function AdvancedFilters({ isOpen, onClose, userRole, onApplyFilters, cur
                           exit={{ scale: 0 }}
                           className="absolute -top-1 -right-1"
                         >
-                          <Badge className="h-5 min-w-[20px] rounded-full px-1 font-black bg-primary text-white text-[10px] shadow-lg">
+                          <Badge className="h-5 min-w-[20px] rounded-full px-1 font-black bg-primary text-primary-foreground text-[10px] shadow-lg">
                             {count}
                           </Badge>
                         </motion.div>

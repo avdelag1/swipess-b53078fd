@@ -220,19 +220,28 @@ const LegalHub = () => {
       <main className="container mx-auto px-4 sm:px-6 pt-28 pb-48 relative z-10 space-y-12">
         
         {/* 🛸 PREMIUM HEADER SECTION */}
-        {currentDoc !== 'hub' ? (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
-            <button 
-              onClick={() => { haptics.tap(); setCurrentDoc('hub'); }}
-              className={cn(
-                "flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] italic mb-8 hover:opacity-70 transition-opacity text-primary"
-              )}
+        <AnimatePresence mode="wait">
+          {currentDoc !== 'hub' ? (
+            <motion.div 
+              key={currentDoc}
+              initial={{ opacity: 0, x: 20 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+              className="space-y-12"
             >
-              <ChevronLeft className="w-4 h-4" /> Back to Hub
-            </button>
+              <button 
+                onClick={() => { haptics.tap(); setCurrentDoc('hub'); }}
+                className={cn(
+                  "flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] italic mb-8 hover:opacity-70 transition-opacity",
+                  isLight ? "text-black" : "text-white"
+                )}
+              >
+                <ChevronLeft className="w-4 h-4" /> Back to Hub
+              </button>
 
-            <div className="space-y-4">
-              <h1 className={cn("text-5xl font-black uppercase italic tracking-tighter leading-none", isLight ? "text-black" : "text-white")}>
+              <div className="space-y-4">
+                <h1 className={cn("text-5xl font-black uppercase italic tracking-tighter leading-none", isLight ? "text-black" : "text-white")}>
                 {currentDoc === 'privacy' && "Privacy Protocol"}
                 {currentDoc === 'terms' && "Terms of Use"}
                 {currentDoc === 'agl' && "Acceptable Use"}
@@ -332,9 +341,14 @@ const LegalHub = () => {
                 RETURN TO HUB
               </Button>
             </div>
-          </motion.div>
-        ) : submitted ? (
-          <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
+            </motion.div>
+          ) : submitted ? (
+            <motion.div 
+              key="submitted"
+              initial={{ opacity: 0, scale: 0.98 }} 
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.02 }}
+            >
             <Card className={cn(
               "rounded-[3rem] overflow-hidden border shadow-3xl text-center p-12 sm:p-20 relative",
               isLight ? "bg-white border-black/5" : "bg-black border-white/5"
@@ -360,7 +374,7 @@ const LegalHub = () => {
                 </div>
                 <div className="pt-8 w-full max-w-xs mx-auto">
                   <Button
-                    onClick={() => { haptics.tap(); setCurrentDoc('hub'); }}
+                    onClick={() => { haptics.tap(); setSubmitted(false); setCurrentDoc('hub'); }}
                     className={cn(
                       "w-full h-16 rounded-2xl font-black uppercase italic tracking-widest text-[11px] shadow-2xl transition-all active:scale-95",
                       isOwner ? "bg-purple-600 hover:bg-purple-500" : "bg-rose-600 hover:bg-rose-700"
@@ -391,7 +405,13 @@ const LegalHub = () => {
             </Card>
           </motion.div>
         ) : (
-          <div className="space-y-16">
+          <motion.div 
+            key="hub"
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="space-y-16"
+          >
             <Card className={cn(
               "rounded-[3rem] overflow-hidden border shadow-3xl relative group transition-all duration-500",
               isLight ? "bg-black/5 border-black/5 shadow-sm" : "bg-white/[0.04] border-white/5 shadow-2xl"
@@ -622,8 +642,9 @@ const LegalHub = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </main>
       
       {/* 🛸 FIXED TELEMETRY TAG */}
