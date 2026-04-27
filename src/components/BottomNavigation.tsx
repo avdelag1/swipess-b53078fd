@@ -244,19 +244,20 @@ export const BottomNavigation = memo(({
 
 
   return (
-    <nav role="navigation" aria-label="Main navigation" className={cn('app-bottom-bar px-3 pb-2 pt-1', className)}>
+    <nav role="navigation" aria-label="Main navigation" className={cn('app-bottom-bar px-2 pb-2 pt-1', className, isTablet ? 'px-3' : '')} style={{ paddingBottom: 'calc(8px + max(0px, env(safe-area-inset-bottom)))' }}>
       {/* ── Liquid Glass bar surface ────────────────────────────────────────
           The bar itself is a glass layer so the swipe card content shows
           through, reinforcing the "floating above" feeling. */}
       <div
         className={cn(
-          "pointer-events-auto w-full max-w-[440px] mx-auto glass-pill-nav px-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
+          "pointer-events-auto w-full glass-pill-nav px-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]",
+          isTablet && "max-w-[440px] mx-auto"
         )}
         style={{
           background: isLight ? 'rgba(255, 255, 255, 0.7)' : 'rgba(10, 15, 30, 0.4)',
           backdropFilter: 'blur(40px) saturate(280%)',
           WebkitBackdropFilter: 'blur(40px) saturate(280%)',
-          borderRadius: '3rem',
+          borderRadius: isTablet ? '3rem' : '0',
           padding: '4px',
           boxShadow: isLight ? '0 15px 40px rgba(0,0,0,0.08)' : '0 25px 60px -10px rgba(0,0,0,0.4)',
           border: 'none',
@@ -319,10 +320,10 @@ export const BottomNavigation = memo(({
                   'touch-manipulation focus-visible:outline-none transform-gpu active:bg-[var(--hud-active-bg)]',
                 )}
                 style={{
-                  minWidth: isTablet ? '100px' : (isNarrow ? '54px' : '64px'),
+                  minWidth: isTablet ? '100px' : (isNarrow ? '48px' : '56px'),
                   scrollSnapAlign: 'start',
                   minHeight: isTablet ? TOUCH_TARGET_TABLET : TOUCH_TARGET,
-                  padding: isTablet ? '8px 12px' : '6px 8px',
+                  padding: isTablet ? '8px 12px' : (isNarrow ? '5px 6px' : '6px 8px'),
                   borderRadius: '3rem',
                   cursor: 'pointer',
                   flexShrink: 0,
@@ -359,10 +360,10 @@ export const BottomNavigation = memo(({
                   <Icon
                     className="transition-all duration-300 ease-out"
                     style={{
-                      width: isTablet ? ICON_SIZE_TABLET : (isNarrow ? ICON_SIZE_COMPACT : ICON_SIZE),
-                      height: isTablet ? ICON_SIZE_TABLET : (isNarrow ? ICON_SIZE_COMPACT : ICON_SIZE),
-                      color: active 
-                        ? (isLight ? 'black' : 'white') 
+                      width: isTablet ? ICON_SIZE_TABLET : (isNarrow ? 16 : ICON_SIZE),
+                      height: isTablet ? ICON_SIZE_TABLET : (isNarrow ? 16 : ICON_SIZE),
+                      color: active
+                        ? (isLight ? 'black' : 'white')
                         : (isLight ? 'black' : 'white'),
                       opacity: active ? 1 : 0.85,
 
@@ -374,11 +375,11 @@ export const BottomNavigation = memo(({
                 </motion.div>
                 {/* Label: Natural height, no clipping */}
                 {!isNarrow && (
-                  <div className="flex items-center justify-center w-full min-h-[14px] px-1">
+                  <div className="flex items-center justify-center w-full min-h-[12px] px-0.5">
                     <span
                       className={cn(
-                        'tracking-tight transition-all duration-300 relative font-black uppercase italic truncate max-w-[56px]',
-                        isTablet ? 'text-[11px]' : 'text-[10px]',
+                        'tracking-tight transition-all duration-300 relative font-black uppercase italic truncate',
+                        isTablet ? 'text-[11px] max-w-[56px]' : 'text-[8px] max-w-[40px]',
                       )}
                       style={{
                         color: 'var(--hud-text)',
