@@ -229,8 +229,19 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
         )}
       </AnimatePresence>
 
-      {/* 📡 PERSISTENT RADIUS HUD — always visible in swipe phase, collapses to pill */}
+      {/* 📡 PERSISTENT RADIUS HUD — full-screen overlay when expanded, pill when collapsed */}
       <AnimatePresence>
+        {phase === 'swipe' && hudExpanded && (
+          <motion.div
+            key="radius-hud-expanded"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[10005] bg-black/40 backdrop-blur-sm pointer-events-auto"
+            onClick={() => setHudExpanded(false)}
+          />
+        )}
         {phase === 'swipe' && (
           <motion.div
             key="radius-hud"
@@ -238,22 +249,114 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
-            className="fixed z-[10010] pointer-events-none"
-            style={{
+            className={cn(
+              "fixed z-[10010] pointer-events-auto",
+              hudExpanded ? "inset-0 flex items-center justify-center" : ""
+            )}
+            style={!hudExpanded ? {
               top: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px) + 10px)',
               right: '16px',
-            }}
+            } : {}}
           >
-            <LocationRadiusSelector
-              radiusKm={radiusKm}
-              onRadiusChange={setRadiusKm as any}
-              onDetectLocation={handleDetectLocation}
-              detecting={detecting}
-              detected={detected}
-              title="clients"
-              expanded={hudExpanded}
-              onExpandedChange={setHudExpanded}
-            />
+            {hudExpanded ? (
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                className={cn(
+                  "w-full max-w-md mx-auto px-6 rounded-[2.5rem] border backdrop-blur-3xl p-8 relative",
+                  isLight
+                    ? "bg-white/95 border-black/10"
+                    : "bg-[#0d0d0d]/95 border-white/10"
+                )}
+              >
+                <button
+                  onClick={() => setHudExpanded(false)}
+                  className={cn(
+                    "absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-all active:scale-90",
+                    isLight ? "hover:bg-black/5" : "hover:bg-white/10"
+                  )}
+                  title="Close"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">Sector Depth</h3>
+                    <p className="text-lg font-black italic">Scanning for clients</p>
+                  </div>
+
+                  <LocationRadiusSelector
+                    radiusKm={radiusKm}
+                    onRadiusChange={setRadiusKm as any}
+                    onDetectLocation={handleDetectLocation}
+                    detecting={detecting}
+                    detected={detected}
+                    title="clients"
+                    expanded={false}
+                  />
+
+                  <div className={cn("space-y-2 pt-4 border-t", isLight ? "border-black/10" : "border-white/10")}>
+                    <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-50", isLight ? "text-black" : "text-white")}>
+                      Quick Filter
+                    </p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: 'buyers', label: 'Buyers' },
+                        { id: 'renters', label: 'Renters' },
+                        { id: 'hire', label: 'Services' }
+                      ].map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => {
+                            triggerHaptic('medium');
+                            setActiveCategory(cat.id as any);
+                          }}
+                          className={cn(
+                            "py-2 px-3 rounded-full text-xs font-black uppercase tracking-wider transition-all active:scale-95 border",
+                            activeCategory === cat.id
+                              ? isLight
+                                ? "bg-black text-white border-black/30"
+                                : "bg-white/20 text-white border-white/30"
+                              : isLight
+                              ? "bg-white/50 text-black border-black/10 hover:bg-white/70"
+                              : "bg-white/10 text-white border-white/10 hover:bg-white/20"
+                          )}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setHudExpanded(false)}
+                    className={cn(
+                      "w-full py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-colors",
+                      isLight
+                        ? "bg-black/5 hover:bg-black/10"
+                        : "bg-white/8 hover:bg-white/15"
+                    )}
+                  >
+                    Done
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <LocationRadiusSelector
+                radiusKm={radiusKm}
+                onRadiusChange={setRadiusKm as any}
+                onDetectLocation={handleDetectLocation}
+                detecting={detecting}
+                detected={detected}
+                title="clients"
+                expanded={false}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>
