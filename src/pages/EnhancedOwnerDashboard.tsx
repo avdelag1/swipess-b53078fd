@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
-import { LocationRadiusSelector } from '@/components/swipe/LocationRadiusSelector';
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
@@ -12,6 +11,8 @@ import { cn } from '@/lib/utils';
 import { OwnerInsightsDashboard } from '@/components/OwnerInsightsDashboard';
 import { OwnerAllDashboard } from '@/components/swipe/OwnerAllDashboard';
 import { triggerHaptic } from '@/utils/haptics';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { DistanceSlider } from '@/components/swipe/DistanceSlider';
 import type { QuickFilterCategory } from '@/types/filters';
 import useAppTheme from '@/hooks/useAppTheme';
 import type { ClientFilters } from '@/hooks/smartMatching/types';
@@ -55,8 +56,16 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     );
   }, [setUserLocation, setRadiusKm]);
 
-  // Derive phase directly from activeCategory — no intermediate state, no race conditions
-  const phase = activeCategory ? 'swipe' : 'cards';
+  // 🛰️ DISCOVERY FLOW STATE
+  const ownerPhase = useFilterStore(s => s.ownerPhase);
+  const setOwnerPhase = useFilterStore(s => s.setOwnerPhase);
+
+  // Sync phase with category clearing (e.g. from back buttons)
+  useEffect(() => {
+    if (!activeCategory && ownerPhase !== 'cards') {
+      setOwnerPhase('cards');
+    }
+  }, [activeCategory, ownerPhase, setOwnerPhase]);
 
   const { user, loading: isAuthLoading } = useAuth();
 
@@ -128,10 +137,11 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
 
     setCategories([cat]);
     setActiveCategory(cat);
+    setOwnerPhase('kilometer');
 
     if (card.clientType) setClientType(card.clientType as any);
     if (card.listingType) setListingType(card.listingType as any);
-  }, [setClientType, setListingType, setActiveCategory, setCategories]);
+  }, [setClientType, setListingType, setActiveCategory, setCategories, setOwnerPhase]);
 
   const initialLoading = isAuthLoading || isPrefsLoading;
   const showSkeletons = activeCategory === null && initialLoading;
@@ -170,7 +180,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
           >
             <OwnerInsightsDashboard />
           </motion.div>
-        ) : phase === 'cards' ? (
+        ) : ownerPhase === 'cards' ? (
           <motion.div
             key="owner-dash-fan"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -187,6 +197,37 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             <div className="flex-1 w-full relative z-10 flex flex-col justify-center">
               <OwnerAllDashboard onCardSelect={handleCardSelect} />
             </div>
+          </motion.div>
+        ) : ownerPhase === 'kilometer' ? (
+          <motion.div
+            key="owner-dash-kilometer"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="flex-1 min-h-0 relative z-20 flex flex-col w-full h-full"
+            style={{
+              paddingTop: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px))',
+              paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px))'
+            }}
+          >
+            <OwnerKilometerView 
+              category={activeCategory || 'buyers'} 
+              onBack={() => {
+                triggerHaptic('light');
+                setOwnerPhase('cards');
+                setActiveCategory(null);
+              }}
+              onNext={() => {
+                triggerHaptic('medium');
+                setOwnerPhase('swipe');
+              }}
+              radiusKm={radiusKm}
+              onRadiusChange={setRadiusKm}
+              onDetectLocation={detectLocation}
+              detecting={locationDetecting}
+              detected={locationDetected}
+            />
           </motion.div>
         ) : (
           <motion.div
@@ -229,6 +270,90 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
       
       {/* 📡 PERSISTENT HUD: Swipess Flagship v1.0.96-rc4 */}
       <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
+    </div>
+  );
+};
+
+// Internal sub-component for the stable Kilometer Page
+const OwnerKilometerView = ({ 
+  category, 
+  onBack, 
+  onNext, 
+  radiusKm, 
+  onRadiusChange, 
+  onDetectLocation, 
+  detecting, 
+  detected 
+}: any) => {
+  const { isLight } = useAppTheme();
+  
+  const labels: any = {
+    buyers: 'Buyers',
+    renters: 'Renters',
+    hire: 'Workers',
+    'all-clients': 'Everyone',
+  };
+
+  const title = labels[category] || 'Discovery';
+
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center px-8">
+      <div className="w-full max-w-md space-y-8">
+        {/* Header with Back Button */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onBack}
+            className={cn(
+              "w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90 border",
+              isLight ? "bg-white border-black/10 text-black" : "bg-white/10 border-white/10 text-white"
+            )}
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <div>
+            <h2 className="text-3xl font-black uppercase italic tracking-tighter leading-none">{title}</h2>
+            <p className={cn("text-[10px] font-black uppercase tracking-[0.3em] mt-1", isLight ? "text-black/40" : "text-white/40")}>Kilometer Detector</p>
+          </div>
+        </div>
+
+        {/* Main Slider Area */}
+        <div className={cn(
+          "w-full rounded-[3rem] border p-8 relative shadow-2xl",
+          isLight ? "bg-white border-black/10" : "bg-black/60 border-white/10"
+        )}>
+          <div className="mb-6">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mb-2">Sector Depth</h4>
+            <p className="text-lg font-black italic opacity-90">Scanning {radiusKm}km range</p>
+          </div>
+
+          <div className="py-4">
+            <DistanceSlider
+              radiusKm={radiusKm}
+              onRadiusChange={onRadiusChange}
+              onDetectLocation={onDetectLocation}
+              detecting={detecting}
+              detected={detected}
+            />
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onNext}
+          className={cn(
+            "w-full h-20 rounded-[2.5rem] bg-primary text-white font-black uppercase italic tracking-[0.2em] text-xl shadow-[0_20px_50px_rgba(236,72,153,0.3)] flex items-center justify-center gap-3"
+          )}
+        >
+          <span>Initiate Scan</span>
+          <ChevronRight className="w-6 h-6" />
+        </motion.button>
+
+        <p className={cn("text-center text-[10px] font-bold uppercase tracking-widest opacity-40", isLight ? "text-black" : "text-white")}>
+          Adjust the radius to search for {title.toLowerCase()} nearby
+        </p>
+      </div>
     </div>
   );
 };

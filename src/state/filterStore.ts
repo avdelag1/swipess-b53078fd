@@ -71,9 +71,11 @@ interface FilterState {
   lastChangedAt: number;
 
   kmHudExpanded: boolean;
+  ownerPhase: 'cards' | 'kilometer' | 'swipe';
 
   // ACTIONS
   setActiveCategory: (category: QuickFilterCategory | null) => void;
+  setOwnerPhase: (phase: 'cards' | 'kilometer' | 'swipe') => void;
   setKmHudExpanded: (v: boolean) => void;
   toggleCategory: (category: QuickFilterCategory) => void;
   setCategories: (categories: QuickFilterCategory[]) => void;
@@ -154,9 +156,14 @@ export const useFilterStore = create<FilterState>()(
     lastChangedAt: Date.now(),
 
     kmHudExpanded: false,
+    ownerPhase: 'cards',
 
     // ACTIONS
     setKmHudExpanded: (v) => set({ kmHudExpanded: v }),
+    setOwnerPhase: (phase) => {
+      console.info('[FilterStore] ownerPhase changed to:', phase);
+      set({ ownerPhase: phase });
+    },
 
     setRadiusKm: (radius) => {
       console.info('[FilterStore] radiusKm changed to:', radius);
