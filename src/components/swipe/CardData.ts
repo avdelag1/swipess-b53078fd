@@ -127,7 +127,7 @@ export const POKER_CARD_PHOTOS: Record<string, string> = {
   radio: '/images/filters/radio.jpg',
   all: '/images/filters/all.jpg',
   vap: '/images/filters/resident_card.jpg',
-  'all-clients': '/images/filters/owner_all_clients.jpg',
+  'all-clients': '/images/filters/owner_all_clients_tulum.png',
   buyers: '/images/filters/owner_buyers_card.jpg',
   renters: '/images/filters/owner_renters_card.jpg',
   hire: '/images/filters/owner_hire_card.jpg',
