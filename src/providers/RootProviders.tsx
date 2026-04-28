@@ -4,6 +4,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { createIDBPersister } from "@/lib/persister";
 import { BrowserRouter } from "react-router-dom";
 import { LazyMotion, domAnimation } from "framer-motion";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { RadioProvider } from "@/contexts/RadioContext";
 import { ThemeSyncManager } from "@/components/ThemeSyncManager";
@@ -160,38 +161,40 @@ export function RootProviders({ children, authPromise }: RootProvidersProps) {
 
   return (
     <ConnectionGuard>
-      <PersistQueryClientProvider 
-        client={queryClient} 
-        persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24, buster: 'v1.5' }}
-      >
-        <LazyMotion features={domAnimation}>
-          <WarpPrefetcher />
-          <VisualThemeProvider>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-              <AuthProvider authPromise={authPromise}>
-                <AuthReadySignal />
-                <Suspense fallback={null}>
-                  <ZenithPrewarmer />
-                </Suspense>
-                <ActiveModeProvider>
-                  <ThemeProvider>
-                    <ThemeSyncManager />
-                    <PWAProvider>
-                      <RadioProvider>
-                        <ResponsiveProvider>
-                          <AppLifecycleManager>
-                            {content}
-                          </AppLifecycleManager>
-                        </ResponsiveProvider>
-                      </RadioProvider>
-                    </PWAProvider>
-                  </ThemeProvider>
-                </ActiveModeProvider>
-              </AuthProvider>
-            </BrowserRouter>
-          </VisualThemeProvider>
-        </LazyMotion>
-      </PersistQueryClientProvider>
+      <HelmetProvider>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24, buster: 'v1.5' }}
+        >
+          <LazyMotion features={domAnimation}>
+            <WarpPrefetcher />
+            <VisualThemeProvider>
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <AuthProvider authPromise={authPromise}>
+                  <AuthReadySignal />
+                  <Suspense fallback={null}>
+                    <ZenithPrewarmer />
+                  </Suspense>
+                  <ActiveModeProvider>
+                    <ThemeProvider>
+                      <ThemeSyncManager />
+                      <PWAProvider>
+                        <RadioProvider>
+                          <ResponsiveProvider>
+                            <AppLifecycleManager>
+                              {content}
+                            </AppLifecycleManager>
+                          </ResponsiveProvider>
+                        </RadioProvider>
+                      </PWAProvider>
+                    </ThemeProvider>
+                  </ActiveModeProvider>
+                </AuthProvider>
+              </BrowserRouter>
+            </VisualThemeProvider>
+          </LazyMotion>
+        </PersistQueryClientProvider>
+      </HelmetProvider>
     </ConnectionGuard>
   );
 }
