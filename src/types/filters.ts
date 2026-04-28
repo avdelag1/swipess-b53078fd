@@ -13,7 +13,11 @@ export type QuickFilterCategory =
   | 'property'
   | 'motorcycle'  // ALWAYS use 'motorcycle' not 'moto'
   | 'bicycle'
-  | 'services';   // UI name (maps to 'worker' in database)
+  | 'services'   // UI name (maps to 'worker' in database)
+  | 'all-clients'
+  | 'buyers'
+  | 'renters'
+  | 'hire';
 
 /**
  * Listing types for property rentals
@@ -167,6 +171,42 @@ export const categoryConfig: Record<QuickFilterCategory, CategoryConfig> = {
       light: 'text-emerald-600'
     },
     description: 'Workers, contractors, services'
+  },
+  'all-clients': {
+    label: 'All Clients',
+    icon: 'users',
+    color: 'bg-cyan-500',
+    colorClassName: { dark: 'bg-cyan-600', light: 'bg-cyan-500' },
+    gradientClassName: { dark: 'from-cyan-600 to-sky-600', light: 'from-cyan-500 to-sky-500' },
+    textColorClassName: { dark: 'text-cyan-400', light: 'text-cyan-600' },
+    description: 'Everyone seeking a match'
+  },
+  buyers: {
+    label: 'Buyers',
+    icon: 'shopping-bag',
+    color: 'bg-blue-500',
+    colorClassName: { dark: 'bg-blue-600', light: 'bg-blue-500' },
+    gradientClassName: { dark: 'from-blue-600 to-indigo-600', light: 'from-blue-500 to-indigo-500' },
+    textColorClassName: { dark: 'text-blue-400', light: 'text-blue-600' },
+    description: 'Purchase-ready clients'
+  },
+  renters: {
+    label: 'Renters',
+    icon: 'key',
+    color: 'bg-emerald-500',
+    colorClassName: { dark: 'bg-emerald-600', light: 'bg-emerald-500' },
+    gradientClassName: { dark: 'from-emerald-600 to-teal-600', light: 'from-emerald-500 to-teal-500' },
+    textColorClassName: { dark: 'text-emerald-400', light: 'text-emerald-600' },
+    description: 'Move-ready renters'
+  },
+  hire: {
+    label: 'Workers',
+    icon: 'briefcase',
+    color: 'bg-violet-500',
+    colorClassName: { dark: 'bg-violet-600', light: 'bg-violet-500' },
+    gradientClassName: { dark: 'from-violet-600 to-fuchsia-600', light: 'from-violet-500 to-fuchsia-500' },
+    textColorClassName: { dark: 'text-violet-400', light: 'text-violet-600' },
+    description: 'Service-seeking clients'
   }
 };
 

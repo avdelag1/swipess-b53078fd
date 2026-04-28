@@ -13,6 +13,7 @@ import { triggerHaptic } from '@/utils/haptics';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DistanceSlider } from '@/components/swipe/DistanceSlider';
 import type { QuickFilterCategory } from '@/types/filters';
+import { OWNER_INTENT_CARDS } from '@/components/swipe/CardData';
 import useAppTheme from '@/hooks/useAppTheme';
 import type { ClientFilters } from '@/hooks/smartMatching/types';
 import { AtmosphericLayer } from '@/components/AtmosphericLayer';
@@ -59,7 +60,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
       }
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          setUserLocation(pos.coords.latitude, pos.coords.longitude);
           setLocationDetected(true);
           setLocationDetecting(false);
           triggerHaptic('medium');
