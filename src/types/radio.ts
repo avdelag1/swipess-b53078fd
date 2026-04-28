@@ -20,6 +20,7 @@ export type CityLocation =
   | 'meditation'
   | 'bongs'
   | 'london'
+  | 'moscow'
   | 'american-retro'
   | 'sound-healing';
 
