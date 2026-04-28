@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 import { haptics } from '@/utils/microPolish';
 import { useCardReset } from '@/hooks/useCardReset';
+import type { QuickFilterCategory } from '@/types/filters';
 
 interface ClientFiltersProps {
   isEmbedded?: boolean;
@@ -58,7 +59,7 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
     setLocalFilters({});
   }, [resetClientFilters]);
 
-  const CATEGORIES = [
+  const CATEGORIES: { id: QuickFilterCategory; label: string; desc: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: 'property', label: 'Properties', desc: 'Settle Anywhere', icon: Home },
     { id: 'motorcycle', label: 'Motos', desc: 'High Velocity', icon: MotorcycleIcon },
     { id: 'bicycle', label: 'Bikes', desc: 'Urban Agility', icon: Bike },

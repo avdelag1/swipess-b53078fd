@@ -165,6 +165,15 @@ export const cityThemes: Record<CityLocation, CityTheme> = {
     accentColor: '#ffffff',
     gradient: 'linear-gradient(135deg, #cc0000 0%, #000000 100%)',
     description: 'Red Square rhythms'
+  },
+  'sound-healing': {
+    id: 'sound-healing',
+    name: 'Sound Healing',
+    primaryColor: '#c5b358',
+    secondaryColor: '#121212',
+    accentColor: '#ffffff',
+    gradient: 'linear-gradient(135deg, #c5b358 0%, #121212 100%)',
+    description: 'Sound baths and restorative frequencies'
   }
 };
 
