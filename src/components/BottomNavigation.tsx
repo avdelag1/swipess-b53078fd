@@ -22,7 +22,7 @@ import {
   Users2, ShieldCheck,
   Megaphone, PartyPopper, Scale,
   Zap, SlidersHorizontal, Sparkles,
-  Ticket, IdCard, BadgePercent, Radio
+  IdCard, BadgePercent, Radio
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadMessageCount } from '@/hooks/useUnreadMessageCount';
@@ -111,33 +111,30 @@ export const BottomNavigation = memo(({
   }, []);
 
 
-  // Client nav items
+  // Client nav items — Legal lives inside Profile, not in the bar
   const clientNavItems: NavItem[] = [
     { id: 'dashboard', icon: Zap, label: 'Dashboard', path: '/client/dashboard' },
     { id: 'profile', icon: CircleUser, label: 'Profile', path: '/client/profile' },
     { id: 'likes', icon: Flame, label: 'Likes', path: '/client/liked-properties' },
-    { id: 'radio', icon: Radio, label: 'Radio', path: '/radio' },
-    { id: 'ai', icon: Sparkles, label: 'AI Bot', onClick: openAIChat, isSpecial: true },
     { id: 'messages', icon: MessageCircle, label: 'Messages', path: '/messages' },
-    { id: 'roommates', icon: Users2, label: 'Roommates', path: '/explore/roommates' },
-    { id: 'tokens', icon: Ticket, label: 'Tokens', onClick: () => setModal('showTokensModal', true) },
+    { id: 'ai', icon: Sparkles, label: 'AI Bot', onClick: openAIChat, isSpecial: true },
     { id: 'vapid', icon: IdCard, label: 'ID Card', onClick: () => setModal('showVapId', true) },
-    { id: 'search', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
     { id: 'events', icon: PartyPopper, label: 'Events', path: '/explore/eventos' },
+    { id: 'roommates', icon: Users2, label: 'Roommates', path: '/explore/roommates' },
+    { id: 'search', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
     { id: 'perks', icon: BadgePercent, label: 'Perks', path: '/client/perks' },
-    { id: 'legal', icon: Scale, label: 'Legal', path: '/client/legal' },
+    { id: 'radio', icon: Radio, label: 'Radio', path: '/radio' },
   ];
 
   // Owner nav items
   const ownerNavItems: NavItem[] = [
     { id: 'dashboard', icon: Zap, label: 'Dashboard', path: '/owner/dashboard' },
     { id: 'profile', icon: CircleUser, label: 'Profile', path: '/owner/profile' },
-    { id: 'ai-listing', icon: Sparkles, label: 'AI Listing', onClick: () => setModal('showAIListing', true), isSpecial: true },
     { id: 'likes', icon: Flame, label: 'Likes', path: '/owner/liked-clients' },
-    { id: 'listings', icon: Building2, label: 'Listings', path: '/owner/properties' },
     { id: 'messages', icon: MessageCircle, label: 'Messages', path: '/messages' },
-    { id: 'radio', icon: Radio, label: 'Radio', path: '/radio' },
-    { id: 'ai', icon: Sparkles, label: 'AI Bot', onClick: openAIChat, isSpecial: true },
+    { id: 'ai-listing', icon: Sparkles, label: 'AI Listing', onClick: () => setModal('showAIListing', true), isSpecial: true },
+    { id: 'listings', icon: Building2, label: 'Listings', path: '/owner/properties' },
+    { id: 'legal', icon: Scale, label: 'Legal', path: '/owner/legal-services' },
     { id: 'promote', icon: Megaphone, label: 'Promote', path: '/client/advertise' },
     { id: 'filters', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
   ];
@@ -250,8 +247,8 @@ export const BottomNavigation = memo(({
           through, reinforcing the "floating above" feeling. */}
       <div
         className={cn(
-          "pointer-events-auto w-full glass-pill-nav px-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]",
-          isTablet && "max-w-[440px] mx-auto"
+          "pointer-events-auto glass-pill-nav px-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]",
+          isTablet ? "mx-auto w-fit max-w-full" : "w-full"
         )}
         style={{
           background: isLight ? 'rgba(255, 255, 255, 0.7)' : 'rgba(10, 15, 30, 0.4)',
@@ -271,7 +268,7 @@ export const BottomNavigation = memo(({
           data-scroll-axis="x"
           onPointerMove={handlePointerMove}
           className={cn(
-            'relative flex items-center w-full justify-start gap-1 px-4 py-1.5 nav-scroll-hide transform-gpu select-none',
+            'relative flex items-center w-full gap-1 px-4 py-1.5 nav-scroll-hide transform-gpu select-none',
           )}
           style={{
             zIndex: 2,
@@ -288,6 +285,9 @@ export const BottomNavigation = memo(({
             touchAction: 'pan-x',
             overscrollBehaviorX: 'contain',
             overscrollBehaviorY: 'none',
+            // 'safe center' centers the items when they fit, but falls back to
+            // start-alignment when they overflow so nothing gets clipped.
+            justifyContent: 'safe center',
           }}
         >
           {navItems.map((item) => {

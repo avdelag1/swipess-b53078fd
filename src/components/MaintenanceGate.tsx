@@ -31,20 +31,14 @@ export function MaintenanceGate({ children }: { children: React.ReactNode }) {
         } catch {
           // ignore — fall back to in-memory unlock
         }
-        if ("vibrate" in navigator) navigator.vibrate([20, 40, 20]);
         setUnlocked(true);
         return 0;
       }
       return next;
     });
 
-    if ("vibrate" in navigator) navigator.vibrate(8);
-
     resetTimer.current = setTimeout(() => setTaps(0), TAP_RESET_MS);
   };
-
-  const remaining = Math.max(0, REQUIRED_TAPS - taps);
-  const showHint = taps >= 3;
 
   return (
     <div
@@ -79,8 +73,6 @@ export function MaintenanceGate({ children }: { children: React.ReactNode }) {
           cursor: "pointer",
           outline: "none",
           WebkitTapHighlightColor: "transparent",
-          transform: taps > 0 ? `scale(${1 + taps * 0.012})` : "scale(1)",
-          transition: "transform 180ms cubic-bezier(0.32, 0.72, 0, 1)",
         }}
       >
         <img
@@ -124,48 +116,6 @@ export function MaintenanceGate({ children }: { children: React.ReactNode }) {
       >
         Swipess is currently undergoing scheduled improvements. We&rsquo;ll be
         back online shortly. Thanks for your patience.
-      </p>
-
-      <div
-        style={{
-          marginTop: "3rem",
-          display: "flex",
-          gap: "0.5rem",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "1.5rem",
-        }}
-      >
-        {Array.from({ length: REQUIRED_TAPS }).map((_, i) => (
-          <span
-            key={i}
-            style={{
-              width: i < taps ? "1.25rem" : "0.5rem",
-              height: "0.5rem",
-              borderRadius: "999px",
-              background:
-                i < taps ? "rgba(244, 63, 94, 0.95)" : "rgba(255,255,255,0.1)",
-              transition: "all 220ms cubic-bezier(0.32, 0.72, 0, 1)",
-            }}
-          />
-        ))}
-      </div>
-
-      <p
-        style={{
-          marginTop: "1.25rem",
-          fontSize: "0.7rem",
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          fontWeight: 700,
-          opacity: showHint ? 0.5 : 0,
-          transition: "opacity 320ms ease",
-          minHeight: "1rem",
-        }}
-      >
-        {showHint && remaining > 0
-          ? `${remaining} more tap${remaining === 1 ? "" : "s"}`
-          : ""}
       </p>
 
       <p

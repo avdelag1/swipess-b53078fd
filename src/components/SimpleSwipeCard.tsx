@@ -463,7 +463,11 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
         onPointerDown={handleUnifiedPointerDown}
         onPointerMove={(e) => {
           handleUnifiedPointerMove(e);
-          handlePointerMoveForTilt(e);
+          // Skip the parallax tilt entirely while dragging — its rotateX/rotateY
+          // fights the drag rotation and produces visible flicker on touch.
+          if (!isDragging.current) {
+            handlePointerMoveForTilt(e);
+          }
         }}
         onPointerLeave={handlePointerLeaveForTilt}
         onPointerUp={(e) => {
@@ -496,7 +500,9 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
           background: 'rgba(255, 255, 255, 0.01)',
-          backdropFilter: 'blur(12px)', // 🚀 PERF: Reduced from 20px for smoother Android/Web scrolling
+          // No backdrop-filter on the moving card — backdrop-filter forces
+          // the browser to recomposite the entire card area on every drag
+          // frame, which is the primary source of the shake/flicker.
         }}
       >
         <GlassShine x={x} y={y} />

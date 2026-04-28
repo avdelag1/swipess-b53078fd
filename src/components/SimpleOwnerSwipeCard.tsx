@@ -298,7 +298,9 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
   const rotateY = useTransform(pointerRotateY, (val) => val + gyroTiltX);
 
   const handlePointerMoveForTilt = useCallback((e: React.PointerEvent) => {
-    if (!isTop) return;
+    // Skip parallax tilt while dragging — feeding rotateX/rotateY into the
+    // drag transform produces visible shake on touch screens.
+    if (!isTop || isDragging.current) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const xPos = e.clientX - rect.left;
     const yPos = e.clientY - rect.top;
@@ -430,7 +432,11 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
   const handleDragStart = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     isDragging.current = true;
     dragStartY.current = info.point.y;
-  }, []);
+    // Clear any in-progress parallax tilt so the drag rotation isn't stacked
+    // on top of stale rotateX/rotateY values (cause of the shake on grab).
+    pointerRotateX.set(0);
+    pointerRotateY.set(0);
+  }, [pointerRotateX, pointerRotateY]);
 
   const handleDragEnd = useCallback((_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (hasExited.current) return;
@@ -627,7 +633,9 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
         onPointerDown={handleUnifiedPointerDown}
         onPointerMove={(e) => {
           handleUnifiedPointerMove(e);
-          handlePointerMoveForTilt(e);
+          if (!isDragging.current) {
+            handlePointerMoveForTilt(e);
+          }
         }}
         onPointerLeave={handlePointerLeaveForTilt}
         onPointerUp={(e) => {
@@ -660,7 +668,9 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
           boxShadow: fullScreen ? 'none' : '0 32px 64px -16px rgba(0,0,0,0.5), 0 16px 32px -8px rgba(0,0,0,0.3)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           background: 'rgba(255, 255, 255, 0.01)',
-          backdropFilter: 'blur(20px)',
+          // backdrop-filter removed from the dragged motion.div — it forced a
+          // full recomposite on every frame and was the main shake/flicker
+          // source. Background blur is handled by the photo layer below.
         } as any}
         className={cn(
           "flex-1 cursor-grab active:cursor-grabbing select-none touch-none relative overflow-hidden",
