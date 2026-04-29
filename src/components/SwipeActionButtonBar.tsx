@@ -25,6 +25,7 @@ interface SwipeActionButtonBarProps {
   onUndo?: () => void;
   onMessage?: () => void;
   onSpeedMeet?: () => void;
+  onCycleCategory?: () => void;
   canUndo?: boolean;
   disabled?: boolean;
   className?: string;
@@ -36,12 +37,12 @@ const _ICON_SPRING = { type: 'spring' as const, stiffness: 520, damping: 28 } as
 const ENTRY_SPRING = { type: 'spring' as const, stiffness: 340, damping: 26, mass: 0.7 } as const;
 
 // ── DIMENSIONS ────────────────────────────────────────────────────────────────
-const LARGE_CSS = 'clamp(56px, 15vw, 68px)';
-const SMALL_CSS = 'clamp(44px, 12vw, 52px)';
-const LARGE_ICON = 32;
-const SMALL_ICON = 24;
-const GAP_CSS = 'clamp(8px, 3.5vw, 16px)';
-const TAP_SCALE = 0.94;
+const LARGE_CSS = 'clamp(44px, 11vw, 54px)';
+const SMALL_CSS = 'clamp(38px, 9vw, 44px)';
+const LARGE_ICON = 26;
+const SMALL_ICON = 18;
+const GAP_CSS = 'clamp(6px, 1.5vw, 12px)';
+const TAP_SCALE = 0.92;
 
 // ── VARIANT CONFIGS ───────────────────────────────────────────────────────────
 type Variant = 'default' | 'like' | 'dislike' | 'amber' | 'cyan' | 'purple' | 'gold';
@@ -238,6 +239,7 @@ function SwipeActionButtonBarComponent({
   onUndo,
   onMessage,
   onSpeedMeet,
+  onCycleCategory,
   canUndo = false,
   disabled = false,
   className = '',
@@ -259,6 +261,19 @@ function SwipeActionButtonBarComponent({
         className="relative flex items-center justify-center"
         style={{ gap: GAP_CSS }}
       >
+        {onCycleCategory && (
+          <ActionButton
+            onClick={onCycleCategory}
+            disabled={disabled}
+            size="small"
+            variant="gold"
+            ariaLabel="Switch Category"
+            index={-1}
+          >
+            <Sparkles className="w-full h-full" strokeWidth={1.5} />
+          </ActionButton>
+        )}
+
         <ActionButton
           onClick={onUndo || (() => {})}
           disabled={disabled || !canUndo}
@@ -294,17 +309,6 @@ function SwipeActionButtonBarComponent({
           </ActionButton>
         )}
 
-        <ActionButton
-          onClick={onLike}
-          disabled={disabled}
-          size="large"
-          variant="like"
-          ariaLabel="Like this listing"
-          index={3}
-        >
-          <Flame className="w-full h-full" strokeWidth={1.8} />
-        </ActionButton>
-
         {onMessage && (
           <ActionButton
             onClick={onMessage}
@@ -312,17 +316,28 @@ function SwipeActionButtonBarComponent({
             size="small"
             variant="cyan"
             ariaLabel="Message the owner"
-            index={4}
+            index={3}
           >
             <MessageCircle className="w-full h-full" strokeWidth={1.5} />
           </ActionButton>
         )}
 
+        <ActionButton
+          onClick={onLike}
+          disabled={disabled}
+          size="large"
+          variant="like"
+          ariaLabel="Like this listing"
+          index={4}
+        >
+          <Flame className="w-full h-full" strokeWidth={1.8} />
+        </ActionButton>
+
         {onSpeedMeet && (
           <ActionButton
             onClick={onSpeedMeet}
             disabled={disabled}
-            size="large"
+            size="small"
             variant="gold"
             ariaLabel="AI Speed Meet"
             index={5}

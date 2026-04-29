@@ -151,6 +151,14 @@ const ClientSwipeContainerComponent = ({
   const [locationDetecting, setLocationDetecting] = useState(false);
   const [locationDetected, setLocationDetected] = useState(false);
 
+  const handleCycleCategory = useCallback(() => {
+    triggerHaptic('heavy');
+    const cycle: string[] = ['buyers', 'renters', 'hire'];
+    const currentIdx = cycle.indexOf(storeActiveCategory as any);
+    const nextIdx = (currentIdx + 1) % cycle.length;
+    setActiveCategory(cycle[nextIdx] as any);
+  }, [storeActiveCategory, setActiveCategory]);
+
   const radarNodes = useMemo(() => (externalProfiles || []).map(p => ({
     id: p.user_id || p.id,
     lat: p.latitude || 0,
@@ -910,7 +918,7 @@ const ClientSwipeContainerComponent = ({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 1.1, y: -20 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full h-[calc(100%-20px)] max-w-xl mx-auto"
+                className="relative w-[94%] h-[85%] max-w-[420px] max-h-[800px] mx-auto"
               >
                 {/* Back card (Peek) */}
                 {_nextCard && (
@@ -919,6 +927,7 @@ const ClientSwipeContainerComponent = ({
                     style={{
                       scale: nextCardScale,
                       opacity: nextCardOpacity,
+                      y: 8, // slight vertical offset for premium stack feel
                       willChange: 'transform, opacity',
                     }}
                   >
@@ -980,50 +989,21 @@ const ClientSwipeContainerComponent = ({
         </div>
         </div>
 
-        {/* 🛸 DASHBOARD CONTROLS: Centered Interface */}
-        {(!isLoading || deckQueue.length > 0) && (
-          <div className="absolute bottom-[60px] left-0 right-0 z-[60] flex flex-col items-center pointer-events-none">
-            <div className="w-full max-w-[700px] flex flex-col items-center gap-4 px-6 pointer-events-none">
-              {/* Bottom buttons (already centered via flex-col items-center) */}
-              <div className="w-full flex flex-col items-center gap-4 pointer-events-none">
-            
-            {/* Main Switcher */}
-            <div className="flex items-center gap-1.5 p-1.5 rounded-full backdrop-blur-3xl border border-white/10 bg-black/40 pointer-events-auto shadow-2xl">
-              {OWNER_INTENT_CARDS.filter(c => 
-                ['buyers', 'renters', 'hire'].includes(c.id) 
-              ).map((cat: any) => {
-                const isActive = storeActiveCategory === cat.id;
-                return (
-                  <motion.button
-                    key={cat.id}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      triggerHaptic('medium');
-                      setActiveCategory(cat.id);
-                    }}
-                    className={cn(
-                      "px-5 py-2.5 rounded-full transition-all duration-300 relative text-[10px] font-black uppercase tracking-[0.15em] italic",
-                      isActive 
-                        ? "text-primary bg-white/5 shadow-[0_0_40px_rgba(var(--color-brand-primary-rgb),0.2)]"
-                        : "text-white/60 hover:text-white/60"
-                    )}
-                  >
-                    {cat.label}
-                    {isActive && (
-                      <motion.div 
-                        layoutId="activeTabUnderline" 
-                        className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-primary/60" 
-                      />
-                    )}
-                  </motion.button>
-                );
-              })}
-            </div>
 
+        {/* 🛸 ACTION BAR: Single unified row below the card */}
+        {topCard && (
+          <div className="shrink-0 flex justify-center z-[60] pointer-events-auto">
+            <SwipeActionButtonBar
+              onLike={handleButtonLike}
+              onDislike={handleButtonDislike}
+              onShare={handleShare}
+              onUndo={undoLastSwipe}
+              onMessage={() => handleConnect(topCard.user_id)}
+              onCycleCategory={handleCycleCategory}
+              canUndo={canUndo}
+            />
           </div>
-        </div>
-      </div>
-    )}
+        )}
       </div>
 
 

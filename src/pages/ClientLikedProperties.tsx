@@ -182,7 +182,7 @@ const ClientLikedProperties = (_props: ClientLikedPropertiesProps) => {
 
   return (
     <div className="w-full relative flex flex-col" data-no-swipe-nav="true">
-      <div className="flex-1 flex flex-col p-4 pt-4 sm:p-8 sm:pt-6 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col flex-1 min-h-full p-4 pt-4 sm:p-8 sm:pt-6 max-w-7xl mx-auto w-full">
         {/* Category tabs and Sync button */}
         <div className="flex items-center justify-between gap-4 mb-8">
           <div className="flex-1 flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">

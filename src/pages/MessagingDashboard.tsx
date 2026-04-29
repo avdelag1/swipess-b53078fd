@@ -176,7 +176,7 @@ export function MessagingDashboard() {
     const listing = conversation?.listing;
 
     return (
-      <div className={cn("w-full flex flex-col transition-colors duration-500 overflow-hidden", isLight ? "bg-white" : "bg-black")} style={{ height: 'calc(100dvh - var(--top-bar-height, 60px) - var(--safe-top, 0px) - var(--bottom-nav-height, 72px) - var(--safe-bottom, 0px))' }}>
+      <div className={cn("w-full flex flex-col transition-colors duration-500 overflow-hidden flex-1 min-h-0", isLight ? "bg-white" : "bg-black")}>
         <AnimatePresence mode="wait">
           <motion.div 
             key="interface" 

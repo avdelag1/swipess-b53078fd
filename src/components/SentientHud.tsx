@@ -72,6 +72,10 @@ export function SentientHud({
         isVisible && "opacity-100 translate-y-0",
         className
       )}
+      style={{
+        willChange: 'transform, opacity',
+        transform: 'translateZ(0)',
+      }}
     >
       {children}
     </div>

@@ -1122,7 +1122,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="relative w-full h-full max-w-[700px] mx-auto"
+                className="relative w-[94%] h-[85%] max-w-[420px] max-h-[800px] mx-auto"
               >
                 {/* Back card (Peek) */}
                 {currentIndex + 1 < deckQueue.length && (
@@ -1131,6 +1131,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                     style={{
                       scale: nextCardScale,
                       opacity: nextCardOpacity,
+                      y: 8, // slight vertical offset for premium stack feel
                       willChange: 'transform, opacity',
                     }}
                   >
@@ -1202,27 +1203,13 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
             onShare={handleShare}
             onUndo={undoLastSwipe}
             onMessage={handleMessage}
+            onCycleCategory={handleCycleCategory}
             canUndo={canUndo}
           />
         </div>
       )}
 
-      {/* Category Switcher */}
-      {hasCards && (
-        <div className="shrink-0 flex justify-center pointer-events-auto pb-2">
-          <button
-            onClick={handleCycleCategory}
-            className={cn(
-              "px-6 py-2 rounded-full font-black uppercase text-xs transition-all active:scale-95 border",
-              isLight
-                ? "bg-white text-black border-black/10 hover:bg-black/5"
-                : "bg-black text-white border-white/20 hover:bg-black/80"
-            )}
-          >
-            Switch Category
-          </button>
-        </div>
-      )}
+
 
     </div>
 

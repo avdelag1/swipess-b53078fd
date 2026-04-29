@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
-import { SwipessSwipeContainer } from '@/components/SwipessSwipeContainer';
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
@@ -11,14 +10,13 @@ import { cn } from '@/lib/utils';
 import { OwnerInsightsDashboard } from '@/components/OwnerInsightsDashboard';
 import { OwnerAllDashboard } from '@/components/swipe/OwnerAllDashboard';
 import { triggerHaptic } from '@/utils/haptics';
-import { ChevronLeft, ChevronRight, Eye, Users, Home as HomeIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DistanceSlider } from '@/components/swipe/DistanceSlider';
 import type { QuickFilterCategory } from '@/types/filters';
 import { OWNER_INTENT_CARDS } from '@/components/swipe/CardData';
 import useAppTheme from '@/hooks/useAppTheme';
 import type { ClientFilters } from '@/hooks/smartMatching/types';
 import { AtmosphericLayer } from '@/components/AtmosphericLayer';
-import { OWNER_INTENT_CARDS } from '@/components/swipe/CardData';
 
 interface EnhancedOwnerDashboardProps {
   onClientInsights?: (clientId: string) => void;
@@ -28,24 +26,11 @@ interface EnhancedOwnerDashboardProps {
 
 // 🛡️ Safety fallback to prevent crashes if imports fail
 const SAFE_INTENT_CARDS = OWNER_INTENT_CARDS || [];
-if (!OWNER_INTENT_CARDS) {
-  console.error("Critical: OWNER_INTENT_CARDS is not defined in EnhancedOwnerDashboard. Check CardData.ts exports.");
-}
 
 const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: EnhancedOwnerDashboardProps) => {
   const { theme } = useAppTheme();
   const isLight = theme === 'light';
   const [viewMode] = useState<'discovery' | 'insights'>('discovery');
-
-  // Owner test mode: Clients (real ClientSwipeContainer) vs Listings (real SwipessSwipeContainer)
-  // Persisted so the choice sticks while testing.
-  const [swipeDeckMode, setSwipeDeckMode] = useState<'clients' | 'listings'>(() => {
-    if (typeof window === 'undefined') return 'clients';
-    return (localStorage.getItem('Swipess_owner_deck_mode') as 'clients' | 'listings') || 'clients';
-  });
-  useEffect(() => {
-    try { localStorage.setItem('Swipess_owner_deck_mode', swipeDeckMode); } catch {}
-  }, [swipeDeckMode]);
 
   const activeCategory = useFilterStore(s => s.activeCategory);
   const { setCategories, setClientType, setListingType, setActiveCategory } = useFilterActions();
@@ -72,10 +57,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     setLocationDetecting(true);
     triggerHaptic('light');
     try {
-      if (!navigator.geolocation) {
-        setLocationDetecting(false);
-        return;
-      }
+      if (!navigator.geolocation) { setLocationDetecting(false); return; }
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setUserLocation(pos.coords.latitude, pos.coords.longitude);
@@ -83,12 +65,10 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
           setLocationDetecting(false);
           triggerHaptic('medium');
         },
-        () => {
-          setLocationDetecting(false);
-        },
+        () => { setLocationDetecting(false); },
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
-    } catch (e) {
+    } catch {
       setLocationDetecting(false);
     }
   }, [setUserLocation]);
@@ -111,22 +91,12 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
   useEffect(() => {
     if (!ownerPrefs || hydratedRef.current) return;
     hydratedRef.current = true;
-
     const genders = ownerPrefs.selected_genders as string[] | null;
     const nationalities = ownerPrefs.preferred_nationalities as string[] | null;
-
-    if (storeGender === 'any' && genders?.length) {
-      setClientGender(genders[0] as any);
-    }
-    if (ownerPrefs.min_age != null || ownerPrefs.max_age != null) {
-      setClientAgeRange([ownerPrefs.min_age ?? 18, ownerPrefs.max_age ?? 65]);
-    }
-    if (ownerPrefs.min_budget != null || ownerPrefs.max_budget != null) {
-      setClientBudgetRange([ownerPrefs.min_budget ?? 0, ownerPrefs.max_budget ?? 50000]);
-    }
-    if (nationalities?.length) {
-      setClientNationalities(nationalities);
-    }
+    if (storeGender === 'any' && genders?.length) setClientGender(genders[0] as any);
+    if (ownerPrefs.min_age != null || ownerPrefs.max_age != null) setClientAgeRange([ownerPrefs.min_age ?? 18, ownerPrefs.max_age ?? 65]);
+    if (ownerPrefs.min_budget != null || ownerPrefs.max_budget != null) setClientBudgetRange([ownerPrefs.min_budget ?? 0, ownerPrefs.max_budget ?? 50000]);
+    if (nationalities?.length) setClientNationalities(nationalities);
   }, [ownerPrefs, storeGender, setClientGender, setClientAgeRange, setClientBudgetRange, setClientNationalities]);
 
   const storeFilterVersion = useFilterStore((s) => s.filterVersion);
@@ -160,19 +130,17 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     const cat = (card.id || card.category || 'buyers') as QuickFilterCategory;
     setCategories([cat]);
     setActiveCategory(cat);
-    setOwnerPhase('kilometer');
+    // 🚀 Bypass kilometer screen and jump straight to swipe cards!
+    setOwnerPhase('swipe');
     if (card.clientType) setClientType(card.clientType as any);
     if (card.listingType) setListingType(card.listingType as any);
   }, [setClientType, setListingType, setActiveCategory, setCategories, setOwnerPhase]);
 
-  // Quick bypass: jump straight to the real swipe deck without going through quick-filter + radius.
+  // Skip radius → jump straight to swipe deck
   const jumpToSwipeDeck = useCallback(() => {
     triggerHaptic('medium');
-    const fallbackCat = (activeCategory || 'all-clients') as QuickFilterCategory;
-    setCategories([fallbackCat]);
-    setActiveCategory(fallbackCat);
     setOwnerPhase('swipe');
-  }, [activeCategory, setCategories, setActiveCategory, setOwnerPhase]);
+  }, [setOwnerPhase]);
 
   const initialLoading = isAuthLoading || isPrefsLoading;
   const showSkeletons = activeCategory === null && initialLoading;
@@ -190,15 +158,15 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             exit={{ opacity: 0 }}
             className="flex-1 flex flex-col items-center justify-center p-8 space-y-6 z-10"
           >
-             <div className="relative">
-                <div className="w-20 h-20 rounded-[2.2rem] border-[4px] border-primary/10 border-t-primary animate-spin shadow-2xl" />
-                <div className="absolute inset-0 m-auto w-6 h-6 bg-primary/40 rounded-full animate-pulse" />
-             </div>
-             <p className="text-[10px] font-black uppercase italic tracking-[0.4em] text-primary/60 animate-pulse">Synchronizing Swipess Logic...</p>
-             <div className="w-full max-w-sm space-y-3 pt-8">
-                <div className="h-24 w-full bg-white/5 rounded-3xl animate-pulse" />
-                <div className="h-24 w-full bg-white/5 rounded-3xl animate-pulse opacity-50" />
-             </div>
+            <div className="relative">
+              <div className="w-20 h-20 rounded-[2.2rem] border-[4px] border-primary/10 border-t-primary animate-spin shadow-2xl" />
+              <div className="absolute inset-0 m-auto w-6 h-6 bg-primary/40 rounded-full animate-pulse" />
+            </div>
+            <p className="text-[10px] font-black uppercase italic tracking-[0.4em] text-primary/60 animate-pulse">Synchronizing Swipess Logic...</p>
+            <div className="w-full max-w-sm space-y-3 pt-8">
+              <div className="h-24 w-full bg-white/5 rounded-3xl animate-pulse" />
+              <div className="h-24 w-full bg-white/5 rounded-3xl animate-pulse opacity-50" />
+            </div>
           </motion.div>
         ) : viewMode === 'insights' ? (
           <motion.div
@@ -225,21 +193,6 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               willChange: 'transform, opacity'
             }}
           >
-            {/* Quick bypass — jump straight to the real swipe deck (skip quick filter + radius) */}
-            <button
-              type="button"
-              onClick={jumpToSwipeDeck}
-              className={cn(
-                "absolute z-30 right-4 flex items-center gap-2 px-4 h-10 rounded-full backdrop-blur-xl border text-[10px] font-black uppercase tracking-[0.25em] active:scale-95 transition-all shadow-lg",
-                isLight
-                  ? "bg-white/80 border-black/10 text-black"
-                  : "bg-white/10 border-white/15 text-white"
-              )}
-              style={{ top: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px) + 12px)' }}
-            >
-              <Eye className="w-3.5 h-3.5" />
-              Show Swipe Deck
-            </button>
             <div className="flex-1 w-full relative z-10 flex flex-col justify-center">
               <OwnerAllDashboard onCardSelect={handleCardSelect} />
             </div>
@@ -257,28 +210,21 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px))'
             }}
           >
-            <OwnerKilometerView 
-              category={activeCategory || 'buyers'} 
-              onBack={() => {
-                triggerHaptic('light');
-                setOwnerPhase('cards');
-                setActiveCategory(null);
-              }}
-              onNext={() => {
-                triggerHaptic('medium');
-                setOwnerPhase('swipe');
-              }}
+            <OwnerKilometerView
+              category={activeCategory || 'buyers'}
+              onBack={() => { triggerHaptic('light'); setOwnerPhase('cards'); setActiveCategory(null); }}
+              onNext={() => { triggerHaptic('medium'); setOwnerPhase('swipe'); }}
               onSkip={jumpToSwipeDeck}
               radiusKm={radiusKm}
               onRadiusChange={setRadiusKm}
               onDetectLocation={detectLocation}
               detecting={locationDetecting}
               detected={locationDetected}
-              // Pass the full card for better labeling
               activeCard={SAFE_INTENT_CARDS.find(c => c.id === activeCategory)}
             />
           </motion.div>
         ) : (
+          /* SWIPE PHASE — always shows ClientSwipeContainer (client profiles only) */
           <motion.div
             key="owner-dash-swipe"
             initial={{ opacity: 0, y: 60, scale: 0.94 }}
@@ -292,79 +238,43 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px))'
             }}
           >
-            {/* Owner deck mode toggle — Clients vs Listings */}
-            <div
-              className="absolute z-30 left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 rounded-full backdrop-blur-xl border shadow-lg bg-black/60 border-white/15"
-              style={{ top: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px) + 8px)' }}
-            >
-              <button
-                type="button"
-                onClick={() => { triggerHaptic('light'); setSwipeDeckMode('clients'); }}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 h-8 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all",
-                  swipeDeckMode === 'clients' ? "bg-primary text-black" : "text-white/60"
-                )}
-              >
-                <Users className="w-3 h-3" />
-                Clients
-              </button>
-              <button
-                type="button"
-                onClick={() => { triggerHaptic('light'); setSwipeDeckMode('listings'); }}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 h-8 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all",
-                  swipeDeckMode === 'listings' ? "bg-primary text-black" : "text-white/60"
-                )}
-              >
-                <HomeIcon className="w-3 h-3" />
-                Listings
-              </button>
-            </div>
             <div className="flex-1 min-h-0 h-full">
-              {swipeDeckMode === 'clients' ? (
-                <ClientSwipeContainer
-                  onClientTap={handleClientTap}
-                  onInsights={handleInsights}
-                  onMessageClick={onMessageClick}
-                  profiles={clientProfiles}
-                  isLoading={isLoading}
-                  error={error}
-                  insightsOpen={false}
-                  category={activeCategory || 'default'}
-                  filters={mergedFilters}
-                />
-              ) : (
-                <SwipessSwipeContainer
-                  onListingTap={() => {}}
-                  onInsights={() => {}}
-                  onMessageClick={onMessageClick}
-                />
-              )}
+              <ClientSwipeContainer
+                onClientTap={handleClientTap}
+                onInsights={handleInsights}
+                onMessageClick={onMessageClick}
+                profiles={clientProfiles}
+                isLoading={isLoading}
+                error={error}
+                insightsOpen={false}
+                category={activeCategory || 'default'}
+                filters={mergedFilters}
+              />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.96-rc4</p>
+      <p className="absolute bottom-4 left-6 text-[8px] font-black uppercase tracking-[0.6em] opacity-10 pointer-events-none z-0">Swipess FLAGSHIP v1.0.97</p>
     </div>
   );
 };
 
 // Internal sub-component for the stable Kilometer Page
-const OwnerKilometerView = ({ 
-  category, 
-  onBack, 
-  onNext, 
+const OwnerKilometerView = ({
+  category,
+  onBack,
+  onNext,
   onSkip,
-  radiusKm, 
-  onRadiusChange, 
-  onDetectLocation, 
-  detecting, 
+  radiusKm,
+  onRadiusChange,
+  onDetectLocation,
+  detecting,
   detected,
   activeCard
 }: any) => {
   const { isLight } = useAppTheme();
-  
+
   const labels: any = {
     buyers: 'Buyers',
     renters: 'Renters',
@@ -377,7 +287,6 @@ const OwnerKilometerView = ({
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-8">
       <div className="w-full max-w-md space-y-8">
-        {/* Header with Back Button */}
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
@@ -394,8 +303,7 @@ const OwnerKilometerView = ({
           </div>
         </div>
 
-        {/* Main Slider Area */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -414,7 +322,6 @@ const OwnerKilometerView = ({
               Scanning {title.toLowerCase()} in your vicinity
             </p>
           </div>
-
           <div className="py-6">
             <DistanceSlider
               radiusKm={radiusKm}
@@ -426,14 +333,11 @@ const OwnerKilometerView = ({
           </div>
         </motion.div>
 
-        {/* Action Button */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onNext}
-          className={cn(
-            "w-full h-20 rounded-[2.5rem] bg-primary font-black uppercase italic tracking-[0.2em] text-xl shadow-[0_20px_50px_rgba(236,72,153,0.3)] flex items-center justify-center gap-3 text-primary-foreground",
-          )}
+          className="w-full h-20 rounded-[2.5rem] bg-primary font-black uppercase italic tracking-[0.2em] text-xl shadow-[0_20px_50px_rgba(236,72,153,0.3)] flex items-center justify-center gap-3 text-primary-foreground"
         >
           <span className="text-primary-foreground">Initiate Scan</span>
           <ChevronRight className="w-6 h-6 text-primary-foreground" />
@@ -450,7 +354,7 @@ const OwnerKilometerView = ({
                 : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
             )}
           >
-            Skip → Show Swipe Deck
+            Skip → Show Clients
           </button>
         )}
 

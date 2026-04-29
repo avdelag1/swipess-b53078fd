@@ -251,7 +251,7 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
   // Magnifier hook for press-and-hold zoom
   const { containerRef, pointerHandlers: magnifierPointerHandlers, isActive: isMagnifierActive } = useMagnifier({
     scale: 2.8, // Edge-to-edge zoom level
-    holdDelay: 450,
+    holdDelay: 300,
     enabled: isTop,
   });
 
@@ -281,7 +281,7 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
       // Start drag only if we move more than a minor threshold
       if (dx > 5 || dy > 5) {
         dragStartedRef.current = true;
-        dragControls.start(storedPointerEventRef.current);
+        dragControls.start((storedPointerEventRef.current as any).nativeEvent);
         storedPointerEventRef.current = null;
       }
     }
@@ -353,22 +353,20 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
     const clickX = e.clientX - rect.left;
     const width = rect.width;
 
-    if (imageCount > 1) {
-      if (clickX < width * 0.33) {
-        setPhotoDirection('left');
-        setCurrentImageIndex(prev => prev === 0 ? imageCount - 1 : prev - 1);
-        triggerHaptic('light');
-      }
-      else if (clickX > width * 0.67) {
-        setPhotoDirection('right');
-        setCurrentImageIndex(prev => prev === imageCount - 1 ? 0 : prev + 1);
-        triggerHaptic('light');
-      }
-      else if (onInsights) {
-        triggerHaptic('light');
-        onInsights();
-      }
-    } else if (onInsights) {
+    // LEFT 33% - Prev image
+    if (imageCount > 1 && clickX < width * 0.33) {
+      setPhotoDirection('left');
+      setCurrentImageIndex(prev => prev === 0 ? imageCount - 1 : prev - 1);
+      triggerHaptic('light');
+    }
+    // RIGHT 33% - Next image
+    else if (imageCount > 1 && clickX > width * 0.67) {
+      setPhotoDirection('right');
+      setCurrentImageIndex(prev => prev === imageCount - 1 ? 0 : prev + 1);
+      triggerHaptic('light');
+    }
+    // MIDDLE 34% or any click on single image - Open Insights
+    else if (onInsights) {
       triggerHaptic('light');
       onInsights();
     }
@@ -485,7 +483,7 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           transition: { type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }
         }}
         // Photo swim effect now lives on the <img> inside CardImage (CSS keyframes)
-        className="flex-1 cursor-grab active:cursor-grabbing select-none touch-none relative rounded-[32px] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5),0_16px_32px_-8px_rgba(0,0,0,0.3)] glass-nano-texture pointer-events-auto border border-white/10 zenith-interaction-isolation gpu-ultra"
+        className="flex-1 cursor-grab active:cursor-grabbing select-none touch-none relative rounded-[24px] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5),0_16px_32px_-8px_rgba(0,0,0,0.3)] glass-nano-texture pointer-events-auto border border-white/10 zenith-interaction-isolation gpu-ultra"
         style={{
           x,
           y,
@@ -530,6 +528,9 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
               priority={isTop}
             />
           )}
+
+          {/* Premium Top Safe Zone Header Dark Fade */}
+          <div className="absolute top-0 left-0 right-0 h-[15%] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none z-20" />
           
           {imageCount > 1 && (
             <div className="absolute top-3 left-3 right-3 flex gap-1.5 z-20">

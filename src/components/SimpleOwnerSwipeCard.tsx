@@ -24,7 +24,7 @@ import { getWorkScheduleLabel } from '@/constants/profileConstants';
 import { SwipeMatchMeter } from '@/components/swipe/SwipeMatchMeter';
 import useAppTheme from '@/hooks/useAppTheme';
 import { useDeviceParallax } from '@/hooks/useDeviceParallax';
-import { DiscoverySidebar } from '@/components/DiscoverySidebar';
+
 
 
 // Exposed interface for parent to trigger swipe animations
@@ -87,23 +87,24 @@ interface ClientProfile {
 const PlaceholderImage = memo(({ name }: { name?: string | null }) => {
   return (
     <div
-      className="absolute inset-0 w-full h-full bg-black/20 flex flex-col items-center justify-center p-8 text-center"
+      className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-8 text-center"
       style={{
         transform: 'translateZ(0)',
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%)',
         backdropFilter: 'blur(20px)',
       }}
     >
-      <div className="w-32 h-32 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center mb-8 shadow-2xl relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="w-28 h-28 rounded-full bg-white/5 flex items-center justify-center mb-8 shadow-[0_20px_60px_rgba(0,0,0,0.3)] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-transparent" />
         <img
           src="/icons/Swipess-logo.png"
           alt="Logo"
-          className="w-16 h-16 relative z-10"
+          className="w-14 h-14 relative z-10 opacity-80"
           draggable={false}
         />
       </div>
       <h3 className="text-white text-2xl font-black tracking-tight mb-2 uppercase">{name || 'Client'}</h3>
-      <p className="text-white/70 text-xs font-bold uppercase tracking-widest leading-relaxed">
+      <p className="text-white/50 text-xs font-bold uppercase tracking-widest leading-relaxed">
         Visual identity is being processed<br/>by the sentient engine
       </p>
     </div>
@@ -378,7 +379,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
   // Magnifier hook for press-and-hold zoom - MUST be called before any callbacks that use it
   const { containerRef, pointerHandlers: magnifierPointerHandlers, isActive: isMagnifierActive, isHoldPending } = useMagnifier({
     scale: 2.8,
-    holdDelay: 450, // Zoom needs clearly more time than swipe (movement-based) to avoid accidental activation
+    holdDelay: 300, // snappier 'automatic' zoom
     enabled: isTop,
     onActiveChange: setMagnifierActive,
   });
@@ -410,7 +411,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
           dragStartedRef.current = true;
           isDragging.current = true;
           triggerHaptic('light');
-          dragControls.start(e.nativeEvent);
+          dragControls.start(storedPointerEventRef.current.nativeEvent);
         }
       }
       return;
@@ -518,24 +519,18 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
     const clickX = e.clientX - rect.left;
     const width = rect.width;
 
-    if (imageCount > 1) {
-      // Left third - previous image
-      if (clickX < width * 0.33) {
-        setCurrentImageIndex(prev => prev === 0 ? imageCount - 1 : prev - 1);
-        triggerHaptic('light');
-      }
-      // Right third - next image
-      else if (clickX > width * 0.67) {
-        setCurrentImageIndex(prev => prev === imageCount - 1 ? 0 : prev + 1);
-        triggerHaptic('light');
-      }
-      // Middle third - open inside page
-      else if (onInsights) {
-        triggerHaptic('light');
-        onInsights();
-      }
-    } else if (onInsights) {
-      // Single image: any tap opens the inside page
+    // LEFT 33% - Prev image
+    if (imageCount > 1 && clickX < width * 0.33) {
+      setCurrentImageIndex(prev => prev === 0 ? imageCount - 1 : prev - 1);
+      triggerHaptic('light');
+    }
+    // RIGHT 33% - Next image
+    else if (imageCount > 1 && clickX > width * 0.67) {
+      setCurrentImageIndex(prev => prev === imageCount - 1 ? 0 : prev + 1);
+      triggerHaptic('light');
+    }
+    // MIDDLE 34% or any click on single image - Open Insights
+    else if (onInsights) {
       triggerHaptic('light');
       onInsights();
     }
@@ -597,7 +592,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
     // Non-top card: GLASS PEEK
     return (
       <div
-        className="absolute inset-x-2 bottom-4 top-4 rounded-[32px] overflow-hidden shadow-sm"
+        className="absolute inset-x-2 bottom-4 top-4 rounded-[24px] overflow-hidden shadow-sm"
         style={{
           pointerEvents: 'none',
           backgroundColor: 'rgba(255, 255, 255, 0.03)',
@@ -664,7 +659,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
           WebkitTapHighlightColor: 'transparent',
           WebkitTouchCallout: 'none',
           transform: 'translateZ(0)',
-          borderRadius: fullScreen ? '0px' : '32px',
+          borderRadius: fullScreen ? '0px' : '24px',
           boxShadow: fullScreen ? 'none' : '0 32px 64px -16px rgba(0,0,0,0.5), 0 16px 32px -8px rgba(0,0,0,0.3)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           background: 'rgba(255, 255, 255, 0.01)',
@@ -706,10 +701,12 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
             fullScreen={fullScreen}
           />
 
+          {/* Premium Top Safe Zone Header Dark Fade */}
+          <div className="absolute top-0 left-0 right-0 h-[15%] bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none z-20" />
+
           {imageCount > 1 && (
             <div 
-              className="absolute left-4 right-4 z-30 flex gap-2 transform-gpu" 
-              style={{ top: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 12px) + 16px)' }}
+              className="absolute top-3 left-3 right-3 z-30 flex gap-1.5 transform-gpu" 
             >
                {images.map((_, idx) => (
                 <div
@@ -748,19 +745,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
           </div>
         </motion.div>
 
-        {/* Discovery Sidebar — in-card action icons */}
-        {isTop && (
-          <DiscoverySidebar
-            onUndo={onUndo}
-            onMessage={onMessage}
-            onShare={onShare}
-            onInsights={onInsights}
-            onLike={onLike ?? (() => handleButtonSwipe('right'))}
-            onDislike={onDislike ?? (() => handleButtonSwipe('left'))}
-            canUndo={canUndo}
-            matchPercentage={'matchPercentage' in profile ? (profile as any).matchPercentage : undefined}
-          />
-        )}
+
 
         <div
           className="absolute left-0 right-0 bottom-0 z-15 pointer-events-none"
@@ -773,7 +758,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
         <div
           key={`info-${currentImageIndex % 4}`}
           className={cn(
-            "absolute left-6 bottom-36 z-30 pointer-events-none flex flex-col justify-end max-w-[85%]",
+            "absolute left-6 bottom-24 z-30 pointer-events-none flex flex-col justify-end max-w-[85%]",
             fullScreen && "pb-[calc(100px+var(--safe-bottom))]"
           )}
         >

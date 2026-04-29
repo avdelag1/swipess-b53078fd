@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 
@@ -14,6 +14,31 @@ interface AtmosphericLayerProps {
  */
 export const AtmosphericLayer = memo(({ variant = 'default', opacity = 0.08, speed = 1 }: AtmosphericLayerProps) => {
   const { isLight } = useAppTheme();
+  const liquidRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice || !liquidRef.current) return;
+
+    let rafId = 0;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (rafId) return; 
+      rafId = requestAnimationFrame(() => {
+        if (liquidRef.current) {
+          const x = (e.clientX / window.innerWidth) * 100;
+          const y = (e.clientY / window.innerHeight) * 100;
+          liquidRef.current.style.transform = `translate(calc(${x}% * 0.02 - 1%), calc(${y}% * 0.02 - 1%))`;
+        }
+        rafId = 0;
+      });
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   const getGradients = () => {
     switch (variant) {
@@ -61,13 +86,14 @@ export const AtmosphericLayer = memo(({ variant = 'default', opacity = 0.08, spe
   return (
     <div 
       className="absolute inset-0 pointer-events-none overflow-hidden z-0"
-      style={{ opacity }}
+      style={{ opacity, transform: 'translateZ(0)' }}
     >
-      {/* 🔮 LIQUID DEPTH: Reacts to DashboardLayout's mouse tracking */}
+      {/* 🔮 LIQUID DEPTH: Local hardware-accelerated tracking */}
       <div 
-        className="absolute inset-[-10%] transition-transform duration-1000 ease-out"
+        ref={liquidRef}
+        className="absolute inset-[-10%] transition-transform duration-1000 ease-out will-change-transform"
         style={{
-          transform: 'translate(calc(var(--mouse-x, 50%) * 0.02 - 1%), calc(var(--mouse-y, 50%) * 0.02 - 1%))'
+          transform: 'translate(calc(50% * 0.02 - 1%), calc(50% * 0.02 - 1%))'
         }}
       >
         <div className={cn(

@@ -92,26 +92,8 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
     return () => clearTimeout(safetyCheck);
   }, [location.pathname]);
 
-  // NEXT-GEN DESIGN: Mouse tracking for liquid glass effects
-  useEffect(() => {
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    if (isTouchDevice) return;
-
-    let rafId = 0;
-    const handleMouseMove = (e: MouseEvent) => {
-      if (rafId) return; 
-      rafId = requestAnimationFrame(() => {
-        document.documentElement.style.setProperty('--mouse-x', `${(e.clientX / window.innerWidth) * 100}%`);
-        document.documentElement.style.setProperty('--mouse-y', `${(e.clientY / window.innerHeight) * 100}%`);
-        rafId = 0;
-      });
-    };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
+  // NEXT-GEN DESIGN: Mouse tracking for liquid glass effects has been moved
+  // to AtmosphericLayer.tsx natively to prevent global CSS reflows/layout thrashing.
 
   const { shouldShowWelcome: _shouldShowWelcome, dismissWelcome: _dismissWelcome } = useWelcomeState(userId)
   const queryClient = useQueryClient();
@@ -263,11 +245,7 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
     return path === '/client/dashboard' || path === '/owner/dashboard' || path === '/client/dashboard/' || path === '/owner/dashboard/';
   }, [location.pathname]);
 
-  useSwipeNavigation({
-    paths: userRole === 'client' ? clientSwipePaths : userRole === 'owner' ? ownerSwipePaths : [],
-    containerSelector: '#dashboard-scroll-container',
-    enabled: userRole !== 'admin' && !isSwipeDeck && location.pathname !== '/client/liked-properties' && location.pathname !== '/owner/liked-clients',
-  });
+  // useSwipeNavigation removed to prevent horizontal scrolling interference with listing details
 
   return (
     <div className={cn(
@@ -277,25 +255,18 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
       <main
         ref={scrollContainerRef}
         id="dashboard-scroll-container"
-        onPointerDown={() => window.dispatchEvent(new CustomEvent('sentient-ui-recovery'))}
         className={cn(
-          "flex-1 w-full relative z-0 touch-pan-y",
-          isRadioRoute
-            ? "overflow-visible"
-            : isSwipeDeck
-            ? "h-full overflow-hidden"
-            : "overflow-y-auto overflow-x-hidden scroll-area-momentum",
-          "shadow-none bg-transparent"
+          "flex-1 flex flex-col relative w-full",
+          isSwipeDeck ? "overflow-hidden touch-none" : "overflow-y-auto scroll-area-momentum"
         )}
         style={{
-          // Always pad for HUD so content is never hidden under TopBar/BottomNav
-          paddingTop: isSwipeDeck || isRadioRoute ? '0px' : 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px))',
-          paddingBottom: isSwipeDeck || isRadioRoute ? '0px' : 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 16px)',
-          paddingLeft: 'max(var(--safe-left, 0px), 0px)',
-          paddingRight: 'max(var(--safe-right, 0px), 0px)',
+          WebkitOverflowScrolling: 'touch',
+          scrollPaddingTop: 'var(--top-bar-height, 60px)',
+          scrollPaddingBottom: 'var(--bottom-nav-height, 72px)',
         }}
       >
-        <div className="min-h-full w-full flex flex-col">
+        {/* INNER WRAPPER: Ensures flex-grow works correctly for child pages */}
+        <div className="flex-grow w-full flex flex-col min-h-full">
           {children}
         </div>
       </main>

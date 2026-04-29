@@ -25,6 +25,9 @@ html, body, #root {
   backface-visibility: hidden;
   perspective: 1000;
   overscroll-behavior-y: none;
+  /* 📱 MOBILE OPTIMIZATION: Prevent text selection and highlight */
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* 🚀 FLAGSHIP LAYOUT CONTAINMENT */
@@ -216,7 +219,7 @@ body {
 
 main, .scrollable-content, .overflow-y-auto {
   overscroll-behavior-y: auto;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 #root {

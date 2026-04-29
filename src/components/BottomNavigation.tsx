@@ -324,10 +324,10 @@ export const BottomNavigation = memo(({
                   'touch-manipulation focus-visible:outline-none transform-gpu active:bg-[var(--hud-active-bg)]',
                 )}
                 style={{
-                  minWidth: isTablet ? '100px' : (isNarrow ? '44px' : '52px'),
+                  minWidth: 'clamp(42px, 10vw, 54px)',
                   scrollSnapAlign: 'start',
                   minHeight: isTablet ? TOUCH_TARGET_TABLET : TOUCH_TARGET,
-                  padding: isTablet ? '8px 12px' : (isNarrow ? '4px 5px' : '5px 6px'),
+                  padding: isTablet ? '8px 12px' : (isNarrow ? '4px' : 'clamp(4px, 1.2vw, 8px)'),
                   borderRadius: '3rem',
                   cursor: 'pointer',
                   flexShrink: 0,

@@ -69,13 +69,13 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
   return (
     <div
       className={cn(
-        "w-full flex flex-col p-4 relative min-h-screen",
+        "w-full flex flex-col p-4 relative min-h-full",
         isLight ? "bg-white text-slate-900" : "bg-[#020202] text-white"
       )}
       style={{ paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 24px)' }}
     >
       {!isEmbedded && (
-        <div className="mb-6 pt-4">
+        <div className="mb-6 pt-4 px-4">
           <h1 className={cn(
             "text-4xl font-black uppercase italic tracking-[-0.05em] leading-none",
             isLight ? "text-slate-900" : "text-white"
