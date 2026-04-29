@@ -141,7 +141,7 @@ const OwnerProfile = () => {
         <motion.div
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          className="flex items-center justify-between p-6 rounded-3xl cursor-pointer border border-white/[0.06] bg-white/[0.02]"
+          className={cn("flex items-center justify-between p-6 rounded-3xl cursor-pointer border", isLight ? "border-slate-200 bg-slate-50" : "border-white/[0.06] bg-white/[0.02]")}
           style={{ boxShadow: 'inset 0 0 40px rgba(0,212,255,0.06)' }}
           onClick={() => { triggerHaptic('light'); navigate('/subscription/packages'); }}
         >
@@ -150,8 +150,8 @@ const OwnerProfile = () => {
               <Coins className="w-6 h-6 text-cyan-400" />
             </div>
             <div>
-              <h3 className="text-[13px] font-black uppercase tracking-[0.2em] italic text-white leading-tight">Global Credits</h3>
-              <p className="text-[9px] font-bold uppercase tracking-[0.15em] mt-1 text-white/25">Swipess Messaging Reserve</p>
+              <h3 className={cn("text-[13px] font-black uppercase tracking-[0.2em] italic leading-tight", isLight ? "text-slate-900" : "text-white")}>Global Credits</h3>
+              <p className={cn("text-[9px] font-bold uppercase tracking-[0.15em] mt-1", isLight ? "text-slate-500" : "text-white/25")}>Swipess Messaging Reserve</p>
             </div>
           </div>
           <div className="text-4xl font-black italic tracking-tighter text-cyan-400">
@@ -190,7 +190,7 @@ const OwnerProfile = () => {
 
           <Button
             onClick={() => { triggerHaptic('medium'); navigate('/client/advertise'); }}
-            className="w-full h-16 rounded-2xl transition-all active:scale-95 border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.05]"
+            className={cn("w-full h-16 rounded-2xl transition-all active:scale-95 border", isLight ? "border-slate-200 bg-slate-50 hover:bg-slate-100" : "border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.05]")}
           >
             <Megaphone className="w-6 h-6 text-violet-400 mr-3" />
             <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent font-black uppercase italic tracking-[0.2em] text-[14px]">
@@ -209,15 +209,15 @@ const OwnerProfile = () => {
               key={i}
               whileTap={{ scale: 0.97 }}
               onClick={() => { triggerHaptic('light'); navigate(nav.path); }}
-              className="rounded-3xl p-7 flex flex-col gap-5 text-left border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-all"
+              className={cn("rounded-3xl p-7 flex flex-col gap-5 text-left border transition-all", isLight ? "border-slate-200 bg-slate-50 hover:bg-slate-100" : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]")}
               style={{ boxShadow: `inset 0 0 30px ${nav.glow}` }}
             >
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center border border-white/[0.08] bg-white/[0.04]">
+              <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border", isLight ? "border-slate-200 bg-white" : "border-white/[0.08] bg-white/[0.04]")}>
                 <nav.icon className={cn("w-6 h-6", nav.color)} />
               </div>
               <div>
-                <div className="text-[13px] font-black uppercase tracking-[0.1em] italic text-white leading-tight">{nav.label}</div>
-                <div className="text-[10px] font-bold mt-1 uppercase tracking-widest text-white/25">{nav.sub}</div>
+                <div className={cn("text-[13px] font-black uppercase tracking-[0.1em] italic leading-tight", isLight ? "text-slate-900" : "text-white")}>{nav.label}</div>
+                <div className={cn("text-[10px] font-bold mt-1 uppercase tracking-widest", isLight ? "text-slate-500" : "text-white/25")}>{nav.sub}</div>
               </div>
             </motion.button>
           ))}
@@ -228,7 +228,7 @@ const OwnerProfile = () => {
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <h3 className="text-[10px] font-black uppercase tracking-[0.35em] text-white/30">Activity Feed</h3>
+              <h3 className={cn("text-[10px] font-black uppercase tracking-[0.35em]", isLight ? "text-slate-500" : "text-white/30")}>Activity Feed</h3>
             </div>
             <Zap className="w-4 h-4 text-cyan-400/30" />
           </div>
@@ -276,10 +276,12 @@ const OwnerProfile = () => {
                   "w-full h-14 rounded-2xl flex items-center px-8 gap-5 active:scale-[0.97] transition-all border",
                   btn.urgent
                     ? "bg-red-500/10 border-red-500/20 text-red-400"
-                    : "bg-white/[0.03] border-white/[0.06] text-white/70 hover:bg-white/[0.05]"
+                    : isLight
+                      ? "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
+                      : "bg-white/[0.03] border-white/[0.06] text-white/70 hover:bg-white/[0.05]"
                 )}
               >
-                <btn.icon className={cn("w-5 h-5", btn.urgent ? "text-red-400" : "text-white/25")} />
+                <btn.icon className={cn("w-5 h-5", btn.urgent ? "text-red-400" : isLight ? "text-slate-500" : "text-white/25")} />
                 <span className="text-[12px] font-black uppercase tracking-[0.2em] italic">{btn.label}</span>
               </motion.button>
             ))}
