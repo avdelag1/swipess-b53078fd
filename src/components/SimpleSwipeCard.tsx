@@ -23,8 +23,6 @@ import { CompactRatingDisplay } from '@/components/RatingDisplay';
 import { useListingRatingAggregate } from '@/hooks/useRatingSystem';
 import CardImage from '@/components/CardImage';
 import { imageCache } from '@/lib/swipe/cardImageCache';
-import { DiscoverySidebar } from '@/components/DiscoverySidebar';
-import { useSwipeUndo } from '@/hooks/useSwipeUndo';
 import { useDeviceParallax } from '@/hooks/useDeviceParallax';
 
 // Exposed interface for parent to trigger swipe animations
@@ -93,11 +91,6 @@ interface SimpleSwipeCardProps {
   listing: Listing | MatchedListing;
   onSwipe: (direction: 'left' | 'right') => void;
   onInsights?: () => void;
-  onShare?: () => void;
-  onMessage?: () => void;
-  onLike?: () => void;
-  onDislike?: () => void;
-  onReport?: () => void;
   isTop?: boolean;
   /** Optional shared MotionValue from parent — lets container animate the card below in real-time */
   externalX?: MotionValue<number>;
@@ -110,11 +103,6 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
   listing,
   onSwipe,
   onInsights,
-  onShare,
-  onMessage,
-  onLike,
-  onDislike,
-  onReport,
   isTop = true,
   externalX,
   externalY,
@@ -128,7 +116,6 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
   const dragControls = useDragControls();
   const dragStartedRef = useRef(false);
   const storedPointerEventRef = useRef<React.PointerEvent | null>(null);
-  const { undoLastSwipe, canUndo } = useSwipeUndo();
 
   // Motion values for BOTH X and Y - enables diagonal movement
   // Always create internal values (hooks must not be conditional)
@@ -673,21 +660,6 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
             background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)'
           }}
         />
-
-        {/* 🏎️ DISCOVERY REEL SIDEBAR — Social-Media Standard */}
-        {isTop && (
-          <DiscoverySidebar
-            onUndo={undoLastSwipe}
-            onMessage={onMessage}
-            onShare={onShare}
-            onInsights={onInsights}
-            onLike={onLike}
-            onDislike={onDislike}
-            onReport={onReport}
-            canUndo={canUndo}
-            matchPercentage={'matchPercentage' in listing ? (listing as MatchedListing).matchPercentage : undefined}
-          />
-        )}
 
         {/* Verified Badge - Left corner higher up */}
         {listing.has_verified_documents && (

@@ -1134,11 +1134,6 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                     handleInsights();
                     if (onListingTap) onListingTap(topCard.id);
                   }}
-                  onMessage={handleMessage}
-                  onShare={handleShare}
-                  onReport={handleReport}
-                  onLike={handleButtonLike}
-                  onDislike={handleButtonDislike}
                   onDragStart={handleDragStart}
                   isTop={true}
                   externalX={topCardX}
@@ -1177,16 +1172,30 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
           </AnimatePresence>
       </div>
 
-      {/* Category Switcher — simple button to change listing type */}
-      {deckQueue.length > 0 && currentIndex < deckQueue.length && (
-        <div
-          className="absolute left-0 right-0 z-[100] flex justify-center pointer-events-none px-6"
-          style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 12px)' }}
-        >
+    </div>
+    </div>
+
+      {/* Action buttons — horizontal bar below the card */}
+      {hasCards && (
+        <div className="shrink-0 flex justify-center z-[100] pointer-events-auto">
+          <SwipeActionButtonBar
+            onLike={handleButtonLike}
+            onDislike={handleButtonDislike}
+            onShare={handleShare}
+            onUndo={undoLastSwipe}
+            onMessage={handleMessage}
+            canUndo={canUndo}
+          />
+        </div>
+      )}
+
+      {/* Category Switcher */}
+      {hasCards && (
+        <div className="shrink-0 flex justify-center pointer-events-auto pb-2">
           <button
             onClick={handleCycleCategory}
             className={cn(
-              "pointer-events-auto px-6 py-2 rounded-full font-black uppercase text-xs transition-all active:scale-95 border",
+              "px-6 py-2 rounded-full font-black uppercase text-xs transition-all active:scale-95 border",
               isLight
                 ? "bg-black text-white border-white/20 hover:bg-black/80"
                 : "bg-white text-black border-black/20 hover:bg-white/80"
@@ -1196,9 +1205,6 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
           </button>
         </div>
       )}
-
-    </div>
-    </div>
 
       {/* Action buttons now live inside the card via DiscoverySidebar */}
 
