@@ -192,19 +192,19 @@ function TopBarComponent({
                 style={{
                   ...glassPillStyle,
                   background: isLight
-                    ? 'linear-gradient(135deg, rgba(245,158,11,0.18), rgba(249,115,22,0.14))'
-                    : 'linear-gradient(135deg, rgba(245,158,11,0.28), rgba(249,115,22,0.22))',
+                    ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(99, 102, 241, 0.14))'
+                    : 'linear-gradient(135deg, rgba(139, 92, 246, 0.28), rgba(99, 102, 241, 0.22))',
                   boxShadow: isLight
-                    ? '0 8px 24px -6px rgba(245,158,11,0.35), inset 0 0 0 1px rgba(245,158,11,0.35)'
-                    : '0 12px 32px -8px rgba(245,158,11,0.45), inset 0 0 0 1px rgba(245,158,11,0.4)',
+                    ? '0 8px 24px -6px rgba(139, 92, 246, 0.35), inset 0 0 0 1px rgba(139, 92, 246, 0.35)'
+                    : '0 12px 32px -8px rgba(139, 92, 246, 0.45), inset 0 0 0 1px rgba(139, 92, 246, 0.4)',
                 }}
                 aria-label="Tokens"
               >
                 <Ticket
                   className="w-4 h-4"
                   style={{
-                    color: '#fbbf24',
-                    filter: 'drop-shadow(0 0 6px rgba(251,191,36,0.6))',
+                    color: '#a78bfa',
+                    filter: 'drop-shadow(0 0 6px rgba(167, 139, 250, 0.6))',
                   }}
                   strokeWidth={2.4}
                 />

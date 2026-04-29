@@ -735,7 +735,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
             </div>
           )}
 
-          {/* In-Card Navigation Buttons — Clear & Visible */}
+          {/* In-Card Navigation Buttons — Theme-Aware, Always Visible */}
           <div className="absolute top-[calc(var(--safe-top,0px)+80px)] left-4 right-4 z-40 flex justify-between pointer-events-none">
             <button
               onClick={(e) => {
@@ -743,7 +743,12 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
                 triggerHaptic('light');
                 onShare?.();
               }}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/25 text-white active:scale-90 transition-all pointer-events-auto shadow-lg"
+              className={cn(
+                "flex items-center gap-1.5 px-4 py-2.5 rounded-full backdrop-blur-md active:scale-90 transition-all pointer-events-auto shadow-lg",
+                _isDark
+                  ? "bg-black/60 border border-white/25 text-white"
+                  : "bg-black/80 border border-black/10 text-white"
+              )}
               title="Share Profile"
             >
               <Share2 className="w-4 h-4" strokeWidth={2} />
@@ -755,7 +760,12 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
                 triggerHaptic('medium');
                 onReport?.();
               }}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-red-500/30 backdrop-blur-md border border-red-400/30 text-white active:scale-90 transition-all pointer-events-auto shadow-lg"
+              className={cn(
+                "flex items-center gap-1.5 px-4 py-2.5 rounded-full backdrop-blur-md active:scale-90 transition-all pointer-events-auto shadow-lg",
+                _isDark
+                  ? "bg-red-600/50 border border-red-400/30 text-white"
+                  : "bg-red-600/90 border border-red-500/20 text-white"
+              )}
               title="Report Profile"
             >
               <Flag className="w-4 h-4" strokeWidth={2} />
