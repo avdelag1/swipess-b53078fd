@@ -287,10 +287,12 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
       const dy = Math.abs(e.clientY - (storedPointerEventRef.current as any).clientY);
       
       // Start drag only if we move more than a minor threshold
-      if (dx > 5 || dy > 5) {
+      if (dx > 10 || dy > 10) {
+        // Cancel any pending magnifier hold timer
+        magnifierPointerHandlers.onPointerUp(e);
         dragStartedRef.current = true;
+        isDragging.current = true;
         dragControls.start((storedPointerEventRef.current as any).nativeEvent);
-        storedPointerEventRef.current = null;
       }
     }
   }, [isMagnifierActive, magnifierPointerHandlers, dragControls]);
@@ -537,12 +539,14 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
             />
           )}
 
-          {/* Cinema Top Fade — dark vignette behind header, fades to clear photo */}
+          {/* Cinema Top Fade — theme-aware vignette behind header buttons */}
           <div
             className="absolute top-0 left-0 right-0 pointer-events-none z-20"
             style={{
-              height: '30%',
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.05) 70%, transparent 100%)',
+              height: '28%',
+              background: isLight
+                ? 'linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.4) 40%, rgba(255,255,255,0.05) 75%, transparent 100%)'
+                : 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.05) 75%, transparent 100%)',
             }}
           />
           
@@ -733,12 +737,14 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           </motion.div>
         </div>
 
-        {/* Cinema Bottom Fade — dark vignette behind info + nav, fades to clear photo */}
+        {/* Cinema Bottom Fade — theme-aware vignette behind nav + action buttons */}
         <div
           className="absolute inset-x-0 bottom-0 pointer-events-none z-10"
           style={{
-            height: '55%',
-            background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 30%, rgba(0,0,0,0.08) 60%, transparent 100%)',
+            height: '50%',
+            background: isLight
+              ? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 35%, rgba(255,255,255,0.05) 65%, transparent 100%)'
+              : 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0.05) 65%, transparent 100%)',
           }}
         />
 

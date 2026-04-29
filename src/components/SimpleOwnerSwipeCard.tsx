@@ -398,27 +398,29 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
 
   // Unified pointer move: decides between magnifier pan vs starting drag
   const handleUnifiedPointerMove = useCallback((e: React.PointerEvent) => {
-    // Check ref directly (not React state) — avoids stale closure / re-render lag
+    // If magnifier zoom is active, delegate to magnifier panning
     if (isMagnifierActive()) {
       magnifierPointerHandlers.onPointerMove(e);
       return;
     }
-    if (isHoldPending() && storedPointerEventRef.current) {
+
+    // Not zoomed — check if we should start a drag
+    if (storedPointerEventRef.current && !dragStartedRef.current) {
       const startX = storedPointerEventRef.current.clientX;
       const startY = storedPointerEventRef.current.clientY;
       const dx = Math.abs(e.clientX - startX);
       const dy = Math.abs(e.clientY - startY);
-      if (dx > 15 || dy > 15) {
-        // Meaningful movement: cancel magnifier completely, start drag
-        magnifierPointerHandlers.onPointerUp(e); // Force-cancel hold timer + any active zoom
-        if (!dragStartedRef.current && storedPointerEventRef.current) {
-          dragStartedRef.current = true;
-          isDragging.current = true;
-          triggerHaptic('light');
-          dragControls.start(storedPointerEventRef.current.nativeEvent);
+      if (dx > 10 || dy > 10) {
+        // Cancel any pending magnifier hold timer
+        if (isHoldPending()) {
+          magnifierPointerHandlers.onPointerUp(e);
         }
+        // Start the drag
+        dragStartedRef.current = true;
+        isDragging.current = true;
+        triggerHaptic('light');
+        dragControls.start(storedPointerEventRef.current.nativeEvent);
       }
-      return;
     }
   }, [isMagnifierActive, isHoldPending, magnifierPointerHandlers, dragControls]);
 
@@ -704,12 +706,14 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
             fullScreen={fullScreen}
           />
 
-          {/* Cinema Top Fade — dark vignette behind header, fades to clear photo */}
+          {/* Cinema Top Fade — theme-aware vignette behind header buttons */}
           <div
             className="absolute top-0 left-0 right-0 pointer-events-none z-20"
             style={{
-              height: '30%',
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.05) 70%, transparent 100%)',
+              height: '28%',
+              background: _isDark
+                ? 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.05) 75%, transparent 100%)'
+                : 'linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.4) 40%, rgba(255,255,255,0.05) 75%, transparent 100%)',
             }}
           />
 
@@ -782,12 +786,14 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
 
 
 
-        {/* Cinema Bottom Fade — dark vignette behind info + nav, fades to clear photo */}
+        {/* Cinema Bottom Fade — theme-aware vignette behind nav + action buttons */}
         <div
           className="absolute left-0 right-0 bottom-0 z-15 pointer-events-none"
           style={{
-            height: '55%',
-            background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.35) 30%, rgba(0,0,0,0.08) 60%, transparent 100%)',
+            height: '50%',
+            background: _isDark
+              ? 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0.05) 65%, transparent 100%)'
+              : 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 35%, rgba(255,255,255,0.05) 65%, transparent 100%)',
           }}
         />
 
@@ -804,45 +810,28 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
             transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
             className="space-y-1.5"
           >
-            <div className="flex items-center gap-2 mb-3 flex-wrap">
-              {'matchPercentage' in profile && (profile as any).matchPercentage > 0 && (
-                <SwipeMatchMeter
-                  percentage={(profile as any).matchPercentage}
-                  reasons={(profile as any).matchReasons}
-                  compact
-                />
-              )}
-              <div className="inline-flex rounded-full px-3 py-1.5 bg-black/35 backdrop-blur-[10px] border border-white/10">
-                <CompactRatingDisplay
-                  aggregate={ratingAggregate ?? null}
-                  isLoading={isRatingLoading}
-                  showReviews={false}
-                  className="text-white"
-                />
-              </div>
-            </div>
-
-            {currentImageIndex % 4 === 0 && (
-              <>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-white text-3xl font-black tracking-tight" style={{ textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-                    {profile.name || 'Anonymous'}
-                  </h2>
-                  {profile.age && <span className="text-white/80 text-2xl font-bold">{profile.age}</span>}
-                  {profile.verified && (
-                    <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center border border-white/20">
-                      <div className="w-2.5 h-2.5 bg-white rounded-full" />
-                    </div>
-                  )}
-                </div>
-                {profile.city && (
-                  <div className="flex items-center gap-1.5 text-white/70 text-sm font-black uppercase tracking-widest">
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>{profile.city}</span>
-                  </div>
+            {/* Photo 0 = clean first impression, no info overlay */}
+            {currentImageIndex % 4 !== 0 && (
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                {'matchPercentage' in profile && (profile as any).matchPercentage > 0 && (
+                  <SwipeMatchMeter
+                    percentage={(profile as any).matchPercentage}
+                    reasons={(profile as any).matchReasons}
+                    compact
+                  />
                 )}
-              </>
+                <div className="inline-flex rounded-full px-3 py-1.5 bg-black/35 backdrop-blur-[10px] border border-white/10">
+                  <CompactRatingDisplay
+                    aggregate={ratingAggregate ?? null}
+                    isLoading={isRatingLoading}
+                    showReviews={false}
+                    className="text-white"
+                  />
+                </div>
+              </div>
             )}
+
+            {/* Photo 0 = CLEAN — no name, no info, just the portrait */}
 
             {currentImageIndex % 4 === 1 && (
               <>

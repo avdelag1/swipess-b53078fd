@@ -1087,25 +1087,27 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
         isLight ? "bg-transparent" : "bg-black"
       )} />
 
-      {/* Header Controls — Unified with Swipess Standard */}
-      <div className="absolute top-[calc(var(--safe-top,0px)+16px)] left-4 z-[70] flex items-center gap-3 pointer-events-auto">
-        <button
-          onClick={() => {
-            triggerHaptic('light');
-            setActiveCategory(null as any);
-            setCategories([] as any);
-          }}
-          className={cn(
-            "flex items-center justify-center w-10 h-10 rounded-full border transition-all active:scale-90",
-            isLight ? "bg-white border-black/10 text-black" : "bg-black/80 border-white/20 text-white"
-          )}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <span className={cn("text-sm font-black uppercase tracking-wider", isLight ? "text-black" : "text-white")}>
-          {currentCategoryName}
-        </span>
-      </div>
+      {/* Header Controls — ONLY visible when NO cards (radar/empty state) */}
+      {!hasCards && (
+        <div className="absolute top-[calc(var(--safe-top,0px)+16px)] left-4 z-[70] flex items-center gap-3 pointer-events-auto">
+          <button
+            onClick={() => {
+              triggerHaptic('light');
+              setActiveCategory(null as any);
+              setCategories([] as any);
+            }}
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-full border transition-all active:scale-90",
+              isLight ? "bg-white border-black/10 text-black" : "bg-black/80 border-white/20 text-white"
+            )}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className={cn("text-sm font-black uppercase tracking-wider", isLight ? "text-black" : "text-white")}>
+            {currentCategoryName}
+          </span>
+        </div>
+      )}
 
       {/* Card area — flex-1 fills remaining space; overflow-hidden here keeps swipe cards contained */}
       <div className={cn(

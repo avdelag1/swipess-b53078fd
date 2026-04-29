@@ -883,28 +883,30 @@ const ClientSwipeContainerComponent = ({
         {/* Static ambient background */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10" />
 
-        {/* Header Controls — Unified with Swipess Standard */}
-        <div className="absolute top-[calc(var(--safe-top,0px)+16px)] left-4 z-[70] flex items-center gap-3 pointer-events-auto">
-          <button
-            onClick={() => {
-              if (!canClickBack) return;
-              triggerHaptic('light');
-              setActiveCategory(null);
-            }}
-            disabled={!canClickBack}
-            className={cn(
-              "flex items-center justify-center w-10 h-10 rounded-full border transition-all active:scale-90",
-              isLight ? "bg-white border-black/10 text-black" : "bg-black/80 border-white/20 text-white",
-              !canClickBack && "opacity-50 cursor-not-allowed"
-            )}
-            title="Back to Sectors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className={cn("text-sm font-black uppercase tracking-wider", isLight ? "text-black" : "text-white")}>
-            {labels.plural}
-          </span>
-        </div>
+        {/* Header Controls — ONLY visible when NO cards (e.g. radar/kilometer screen) */}
+        {!topCard && (
+          <div className="absolute top-[calc(var(--safe-top,0px)+16px)] left-4 z-[70] flex items-center gap-3 pointer-events-auto">
+            <button
+              onClick={() => {
+                if (!canClickBack) return;
+                triggerHaptic('light');
+                setActiveCategory(null);
+              }}
+              disabled={!canClickBack}
+              className={cn(
+                "flex items-center justify-center w-10 h-10 rounded-full border transition-all active:scale-90",
+                isLight ? "bg-white border-black/10 text-black" : "bg-black/80 border-white/20 text-white",
+                !canClickBack && "opacity-50 cursor-not-allowed"
+              )}
+              title="Back to Sectors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <span className={cn("text-sm font-black uppercase tracking-wider", isLight ? "text-black" : "text-white")}>
+              {labels.plural}
+            </span>
+          </div>
+        )}
 
         {/* 📡 Radar HUD removed from here — now managed at the Dashboard level for persistence */}
 
@@ -953,9 +955,9 @@ const ClientSwipeContainerComponent = ({
                   onUndo={undoLastSwipe}
                   onLike={handleButtonLike}
                   onDislike={handleButtonDislike}
-                  onInsights={() => onListingTap?.(topCard.user_id)}
                   canUndo={canUndo}
                   isTop={true}
+                  fullScreen={true}
                   externalX={topCardX}
                 />
               </motion.div>
