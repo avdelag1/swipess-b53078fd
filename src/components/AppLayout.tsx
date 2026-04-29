@@ -154,6 +154,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         id="main-content"
         className={cn(
           "w-full flex-1 relative z-0 flex flex-col",
+          // Push content down below the fixed header
+          !isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && "pt-[var(--top-bar-height)]",
           // Dashboard pages: overflow-hidden, DashboardLayout scrolls internally
           // Public/standalone pages: overflow-y-auto, scroll at this level
           (isInsideDashboard || isFullScreen) ? "overflow-hidden" : "overflow-y-auto scroll-area-momentum"

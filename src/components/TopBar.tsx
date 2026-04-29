@@ -99,8 +99,8 @@ function TopBarComponent({
         className
       )}
       style={{
-        paddingTop: 'var(--safe-top)',
-        height: 'calc(var(--top-bar-height) - 4px + var(--safe-top))',
+        paddingTop: 'calc(var(--safe-top, 0px) + 6px)',
+        height: 'calc(var(--top-bar-height) + var(--safe-top, 0px))',
         background: 'transparent',
         border: 'none'
       }}
