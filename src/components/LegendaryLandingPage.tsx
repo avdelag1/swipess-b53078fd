@@ -276,7 +276,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
       <div className="w-full max-w-sm bg-[#0d0d0f]/80 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-7 shadow-2xl relative overflow-hidden my-auto">
         
         <button
-          onClick={() => { triggerHaptic('light'); isForgotPassword ? setIsForgotPassword(false) : onBack(); }}
+          onClick={() => { playRandomZen(0.3); triggerHaptic('light'); isForgotPassword ? setIsForgotPassword(false) : onBack(); }}
           className="absolute top-5 left-5 w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-white/70 border border-white/5 active:scale-90 transition-all z-20"
           aria-label="Go back"
         >
@@ -303,7 +303,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
               <div className="flex items-center justify-center gap-1 bg-white/10 rounded-2xl p-1 mb-3 border border-white/10">
                 <button
                   type="button"
-                  onClick={() => { triggerHaptic('light'); setIsLogin(true); setFieldErrors({}); }}
+                  onClick={() => { playRandomZen(0.3); triggerHaptic('light'); setIsLogin(true); setFieldErrors({}); }}
                   className={cn(
                     "flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all",
                     isLogin
@@ -315,7 +315,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                 </button>
                 <button
                   type="button"
-                  onClick={() => { triggerHaptic('light'); setIsLogin(false); setFieldErrors({}); }}
+                  onClick={() => { playRandomZen(0.3); triggerHaptic('light'); setIsLogin(false); setFieldErrors({}); }}
                   className={cn(
                     "flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all",
                     !isLogin

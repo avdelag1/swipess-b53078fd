@@ -11,6 +11,8 @@ interface PageHeaderProps {
   showBack?: boolean;
   onBack?: () => void;
   backTo?: string;
+  icon?: ReactNode;
+  accentColor?: string;
   actions?: ReactNode;
   className?: string;
 }
@@ -21,6 +23,8 @@ export function PageHeader({
   showBack = false,
   onBack,
   backTo,
+  icon,
+  accentColor: _accentColor,
   actions,
   className = ""
 }: PageHeaderProps) {
@@ -63,6 +67,7 @@ export function PageHeader({
           </motion.button>
         )}
         <div className="flex flex-col min-w-0">
+          {icon && <div className="mb-2 text-primary">{icon}</div>}
           <h1 className="text-xl font-black text-foreground tracking-tight leading-none uppercase italic truncate">
              {title}
           </h1>
