@@ -177,16 +177,16 @@ export default function ClientFilters({ isEmbedded, onClose }: ClientFiltersProp
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border transition-all active:scale-95 whitespace-nowrap",
-                      activeCategory === cat.id
-                        ? isLight
-                          ? "bg-slate-900 text-white border-slate-900"
-                          : "bg-primary text-white border-primary"
-                        : isLight
-                        ? "bg-slate-100 text-slate-900 border-slate-200 hover:bg-slate-200"
-                        : "bg-white/10 text-white/70 border-white/10 hover:bg-white/20"
-                    )}
+                    className="px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border transition-all active:scale-95 whitespace-nowrap"
+                    style={activeCategory === cat.id ? {
+                      backgroundColor: '#FF4D00',
+                      borderColor: '#FF4D00',
+                      color: 'white'
+                    } : {
+                      backgroundColor: isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.08)',
+                      borderColor: isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+                      color: isLight ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.7)'
+                    }}
                   >
                     {cat.label}
                   </button>

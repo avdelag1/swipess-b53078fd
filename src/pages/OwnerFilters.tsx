@@ -110,21 +110,18 @@ export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps)
               <button
                 key={cat.id}
                 onClick={() => { haptics.tap(); setActiveCategory(cat.id as CategoryType); }}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1.5 py-4 rounded-[2rem] transition-all duration-300 relative overflow-hidden group",
-                  active 
-                    ? (isLight ? "bg-slate-900 text-white shadow-xl scale-[1.03]" : "bg-white text-black shadow-2xl scale-[1.03]") 
-                    : (isLight ? "text-slate-500 hover:bg-slate-100" : "text-white/40 hover:bg-white/5")
-                )}
+                className="flex flex-col items-center justify-center gap-1.5 py-4 rounded-[2rem] transition-all duration-300 relative overflow-hidden group"
+                style={active ? {
+                  backgroundColor: '#FF4D00',
+                  color: 'white',
+                  boxShadow: '0 8px 24px rgba(255,77,0,0.4)',
+                  transform: 'scale(1.03)'
+                } : {
+                  color: isLight ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'
+                }}
               >
-                <Icon className={cn("w-5 h-5", active ? (isLight ? "text-white" : "text-primary") : "opacity-60")} />
+                <Icon className="w-5 h-5" />
                 <span className="text-[9px] font-black uppercase tracking-tighter">{cat.name}</span>
-                {active && !isLight && (
-                  <motion.div 
-                    layoutId="active-owner-highlight"
-                    className="absolute inset-0 bg-primary/5 pointer-events-none"
-                  />
-                )}
               </button>
             );
           })}
@@ -173,7 +170,7 @@ export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps)
       {/* 🛸 ENGAGEMENT FOOTER */}
       <div className={cn(
         "px-6 z-50",
-        isEmbedded ? "mt-8 pb-12" : "fixed bottom-12 left-0 right-0"
+        isEmbedded ? "mt-8 pb-12" : "mt-8 pb-8"
       )}>
         <div className="max-w-md mx-auto">
           <motion.button
@@ -187,11 +184,8 @@ export default function OwnerFilters({ isEmbedded, onClose }: OwnerFiltersProps)
               }, 2200);
             }}
             disabled={isScanning}
-            className={cn(
-              "w-full h-20 rounded-[2.5rem] font-black uppercase italic tracking-[0.2em] text-xl shadow-[0_30px_70px_rgba(0,0,0,0.5)] flex items-center justify-center gap-4 group transition-all",
-              isLight ? "bg-slate-900 text-white" : "bg-white text-black",
-              "hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            )}
+            className="w-full h-20 rounded-[2.5rem] font-black uppercase italic tracking-[0.2em] text-xl flex items-center justify-center gap-4 group transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ backgroundColor: '#FF4D00', color: 'white', boxShadow: '0 20px 50px rgba(255,77,0,0.4)' }}
           >
             <Sparkles className={cn("w-6 h-6 md:w-7 md:h-7 animate-pulse group-hover:scale-110 transition-transform", isScanning && "animate-spin")} />
             <span className="text-sm font-black uppercase italic tracking-[0.2em]">

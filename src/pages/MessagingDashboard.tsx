@@ -254,15 +254,20 @@ export function MessagingDashboard() {
               { id: 'unread', label: 'Priority', icon: Sparkles },
               { id: 'archived', label: 'Archive', icon: Archive }
             ].map((filter) => (
-              <button 
-                key={filter.id} 
+              <button
+                key={filter.id}
                 onClick={() => { setActiveFilter(filter.id as any); triggerHaptic('light'); }}
-                className={cn(
-                  "flex items-center gap-2.5 px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                  activeFilter === filter.id
-                    ? "bg-[#EB4898] text-white border-[#EB4898] shadow-2xl shadow-[#EB4898]/30"
-                    : (isLight ? "bg-black/5 border-black/5 text-black font-black hover:bg-black/10" : "bg-white/[0.04] border-white/5 text-white/30 hover:bg-white/10")
-                )}
+                className="flex items-center gap-2.5 px-6 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all shrink-0 border"
+                style={activeFilter === filter.id ? {
+                  backgroundColor: '#FF4D00',
+                  borderColor: '#FF4D00',
+                  color: 'white',
+                  boxShadow: '0 6px 20px rgba(255,77,0,0.35)'
+                } : {
+                  backgroundColor: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)',
+                  borderColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
+                  color: isLight ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.65)'
+                }}
               >
                 <filter.icon className="w-3.5 h-3.5" />
                 {filter.label}

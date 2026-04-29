@@ -196,10 +196,17 @@ export function LikedClients() {
               key={id}
               onClick={() => setSelectedCategory(id)}
               whileTap={{ scale: 0.96 }}
-              className={cn(
-                "flex items-center gap-2.5 px-6 py-3.5 rounded-3xl text-sm font-black whitespace-nowrap transition-all border",
-                selectedCategory === id ? "bg-primary border-primary text-white shadow-lg" : (isLight ? "bg-black/5 border-black/10 text-slate-600 hover:bg-black/10" : "bg-white/[0.04] border-white/[0.08] text-muted-foreground")
-              )}
+              className="flex items-center gap-2.5 px-6 py-3.5 rounded-3xl text-sm font-black whitespace-nowrap transition-all border"
+              style={selectedCategory === id ? {
+                backgroundColor: '#FF4D00',
+                borderColor: '#FF4D00',
+                color: 'white',
+                boxShadow: '0 6px 20px rgba(255,77,0,0.35)'
+              } : {
+                backgroundColor: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)',
+                borderColor: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)',
+                color: isLight ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)'
+              }}
             >
               <Icon className="w-4 h-4" />
               {label}
@@ -226,10 +233,16 @@ export function LikedClients() {
             <button
               key={opt}
               onClick={() => setSortBy(opt as SortOption)}
-              className={cn(
-                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all active:scale-95 whitespace-nowrap",
-                sortBy === opt ? "bg-primary border-primary text-white" : (isLight ? "bg-black/5 border-black/10 text-slate-600" : "bg-white/[0.04] border-white/[0.08] text-muted-foreground")
-              )}
+              className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all active:scale-95 whitespace-nowrap"
+              style={sortBy === opt ? {
+                backgroundColor: '#FF4D00',
+                borderColor: '#FF4D00',
+                color: 'white'
+              } : {
+                backgroundColor: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)',
+                borderColor: isLight ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)',
+                color: isLight ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)'
+              }}
             >
               {opt}
             </button>

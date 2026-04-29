@@ -261,16 +261,14 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
             </div>
           </div>
 
-          <Button
+          <button
             onClick={handleAddProperty}
-            className={cn(
-              "h-18 px-10 rounded-[2.2rem] font-black uppercase italic tracking-[0.2em] shadow-2xl border-none active:scale-95 transition-all text-sm",
-              isLight ? "bg-black text-white" : "bg-white text-black"
-            )}
+            className="h-16 px-8 rounded-[2.2rem] font-black uppercase italic tracking-[0.2em] active:scale-95 transition-all text-sm flex items-center"
+            style={{ backgroundColor: '#FF4D00', color: 'white', boxShadow: '0 12px 32px rgba(255,77,0,0.35)' }}
           >
-            <Plus className="w-6 h-6 mr-3" />
+            <Plus className="w-5 h-5 mr-2" />
             Deploy Asset
-          </Button>
+          </button>
         </motion.div>
 
         {/* 🛸 STATISTICS HUD */}
@@ -301,12 +299,14 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
                     <button
                         key={tab.id}
                         onClick={() => { triggerHaptic('light'); setActiveTab(tab.id); }}
-                        className={cn(
-                            "flex items-center gap-3 px-6 h-14 rounded-[2rem] transition-all whitespace-nowrap",
-                            activeTab === tab.id
-                                ? (isLight ? "bg-black text-white shadow-2xl" : "bg-white text-black shadow-2xl")
-                                : isLight ? "text-black/60 hover:bg-black/10" : "text-white/60 hover:bg-white/5"
-                        )}
+                        className="flex items-center gap-3 px-6 h-14 rounded-[2rem] transition-all whitespace-nowrap"
+                        style={activeTab === tab.id ? {
+                          backgroundColor: '#FF4D00',
+                          color: 'white',
+                          boxShadow: '0 6px 20px rgba(255,77,0,0.35)'
+                        } : {
+                          color: isLight ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.55)'
+                        }}
                     >
                         <tab.icon className="w-4 h-4" />
                         <span className="text-[10px] font-black uppercase tracking-widest italic">{tab.label}</span>
