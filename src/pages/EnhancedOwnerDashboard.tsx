@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClientSwipeContainer } from '@/components/ClientSwipeContainer';
+import { SwipessSwipeContainer } from '@/components/SwipessSwipeContainer';
 import { useSmartClientMatching } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
@@ -10,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { OwnerInsightsDashboard } from '@/components/OwnerInsightsDashboard';
 import { OwnerAllDashboard } from '@/components/swipe/OwnerAllDashboard';
 import { triggerHaptic } from '@/utils/haptics';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Users, Home as HomeIcon } from 'lucide-react';
 import { DistanceSlider } from '@/components/swipe/DistanceSlider';
 import type { QuickFilterCategory } from '@/types/filters';
 import { OWNER_INTENT_CARDS } from '@/components/swipe/CardData';
@@ -28,6 +29,16 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
   const { theme } = useAppTheme();
   const isLight = theme === 'light';
   const [viewMode] = useState<'discovery' | 'insights'>('discovery');
+
+  // Owner test mode: Clients (real ClientSwipeContainer) vs Listings (real SwipessSwipeContainer)
+  // Persisted so the choice sticks while testing.
+  const [swipeDeckMode, setSwipeDeckMode] = useState<'clients' | 'listings'>(() => {
+    if (typeof window === 'undefined') return 'clients';
+    return (localStorage.getItem('Swipess_owner_deck_mode') as 'clients' | 'listings') || 'clients';
+  });
+  useEffect(() => {
+    try { localStorage.setItem('Swipess_owner_deck_mode', swipeDeckMode); } catch {}
+  }, [swipeDeckMode]);
 
   const activeCategory = useFilterStore(s => s.activeCategory);
   const { setCategories, setClientType, setListingType, setActiveCategory } = useFilterActions();
@@ -147,6 +158,15 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
     if (card.listingType) setListingType(card.listingType as any);
   }, [setClientType, setListingType, setActiveCategory, setCategories, setOwnerPhase]);
 
+  // Quick bypass: jump straight to the real swipe deck without going through quick-filter + radius.
+  const jumpToSwipeDeck = useCallback(() => {
+    triggerHaptic('medium');
+    const fallbackCat = (activeCategory || 'all-clients') as QuickFilterCategory;
+    setCategories([fallbackCat]);
+    setActiveCategory(fallbackCat);
+    setOwnerPhase('swipe');
+  }, [activeCategory, setCategories, setActiveCategory, setOwnerPhase]);
+
   const initialLoading = isAuthLoading || isPrefsLoading;
   const showSkeletons = activeCategory === null && initialLoading;
 
@@ -198,6 +218,21 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               willChange: 'transform, opacity'
             }}
           >
+            {/* Quick bypass — jump straight to the real swipe deck (skip quick filter + radius) */}
+            <button
+              type="button"
+              onClick={jumpToSwipeDeck}
+              className={cn(
+                "absolute z-30 right-4 flex items-center gap-2 px-4 h-10 rounded-full backdrop-blur-xl border text-[10px] font-black uppercase tracking-[0.25em] active:scale-95 transition-all shadow-lg",
+                isLight
+                  ? "bg-white/80 border-black/10 text-black"
+                  : "bg-white/10 border-white/15 text-white"
+              )}
+              style={{ top: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px) + 12px)' }}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              Show Swipe Deck
+            </button>
             <div className="flex-1 w-full relative z-10 flex flex-col justify-center">
               <OwnerAllDashboard onCardSelect={handleCardSelect} />
             </div>
@@ -226,6 +261,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
                 triggerHaptic('medium');
                 setOwnerPhase('swipe');
               }}
+              onSkip={jumpToSwipeDeck}
               radiusKm={radiusKm}
               onRadiusChange={setRadiusKm}
               onDetectLocation={detectLocation}
@@ -249,18 +285,54 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
               paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px))'
             }}
           >
+            {/* Owner deck mode toggle — Clients vs Listings */}
+            <div
+              className="absolute z-30 left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 rounded-full backdrop-blur-xl border shadow-lg bg-black/60 border-white/15"
+              style={{ top: 'calc(var(--top-bar-height, 60px) + var(--safe-top, 0px) + 8px)' }}
+            >
+              <button
+                type="button"
+                onClick={() => { triggerHaptic('light'); setSwipeDeckMode('clients'); }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 h-8 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                  swipeDeckMode === 'clients' ? "bg-primary text-black" : "text-white/60"
+                )}
+              >
+                <Users className="w-3 h-3" />
+                Clients
+              </button>
+              <button
+                type="button"
+                onClick={() => { triggerHaptic('light'); setSwipeDeckMode('listings'); }}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 h-8 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all",
+                  swipeDeckMode === 'listings' ? "bg-primary text-black" : "text-white/60"
+                )}
+              >
+                <HomeIcon className="w-3 h-3" />
+                Listings
+              </button>
+            </div>
             <div className="flex-1 min-h-0 h-full">
-              <ClientSwipeContainer
-                onClientTap={handleClientTap}
-                onInsights={handleInsights}
-                onMessageClick={onMessageClick}
-                profiles={clientProfiles}
-                isLoading={isLoading}
-                error={error}
-                insightsOpen={false}
-                category={activeCategory || 'default'}
-                filters={mergedFilters}
-              />
+              {swipeDeckMode === 'clients' ? (
+                <ClientSwipeContainer
+                  onClientTap={handleClientTap}
+                  onInsights={handleInsights}
+                  onMessageClick={onMessageClick}
+                  profiles={clientProfiles}
+                  isLoading={isLoading}
+                  error={error}
+                  insightsOpen={false}
+                  category={activeCategory || 'default'}
+                  filters={mergedFilters}
+                />
+              ) : (
+                <SwipessSwipeContainer
+                  onListingTap={() => {}}
+                  onInsights={() => {}}
+                  onMessageClick={onMessageClick}
+                />
+              )}
             </div>
           </motion.div>
         )}
@@ -276,6 +348,7 @@ const OwnerKilometerView = ({
   category, 
   onBack, 
   onNext, 
+  onSkip,
   radiusKm, 
   onRadiusChange, 
   onDetectLocation, 
@@ -358,6 +431,21 @@ const OwnerKilometerView = ({
           <span className="text-black">Initiate Scan</span>
           <ChevronRight className="w-6 h-6 text-black" />
         </motion.button>
+
+        {onSkip && (
+          <button
+            type="button"
+            onClick={onSkip}
+            className={cn(
+              "w-full h-12 rounded-2xl font-black uppercase italic tracking-[0.25em] text-[11px] border transition-all active:scale-[0.98]",
+              isLight
+                ? "bg-white/60 border-black/10 text-black/70 hover:bg-white"
+                : "bg-white/5 border-white/10 text-white/70 hover:bg-white/10"
+            )}
+          >
+            Skip → Show Swipe Deck
+          </button>
+        )}
 
         <p className={cn("text-center text-[10px] font-bold uppercase tracking-widest opacity-40", isLight ? "text-black" : "text-white")}>
           Adjust the radius to search for {title.toLowerCase()} nearby
