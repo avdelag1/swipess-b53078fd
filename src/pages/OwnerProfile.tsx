@@ -17,8 +17,10 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { cn } from "@/lib/utils";
 import { useMessagingQuota } from "@/hooks/useMessagingQuota";
 import { useModalStore } from "@/state/modalStore";
+import useAppTheme from "@/hooks/useAppTheme";
 
 const OwnerProfile = () => {
+  const { isLight } = useAppTheme();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { user, signOut } = useAuth();
   const { data: stats, isLoading: statsLoading } = useOwnerStats();
@@ -34,12 +36,12 @@ const OwnerProfile = () => {
   }
 
   return (
-    <div className="w-full relative overflow-x-hidden min-h-screen bg-[#030308] text-white">
+    <div className={cn("w-full relative overflow-x-hidden min-h-screen", isLight ? "bg-white text-slate-900" : "bg-[#030308] text-white")}>
 
       {/* Swipess Grid Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute inset-0 opacity-[0.035]"
+          className={cn("absolute inset-0", isLight ? "opacity-[0.02]" : "opacity-[0.035]")}
           style={{
             backgroundImage: `
               linear-gradient(rgba(0,212,255,0.8) 1px, transparent 1px),
@@ -48,9 +50,9 @@ const OwnerProfile = () => {
             backgroundSize: '48px 48px',
           }}
         />
-        <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[60%] bg-cyan-500/8 rounded-full blur-[140px]" />
-        <div className="absolute bottom-[10%] right-[-10%] w-[50%] h-[50%] bg-violet-600/8 rounded-full blur-[120px]" />
-        <div className="absolute top-[40%] left-[30%] w-[40%] h-[40%] bg-blue-600/5 rounded-full blur-[100px]" />
+        <div className={cn("absolute top-[-20%] left-[-10%] w-[70%] h-[60%] rounded-full blur-[140px]", isLight ? "bg-cyan-500/[0.04]" : "bg-cyan-500/8")} />
+        <div className={cn("absolute bottom-[10%] right-[-10%] w-[50%] h-[50%] rounded-full blur-[120px]", isLight ? "bg-violet-600/[0.04]" : "bg-violet-600/8")} />
+        <div className={cn("absolute top-[40%] left-[30%] w-[40%] h-[40%] rounded-full blur-[100px]", isLight ? "bg-blue-600/[0.03]" : "bg-blue-600/5")} />
       </div>
 
       <div className="w-full max-w-7xl mx-auto p-6 pt-4 pb-12 space-y-10 relative z-10">
@@ -76,14 +78,14 @@ const OwnerProfile = () => {
               }}
             >
               <div
-                className="w-full h-full overflow-hidden cursor-pointer flex items-center justify-center bg-[#080C14] border border-white/5"
+                className={cn("w-full h-full overflow-hidden cursor-pointer flex items-center justify-center border", isLight ? "bg-slate-50 border-slate-200" : "bg-[#080C14] border-white/5")}
                 style={{ borderRadius: '1.85rem' }}
                 onClick={() => { triggerHaptic('light'); setShowEditDialog(true); }}
               >
                 {ownerProfile?.profile_images?.[0] ? (
                   <img src={ownerProfile.profile_images[0]} alt="Brand" className="w-full h-full object-cover" />
                 ) : (
-                  <UserCircle className="w-16 h-16 text-white/10" />
+                  <UserCircle className={cn("w-16 h-16", isLight ? "text-slate-300" : "text-white/10")} />
                 )}
               </div>
             </motion.div>
@@ -104,11 +106,11 @@ const OwnerProfile = () => {
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-5xl font-black uppercase italic tracking-tighter leading-none text-white">
+            <h1 className={cn("text-5xl font-black uppercase italic tracking-tighter leading-none", isLight ? "text-slate-900" : "text-white")}>
               {ownerProfile?.business_name || 'Brand'}
             </h1>
             <div className="flex items-center justify-center gap-3 mt-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/25">{user?.email}</span>
+              <span className={cn("text-[10px] font-black uppercase tracking-[0.25em]", isLight ? "text-slate-500" : "text-white/25")}>{user?.email}</span>
             </div>
           </div>
         </div>
@@ -123,14 +125,14 @@ const OwnerProfile = () => {
             <motion.div
               key={i}
               whileTap={{ scale: 0.95 }}
-              className="flex flex-col items-center justify-center text-center p-5 rounded-3xl border bg-white/[0.02]"
-              style={{ borderColor: `rgba(255,255,255,0.06)`, boxShadow: `inset 0 0 30px ${stat.glow}` }}
+              className={cn("flex flex-col items-center justify-center text-center p-5 rounded-3xl border", isLight ? "border-slate-200 bg-slate-50" : "bg-white/[0.02]")}
+              style={{ borderColor: isLight ? undefined : `rgba(255,255,255,0.06)`, boxShadow: `inset 0 0 30px ${stat.glow}` }}
             >
               <stat.icon className={cn("w-5 h-5 mb-3", stat.color)} />
-              <div className="text-4xl font-black tabular-nums tracking-tighter leading-none text-white">
+              <div className={cn("text-4xl font-black tabular-nums tracking-tighter leading-none", isLight ? "text-slate-900" : "text-white")}>
                 {stat.value}
               </div>
-              <div className="text-[9px] font-black uppercase tracking-[0.2em] mt-2 text-white/30">{stat.label}</div>
+              <div className={cn("text-[9px] font-black uppercase tracking-[0.2em] mt-2", isLight ? "text-slate-500" : "text-white/30")}>{stat.label}</div>
             </motion.div>
           ))}
         </div>
