@@ -41,6 +41,7 @@ import useAppTheme from '@/hooks/useAppTheme';
 // FIX: Lazy-load modals via portal 
 const ShareDialog = lazy(() => import('./ShareDialog').then(m => ({ default: m.ShareDialog })));
 const MessageConfirmationDialog = lazy(() => import('./MessageConfirmationDialog').then(m => ({ default: m.MessageConfirmationDialog })));
+const ReportDialog = lazy(() => import('./ReportDialog').then(m => ({ default: m.ReportDialog })));
 import { OWNER_INTENT_CARDS } from './swipe/CardData';
 
 
@@ -106,6 +107,7 @@ const ClientSwipeContainerComponent = ({
 
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [_swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
@@ -934,7 +936,7 @@ const ClientSwipeContainerComponent = ({
                   onInsights={() => handleInsights(topCard.user_id)}
                   onMessage={() => handleConnect(topCard.user_id)}
                   onShare={handleShare}
-                  onReport={() => console.log('Report', topCard.user_id)}
+                  onReport={() => { triggerHaptic('medium'); setReportDialogOpen(true); }}
                   onUndo={undoLastSwipe}
                   onLike={handleButtonLike}
                   onDislike={handleButtonDislike}
@@ -1010,6 +1012,16 @@ const ClientSwipeContainerComponent = ({
               profileId={topCard.user_id}
               title={topCard.name ? `Check out ${String(topCard.name)}'s profile` : 'Check out this profile'}
               description={`Budget: $${topCard.budget_max?.toLocaleString() || 'N/A'} - Looking for: ${Array.isArray(topCard.preferred_listing_types) ? topCard.preferred_listing_types.join(', ') : 'Various properties'}`}
+            />
+          )}
+
+          {topCard && (
+            <ReportDialog
+              open={reportDialogOpen}
+              onOpenChange={setReportDialogOpen}
+              reportedUserId={topCard.user_id}
+              reportedUserName={topCard.name || undefined}
+              category="user_profile"
             />
           )}
         </Suspense>,

@@ -735,18 +735,19 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
             </div>
           )}
 
-          {/* In-Card Navigation Buttons (Tinder Style) */}
-          <div className="absolute top-[calc(var(--safe-top,0px)+80px)] left-6 right-6 z-40 flex justify-between pointer-events-none">
+          {/* In-Card Navigation Buttons — Clear & Visible */}
+          <div className="absolute top-[calc(var(--safe-top,0px)+80px)] left-4 right-4 z-40 flex justify-between pointer-events-none">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 triggerHaptic('light');
                 onShare?.();
               }}
-              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-90 transition-all pointer-events-auto"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-black/50 backdrop-blur-md border border-white/25 text-white active:scale-90 transition-all pointer-events-auto shadow-lg"
               title="Share Profile"
             >
-              <Share2 className="w-5 h-5" strokeWidth={1.5} />
+              <Share2 className="w-4 h-4" strokeWidth={2} />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Share</span>
             </button>
             <button
               onClick={(e) => {
@@ -754,10 +755,11 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
                 triggerHaptic('medium');
                 onReport?.();
               }}
-              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/70 active:scale-90 transition-all pointer-events-auto"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-red-500/30 backdrop-blur-md border border-red-400/30 text-white active:scale-90 transition-all pointer-events-auto shadow-lg"
               title="Report Profile"
             >
-              <Flag className="w-5 h-5" strokeWidth={1.5} />
+              <Flag className="w-4 h-4" strokeWidth={2} />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Report</span>
             </button>
           </div>
         </div>
@@ -766,7 +768,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
           className="absolute top-28 left-8 z-30 pointer-events-none"
           style={{ opacity: likeOpacity }}
         >
-          <div className="px-6 py-3 rounded-xl border-4 border-rose-500 text-rose-500 font-black text-3xl tracking-wider" style={{ transform: 'rotate(-12deg)' }}>
+          <div className="px-6 py-3 rounded-xl border-4 border-emerald-500 text-emerald-500 font-black text-3xl tracking-wider" style={{ transform: 'rotate(-12deg)' }}>
             YES!
           </div>
         </motion.div>
@@ -775,7 +777,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
           className="absolute top-28 right-8 z-30 pointer-events-none"
           style={{ opacity: passOpacity }}
         >
-          <div className="px-6 py-3 rounded-xl border-4 border-red-500 text-red-500 font-black text-3xl tracking-wider" style={{ transform: 'rotate(12deg)' }}>
+          <div className="px-6 py-3 rounded-xl border-4 border-red-600 text-red-600 font-black text-3xl tracking-wider" style={{ transform: 'rotate(12deg)' }}>
             NOPE
           </div>
         </motion.div>
