@@ -81,12 +81,12 @@ export const PokerCategoryCard = memo(({ card, index, isTop, isCollapsed = false
 
   // Stack styling — 🚀 Swipess v14.0 Reveal Logic
   // Memoized so background-card filter doesn't recompute on every render → no flicker.
-  const { stackY, stackScale, stackOpacity, stackedFilter } = useMemo(() => ({
-    stackY: isCollapsed ? 0 : index * 14,
-    stackScale: 1 - (index * 0.045),
-    stackOpacity: index === 0 ? 1 : Math.max(0, 0.9 - (index * 0.2)),
-    stackedFilter: isTop ? undefined : `brightness(${0.92 - index * 0.08}) blur(${index * 1.2}px)`,
-  }), [index, isCollapsed, isTop]);
+    const { stackY, stackScale, stackOpacity, stackedFilter } = useMemo(() => ({
+      stackY: 0,
+      stackScale: 1 - (index * 0.045),
+      stackOpacity: index === 0 ? 1 : Math.max(0, 0.9 - (index * 0.2)),
+      stackedFilter: isTop ? undefined : `brightness(${0.92 - index * 0.08}) blur(${index * 1.2}px)`,
+    }), [index, isTop]);
 
   if (index > 7) return null;
 
@@ -140,7 +140,7 @@ export const PokerCategoryCard = memo(({ card, index, isTop, isCollapsed = false
       className="select-none touch-none"
     >
       <div
-        className="w-full h-full relative overflow-hidden transition-colors duration-100 bg-black rounded-[2.5rem] shadow-2xl"
+        className="w-full h-full relative overflow-hidden transition-colors duration-100 bg-black rounded-[2.5rem]"
         style={{ backgroundImage: !imgReady ? fallbackGradient : undefined }}
       >
         {/* Photo & Gradient Base — compositor-only zoom driven by motion value, no inline transform fight */}
@@ -158,7 +158,7 @@ export const PokerCategoryCard = memo(({ card, index, isTop, isCollapsed = false
           }}
           draggable={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         
         {/* 🛸 Swipess METADATA CONTENT */}
         <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end p-9 md:p-11 gap-8">
@@ -195,7 +195,7 @@ export const PokerCategoryCard = memo(({ card, index, isTop, isCollapsed = false
                   triggerHaptic('medium');
                   onSelect(card.id);
                 }}
-                className="w-full h-14 rounded-2xl font-black uppercase italic tracking-widest transition-all hover:scale-[1.02] active:scale-95 bg-white text-black hover:bg-white/90 shadow-2xl"
+                className="w-full h-14 rounded-2xl font-black uppercase italic tracking-widest transition-all hover:scale-[1.02] active:scale-95 bg-white text-black hover:bg-white/90 shadow-lg"
               >
                 Engage Discovery
               </button>
