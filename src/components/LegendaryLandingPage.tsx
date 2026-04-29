@@ -114,14 +114,14 @@ const LandingView = memo(({
         transition={{ delay: 0.5, duration: 0.6 }}
       >
         <button
-          onClick={() => { triggerHaptic('medium'); onEnterAuth('login'); }}
+          onClick={() => { playRandomZen(0.35); triggerHaptic('medium'); onEnterAuth('login'); }}
           className="w-full h-14 rounded-[2rem] bg-[#FF4D00] text-white font-black uppercase tracking-[0.25em] text-[12px] shadow-[0_15px_45px_rgba(255,77,0,0.3)] active:scale-[0.97] transition-all flex items-center justify-center gap-3"
         >
           <LogIn className="w-4 h-4" />
           Sign In
         </button>
         <button
-          onClick={() => { triggerHaptic('medium'); onEnterAuth('signup'); }}
+          onClick={() => { playRandomZen(0.35); triggerHaptic('medium'); onEnterAuth('signup'); }}
           className="w-full h-14 rounded-[2rem] bg-white/10 backdrop-blur-md border border-white/15 text-white font-black uppercase tracking-[0.25em] text-[12px] active:scale-[0.97] transition-all flex items-center justify-center gap-3 hover:bg-white/15"
         >
           <Sparkles className="w-4 h-4" />
@@ -276,7 +276,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
       <div className="w-full max-w-sm bg-[#0d0d0f]/80 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-7 shadow-2xl relative overflow-hidden my-auto">
         
         <button
-          onClick={() => { triggerHaptic('light'); isForgotPassword ? setIsForgotPassword(false) : onBack(); }}
+          onClick={() => { playRandomZen(0.3); triggerHaptic('light'); isForgotPassword ? setIsForgotPassword(false) : onBack(); }}
           className="absolute top-5 left-5 w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-white/70 border border-white/5 active:scale-90 transition-all z-20"
           aria-label="Go back"
         >
@@ -303,7 +303,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
               <div className="flex items-center justify-center gap-1 bg-white/5 rounded-2xl p-1 mb-3">
                 <button
                   type="button"
-                  onClick={() => { triggerHaptic('light'); setIsLogin(true); setFieldErrors({}); }}
+                  onClick={() => { playRandomZen(0.3); triggerHaptic('light'); setIsLogin(true); setFieldErrors({}); }}
                   className={cn(
                     "flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all",
                     isLogin
@@ -315,7 +315,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
                 </button>
                 <button
                   type="button"
-                  onClick={() => { triggerHaptic('light'); setIsLogin(false); setFieldErrors({}); }}
+                  onClick={() => { playRandomZen(0.3); triggerHaptic('light'); setIsLogin(false); setFieldErrors({}); }}
                   className={cn(
                     "flex-1 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-[0.15em] transition-all",
                     !isLogin
