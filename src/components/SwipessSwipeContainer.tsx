@@ -1048,7 +1048,15 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
   if (!storeActiveCategory) {
     return (
       <>
-        <div className="relative w-full h-full">
+        {/* Constrain the category-picker stack between the top bar and bottom nav.
+            Without these paddings the cards bleed under both HUDs. */}
+        <div
+          className="relative w-full h-full"
+          style={{
+            paddingTop: 'var(--safe-top, 0px)',
+            paddingBottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 12px)',
+          }}
+        >
           <SwipeAllDashboard setCategories={(cat) => {
             setActiveCategory(cat as any);
             setCategories([cat] as any);
