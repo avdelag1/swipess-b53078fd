@@ -201,12 +201,12 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="relative flex-1 flex flex-col items-center w-full overflow-hidden z-10"
             style={{
-              paddingTop: 'calc(var(--top-bar-height) + var(--safe-top))',
+              paddingTop: 'var(--safe-top, 0px)',
               paddingBottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom) + 20px)',
               willChange: 'transform, opacity'
             }}
           >
-            <div className="flex-1 w-full relative z-10 flex flex-col justify-center">
+            <div className="flex-1 w-full relative z-10 flex flex-col items-center justify-start pt-2">
               <OwnerAllDashboard onCardSelect={handleCardSelect} />
             </div>
           </motion.div>

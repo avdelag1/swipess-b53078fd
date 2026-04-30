@@ -291,28 +291,56 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
                 />
             </div>
             
-            <div className={cn(
-                "flex items-center gap-2 p-2 rounded-[2.5rem] overflow-x-auto no-scrollbar",
-                isLight ? 'bg-black/[0.03]' : 'bg-white/[0.03]'
-            )}>
-                {tabItems.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => { triggerHaptic('light'); setActiveTab(tab.id); }}
-                        className="flex items-center gap-3 px-6 h-14 rounded-[2rem] transition-all whitespace-nowrap"
-                        style={activeTab === tab.id ? {
-                          backgroundColor: '#FF4D00',
-                          color: 'white',
-                          boxShadow: '0 6px 20px rgba(255,77,0,0.35)'
-                        } : {
-                          color: isLight ? '#000000' : '#ffffff'
-                        }}
-                    >
-                        <tab.icon className="w-4 h-4" />
-                        <span className="text-[10px] font-black uppercase tracking-widest italic">{tab.label}</span>
-                        {tab.count > 0 && <span className="text-[9px] font-black opacity-70">[{tab.count}]</span>}
-                    </button>
-                ))}
+            {/* Scrollable filter tabs with left/right fade-edge indicators */}
+            <div className="relative flex-shrink-0">
+              {/* right fade — tells the user there are more tabs to scroll */}
+              <div
+                className="absolute right-0 top-0 bottom-0 w-10 z-10 pointer-events-none rounded-r-[2.5rem]"
+                style={{
+                  background: isLight
+                    ? 'linear-gradient(to left, rgba(255,255,255,0.95) 0%, transparent 100%)'
+                    : 'linear-gradient(to left, rgba(10,15,30,0.95) 0%, transparent 100%)',
+                }}
+              />
+              {/* left fade */}
+              <div
+                className="absolute left-0 top-0 bottom-0 w-6 z-10 pointer-events-none rounded-l-[2.5rem]"
+                style={{
+                  background: isLight
+                    ? 'linear-gradient(to right, rgba(255,255,255,0.9) 0%, transparent 100%)'
+                    : 'linear-gradient(to right, rgba(10,15,30,0.9) 0%, transparent 100%)',
+                }}
+              />
+              <div className={cn(
+                  "flex items-center gap-2 p-2 rounded-[2.5rem] overflow-x-auto no-scrollbar",
+                  isLight ? 'bg-black/[0.05] border border-black/[0.06]' : 'bg-white/[0.06] border border-white/[0.06]'
+              )}>
+                  {tabItems.map((tab) => (
+                      <button
+                          key={tab.id}
+                          onClick={() => { triggerHaptic('light'); setActiveTab(tab.id); }}
+                          className="flex items-center gap-2 px-5 h-12 rounded-[2rem] transition-all whitespace-nowrap flex-shrink-0"
+                          style={activeTab === tab.id ? {
+                            backgroundColor: '#FF4D00',
+                            color: 'white',
+                            boxShadow: '0 6px 20px rgba(255,77,0,0.35)'
+                          } : {
+                            color: isLight ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.75)',
+                          }}
+                      >
+                          <tab.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span className="text-[10px] font-black uppercase tracking-widest italic">{tab.label}</span>
+                          {tab.count > 0 && (
+                            <span className={cn(
+                              "text-[9px] font-black px-1.5 py-0.5 rounded-full",
+                              activeTab === tab.id
+                                ? 'bg-white/25 text-white'
+                                : isLight ? 'bg-black/10 text-black' : 'bg-white/15 text-white'
+                            )}>{tab.count}</span>
+                          )}
+                      </button>
+                  ))}
+              </div>
             </div>
         </div>
 
