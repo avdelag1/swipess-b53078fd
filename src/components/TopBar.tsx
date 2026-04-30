@@ -182,22 +182,14 @@ function TopBarComponent({
         )}
 
         {/* RIGHT CLUSTER: Individual Action Pills */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           {!minimal && (
             <>
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => { haptics.tap(); setModal('showTokensModal', true); }}
                 className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full relative overflow-hidden"
-                style={{
-                  ...glassPillStyle,
-                  background: isLight
-                    ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(99, 102, 241, 0.14))'
-                    : 'linear-gradient(135deg, rgba(139, 92, 246, 0.28), rgba(99, 102, 241, 0.22))',
-                  boxShadow: isLight
-                    ? '0 8px 24px -6px rgba(139, 92, 246, 0.35), inset 0 0 0 1px rgba(139, 92, 246, 0.35)'
-                    : '0 12px 32px -8px rgba(139, 92, 246, 0.45), inset 0 0 0 1px rgba(139, 92, 246, 0.4)',
-                }}
+                style={glassPillStyle}
                 aria-label="Tokens"
               >
                 <Ticket
