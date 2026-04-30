@@ -794,14 +794,25 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
 
 
 
+        {/* Edge vignette — perimeter inset shadow that outlines the rounded corners
+            so the card always reads as a physical object */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[25] rounded-[24px]"
+          style={{
+            boxShadow: _isDark
+              ? 'inset 0 0 0 1.5px rgba(255,255,255,0.08), inset 0 0 50px rgba(0,0,0,0.45)'
+              : 'inset 0 0 0 1.5px rgba(0,0,0,0.10), inset 0 0 40px rgba(0,0,0,0.18)',
+          }}
+        />
+
         {/* Cinema Bottom Fade — theme-aware vignette behind nav + action buttons */}
         <div
           className="absolute left-0 right-0 bottom-0 z-15 pointer-events-none"
           style={{
             height: '60%',
             background: _isDark
-              ? 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0) 100%)'
-              : 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 35%, rgba(255,255,255,0) 100%)',
+              ? 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0) 100%)'
+              : 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.65) 35%, rgba(255,255,255,0) 100%)',
           }}
         />
 

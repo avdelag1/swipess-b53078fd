@@ -739,10 +739,21 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
         <div
           className="absolute inset-x-0 bottom-0 pointer-events-none z-10"
           style={{
-            height: '50%',
+            height: '55%',
             background: isLight
-              ? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 35%, rgba(255,255,255,0.05) 65%, transparent 100%)'
-              : 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0.05) 65%, transparent 100%)',
+              ? 'linear-gradient(to top, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.5) 35%, rgba(255,255,255,0.06) 65%, transparent 100%)'
+              : 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.06) 65%, transparent 100%)',
+          }}
+        />
+
+        {/* Edge vignette — perimeter inset shadow that outlines the rounded corners
+            so the card always reads as a physical object */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[25] rounded-[24px]"
+          style={{
+            boxShadow: isLight
+              ? 'inset 0 0 0 1.5px rgba(0,0,0,0.10), inset 0 0 40px rgba(0,0,0,0.18)'
+              : 'inset 0 0 0 1.5px rgba(255,255,255,0.08), inset 0 0 50px rgba(0,0,0,0.45)',
           }}
         />
 

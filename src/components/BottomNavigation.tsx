@@ -241,7 +241,7 @@ export const BottomNavigation = memo(({
 
 
   return (
-    <nav role="navigation" aria-label="Main navigation" className={cn('app-bottom-bar px-2 pb-2 pt-1', className, isTablet ? 'px-3' : '')} style={{ paddingBottom: 'calc(8px + max(0px, env(safe-area-inset-bottom)))' }}>
+    <nav role="navigation" aria-label="Main navigation" className={cn('app-bottom-bar px-3 pb-2 pt-1', className, isTablet ? 'px-4' : '')} style={{ paddingBottom: 'calc(8px + max(0px, env(safe-area-inset-bottom)))' }}>
       {/* ── Liquid Glass bar surface ────────────────────────────────────────
           The bar itself is a glass layer so the swipe card content shows
           through, reinforcing the "floating above" feeling. */}
@@ -256,7 +256,7 @@ export const BottomNavigation = memo(({
           // background, but ~3x cheaper per frame on the always-on bar.
           backdropFilter: 'blur(22px) saturate(220%)',
           WebkitBackdropFilter: 'blur(22px) saturate(220%)',
-          borderRadius: isTablet ? '3rem' : '0',
+          borderRadius: '2.5rem',
           padding: '4px',
           boxShadow: isLight
             ? '0 15px 40px rgba(0,0,0,0.14), inset 0 0 0 1px rgba(0,0,0,0.06)'
