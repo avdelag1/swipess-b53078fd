@@ -1048,7 +1048,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
   if (!storeActiveCategory) {
     return (
       <>
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full flex flex-col">
           <SwipeAllDashboard setCategories={(cat) => {
             setActiveCategory(cat as any);
             setCategories([cat] as any);
