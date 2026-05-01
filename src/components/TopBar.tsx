@@ -69,8 +69,8 @@ function TopBarComponent({
     borderRadius: '3rem',
     border: 'none',
     boxShadow: isLight
-      ? '0 10px 30px -5px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.05)'
-      : '0 20px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.1)',
+      ? '0 10px 30px -5px rgba(0,0,0,0.1)'
+      : '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
     pointerEvents: 'auto',
     color: isLight ? '#000000' : 'var(--hud-text)',
     // No mouse-tracking transform — the parent already runs a global mousemove
@@ -135,7 +135,7 @@ function TopBarComponent({
               <div className="w-7 h-7 rounded-[0.6rem] overflow-hidden shrink-0 flex items-center justify-center relative"
                 style={{
                   background: profile?.avatar_url ? 'transparent' : (isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)'),
-                  border: isLight ? '1.5px solid rgba(0,0,0,0.06)' : '1.5px solid rgba(255,255,255,0.1)',
+                  border: 'none',
                 }}
               >
                 {profile?.avatar_url ? (
@@ -199,8 +199,8 @@ function TopBarComponent({
                     ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(79, 70, 229, 0.18))'
                     : 'linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(79, 70, 229, 0.28))',
                   boxShadow: isLight
-                    ? '0 8px 24px -6px rgba(124, 58, 237, 0.4), inset 0 0 0 1px rgba(124, 58, 237, 0.4)'
-                    : '0 12px 32px -8px rgba(124, 58, 237, 0.5), inset 0 0 0 1px rgba(124, 58, 237, 0.5)',
+                    ? '0 8px 24px -6px rgba(124, 58, 237, 0.4)'
+                    : '0 12px 32px -8px rgba(124, 58, 237, 0.5)',
                 }}
                 aria-label="Tokens"
               >
