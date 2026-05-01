@@ -65,7 +65,7 @@ interface NavItem {
 
 // ── SPRING CONFIGS ────────────────────────────────────────────────────────────
 
-const TAP_SPRING = {
+export const TAP_SPRING = {
   type: 'spring' as const,
   stiffness: 1000, // OVERCLOCKED
   damping: 30,
