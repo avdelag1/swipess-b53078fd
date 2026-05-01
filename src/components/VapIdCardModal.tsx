@@ -86,6 +86,7 @@ export function VapIdCardModal({ isOpen, onClose }: VapIdProps) {
           className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 backdrop-blur-xl p-4"
           onClick={onClose}
         >
+          <motion.div
             initial={{ scale: 0.8, opacity: 0, y: 100 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 100 }}
