@@ -53,7 +53,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
 
   return (
     <div
-      className={cn('flex items-center gap-0.5 p-1', className)}
+      className={cn('flex items-center gap-0.5 p-1 pointer-events-auto', className)}
       style={containerStyle}
     >
       <motion.button
