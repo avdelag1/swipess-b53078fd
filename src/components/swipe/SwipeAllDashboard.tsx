@@ -66,16 +66,17 @@ export const SwipeAllDashboard = memo(({ setCategories }: SwipeAllDashboardProps
 
   return (
     <div
-      className="relative flex-1 flex flex-col items-center justify-center bg-transparent overflow-hidden"
+      className="relative flex-1 flex flex-col items-center justify-center bg-transparent"
+      style={{ paddingBottom: 'var(--bottom-nav-height, 80px)' }}
     >
       {/* 🛸 Swipess CENTERED STACK v14.0 */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="relative flex-none flex items-center justify-center transition-all"
-        style={{ 
-          height: 'min(90svh, 800px)',
-          width: 'calc(min(90svh, 800px) * 0.66667)',
+        style={{
+          height: 'min(calc(100dvh - 180px), 680px)',
+          width: 'calc(min(calc(100dvh - 180px), 680px) * 0.66667)',
           aspectRatio: '520 / 780',
           flex: 'none'
         }}

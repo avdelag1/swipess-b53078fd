@@ -196,7 +196,7 @@ const EnhancedOwnerDashboard = ({ onClientInsights, onMessageClick, filters }: E
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 1.1, y: -20 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden z-10"
+            className="absolute inset-0 flex flex-col items-center justify-center z-10"
             style={{
               willChange: 'transform, opacity'
             }}
