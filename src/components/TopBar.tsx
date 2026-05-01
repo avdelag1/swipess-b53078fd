@@ -14,6 +14,7 @@ import { NotificationPopover } from './NotificationPopover';
 import { ThemeToggle } from './ThemeToggle';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { useModalStore } from '@/state/modalStore';
+import { TAP_SPRING } from './BottomNavigation';
 
 interface TopBarProps {
   onNotificationsClick?: () => void;
@@ -63,13 +64,13 @@ function TopBarComponent({
     // Blur cost scales with radius squared. 22px is visually ~indistinguishable
     // from 36px against a busy background but ~2.6x cheaper to composite each
     // frame — and these pills are always on screen.
-    backdropFilter: 'blur(22px) saturate(220%)',
-    WebkitBackdropFilter: 'blur(22px) saturate(220%)',
+    backdropFilter: 'blur(32px) saturate(210%)',
+    WebkitBackdropFilter: 'blur(32px) saturate(210%)',
     borderRadius: '3rem',
     border: 'none',
     boxShadow: isLight
-      ? '0 12px 40px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(0,0,0,0.08)'
-      : '0 25px 70px -10px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.12)',
+      ? '0 10px 30px -5px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.05)'
+      : '0 20px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.1)',
     pointerEvents: 'auto',
     color: isLight ? '#000000' : 'var(--hud-text)',
     // No mouse-tracking transform — the parent already runs a global mousemove
@@ -110,6 +111,7 @@ function TopBarComponent({
         <div className="flex items-center gap-2 pointer-events-auto">
           {onBack ? (
             <motion.button
+              transition={TAP_SPRING}
               whileTap={{ scale: 0.9 }}
                onClick={() => { haptics.tap(); onBack(); }}
               className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full"
@@ -120,6 +122,7 @@ function TopBarComponent({
           ) : (
             user && (
             <motion.button
+              transition={TAP_SPRING}
               whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   haptics.tap();
@@ -186,6 +189,7 @@ function TopBarComponent({
           {!minimal && (
             <>
               <motion.button
+                transition={TAP_SPRING}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => { haptics.tap(); setModal('showTokensModal', true); }}
                 className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full relative overflow-hidden"

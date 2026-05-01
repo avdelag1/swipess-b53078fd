@@ -388,7 +388,7 @@ export const BottomNavigation = memo(({
                   <div className="flex items-center justify-center w-full min-h-[12px] px-0.5">
                     <span
                       className={cn(
-                        'tracking-tight relative font-black uppercase italic truncate',
+                        'tracking-wide relative font-black uppercase truncate',
                         isTablet ? 'text-[11px] max-w-[56px]' : 'text-[8px] max-w-[40px]',
                       )}
                       style={{

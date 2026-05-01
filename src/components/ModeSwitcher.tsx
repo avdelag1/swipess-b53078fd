@@ -41,12 +41,12 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
     background: isLight
       ? 'rgba(255, 255, 255, 0.92)'
       : 'rgba(15, 25, 55, 0.55)',
-    backdropFilter: 'blur(22px) saturate(220%)',
-    WebkitBackdropFilter: 'blur(22px) saturate(220%)',
+    backdropFilter: 'blur(32px) saturate(210%)',
+    WebkitBackdropFilter: 'blur(32px) saturate(210%)',
     borderRadius: '1.5rem',
     boxShadow: isLight
-      ? '0 12px 40px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(0,0,0,0.08)'
-      : '0 25px 70px -10px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.12)',
+      ? '0 10px 30px -5px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.05)'
+      : '0 20px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.1)',
   };
 
   const halfBase = "w-8 h-8 flex items-center justify-center transition-all duration-200 relative rounded-xl";
