@@ -45,8 +45,8 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
     WebkitBackdropFilter: 'blur(32px) saturate(210%)',
     borderRadius: '1.5rem',
     boxShadow: isLight
-      ? '0 10px 30px -5px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.05)'
-      : '0 20px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255,255,255,0.1)',
+      ? '0 10px 30px -5px rgba(0,0,0,0.1)'
+      : '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
   };
 
   const halfBase = "w-8 h-8 flex items-center justify-center transition-all duration-200 relative rounded-xl";
