@@ -109,10 +109,9 @@ class SoundEngine {
     try {
       this.init();
       if (!this.ctx) return;
-      // 🔔 PREMIUM CHIME
-      this.tone({ type: 'sine', startFreq: 523, gainAmount: 0.02, duration: 0.12, delay: 0 });
-      this.tone({ type: 'sine', startFreq: 659, gainAmount: 0.015, duration: 0.1, delay: 0.04 });
-      this.tone({ type: 'sine', startFreq: 784, gainAmount: 0.01, duration: 0.08, delay: 0.08 });
+      // 💧 ORGANIC WATER BUBBLE (Apple-like organic tick)
+      this.tone({ type: 'sine', startFreq: 800, endFreq: 1200, gainAmount: 0.05, duration: 0.05, attack: 0.005 });
+      this.tone({ type: 'sine', startFreq: 1200, endFreq: 1400, gainAmount: 0.02, duration: 0.03, attack: 0.01, delay: 0.02 });
     } catch (_e) {}
   }
 
@@ -120,24 +119,15 @@ class SoundEngine {
     try {
       this.init();
       if (!this.ctx) return;
-      const ctx = this.ctx;
-      const now = ctx.currentTime;
-      const noise = ctx.createBufferSource();
-      const len = Math.round(ctx.sampleRate * 0.15);
-      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-      const ch = buf.getChannelData(0);
-      for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
-      noise.buffer = buf;
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(direction === 'right' ? 1200 : 1500, now);
-      filter.frequency.exponentialRampToValueAtTime(direction === 'right' ? 300 : 200, now + 0.15);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
-      noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
-      noise.start(now); noise.stop(now + 0.15);
+      
+      // 🧘 GENTLE ZEN BOWL SWIPE (instead of digital noise)
+      // Right (Like) gets a slightly higher, ascending pitch. Left (Pass) gets a lower, descending pitch.
+      const baseFreq = direction === 'right' ? 220.00 : 174.61;
+      const endFreq = direction === 'right' ? 246.94 : 146.83;
+      
+      this.tone({ type: 'sine', startFreq: baseFreq, endFreq: endFreq, gainAmount: 0.08, duration: 0.4, attack: 0.05 });
+      this.tone({ type: 'sine', startFreq: baseFreq * 1.5, endFreq: endFreq * 1.5, gainAmount: 0.03, duration: 0.3, attack: 0.08, delay: 0.02 });
+      this.tone({ type: 'sine', startFreq: baseFreq * 2.1, gainAmount: 0.01, duration: 0.2, attack: 0.1, delay: 0.05 });
     } catch (_e) {}
   }
 
