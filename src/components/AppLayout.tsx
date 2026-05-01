@@ -19,6 +19,8 @@ import { useInstantReactivity } from '@/hooks/useInstantReactivity';
 import { cn } from '@/lib/utils';
 import { SentientHud } from './SentientHud';
 import { VapIdCardModal } from './VapIdCardModal';
+import { RadioMiniPlayer } from './RadioMiniPlayer';
+import { uiSounds } from '@/utils/uiSounds'; // ZENITH AUDIO ENGINE
 
 const NotificationSystem = lazy(() =>
   import('@/components/NotificationSystem').then(m => ({ default: m.NotificationSystem }))
@@ -41,7 +43,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { user } = useAuth();
   const { navigate } = useAppNavigate();
   const modalStore = useModalStore();
-  const { showAIChat } = modalStore;
+  const { showAIChat, showAIListing } = modalStore;
   const { activeMode } = useActiveMode();
   const { isRefreshing, pullDistance, triggered } = usePullToRefresh();
 
@@ -55,15 +57,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const { t } = useTranslation();
 
-  const { filters, setFilters, activeCategory, radiusKm, setRadiusKm } = useFilterStore(
-    useShallow((s) => ({
-      filters: s.filters,
-      setFilters: s.setFilters,
-      activeCategory: s.activeCategory,
-      radiusKm: s.radiusKm,
-      setRadiusKm: s.setRadiusKm
-    }))
-  );
+  // Filters removed from here since they are unused
 
 
 
@@ -72,10 +66,34 @@ export function AppLayout({ children }: AppLayoutProps) {
     recover();
     const frame = requestAnimationFrame(recover);
     
-    // 🚀 DISPATCH RENDER READY: Notifies index.html to remove splash screen
-    window.dispatchEvent(new CustomEvent('app-rendered'));
+    // 🚀 ZENITH READY SIGNAL:
+    // Notifies RootProviders that the layout shell is mounted.
+    // This allows the splash screen to fade out ONLY when content is ready.
+    window.dispatchEvent(new CustomEvent('zenith-ready'));
     
-    return () => cancelAnimationFrame(frame);
+    // Fallback for legacy listeners
+    window.dispatchEvent(new CustomEvent('app-rendered'));
+
+    // 🧘 ZEN TAP: Global click listener for meditation bowl sounds
+    const handleGlobalTap = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const isInteractive = target.closest('button, a, input, select, [role="button"]');
+      
+      const isDashboard = location.pathname === '/client/dashboard' || location.pathname === '/owner/dashboard';
+
+      if (isInteractive) {
+        uiSounds.playWaterDrop();
+      } else if (isDashboard) {
+        uiSounds.playZenBowl();
+      }
+    };
+
+    window.addEventListener('mousedown', handleGlobalTap);
+    
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('mousedown', handleGlobalTap);
+    };
   }, [location.pathname]);
 
   const isPublicPreview = location.pathname.startsWith('/listing/') || location.pathname.startsWith('/profile/');
@@ -83,27 +101,27 @@ export function AppLayout({ children }: AppLayoutProps) {
   const isCameraRoute = location.pathname.includes('/camera');
   const isRadioRoute = location.pathname.includes('/radio');
 
-  const isImmersive = useMemo(() => {
-    const immersiveRoutes = [
-      '/client/dashboard', 
-      '/owner/dashboard', 
-      '/client/liked-properties',
-      '/owner/properties',
-      '/owner/interested-clients',
-      '/owner/liked-clients',
-      '/client/advertise',
-      '/explore/eventos',
-      '/client/profile',
-      '/owner/profile'
-    ];
-    return immersiveRoutes.some(r => location.pathname.startsWith(r)) || 
-           location.pathname.includes('discovery') || 
-           location.pathname.includes('/listing/');
+  // AppLayout is ALWAYS a fixed shell — it never scrolls itself.
+  // DashboardLayout's #dashboard-scroll-container owns all authenticated-page scrolling.
+  // Public standalone pages (outside DashboardLayout) scroll via the main container below.
+  const isInsideDashboard = useMemo(() => {
+    const path = location.pathname;
+    // These routes go through PersistentDashboardLayout → DashboardLayout
+    // They must NOT scroll at AppLayout level — DashboardLayout handles it
+    const publicRoutes = ['/', '/reset-password', '/legal', '/about', '/faq/', '/listing/', '/profile/', '/vap-validate/', '/payment/'];
+    const isPublic = publicRoutes.some(r => path === r || path.startsWith(r));
+    return !isPublic;
   }, [location.pathname]);
 
   const isFullScreen = useMemo(() => {
-    return isCameraRoute || isRadioRoute || showAIChat;
-  }, [isCameraRoute, isRadioRoute, showAIChat]);
+    const path = location.pathname;
+    const isRadio = path.startsWith('/radio');
+    const isCamera = path.startsWith('/camera');
+    // Dashboard swipe pages are full-bleed — top bar floats transparently over them
+    const isSwipeDashboard = path === '/client/dashboard' || path === '/owner/dashboard' ||
+      path === '/client/dashboard/' || path === '/owner/dashboard/';
+    return isCamera || isRadio || showAIChat || isSwipeDashboard;
+  }, [location.pathname, showAIChat]);
 
   const handleFilterClick = () => {
     const role = userRole === 'admin' ? 'admin' : activeMode;
@@ -119,7 +137,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className={cn(
-      "w-full min-h-screen flex flex-col relative selection:bg-brand-primary/30", 
+      "w-full h-[100dvh] flex flex-col relative selection:bg-brand-primary/30 overflow-hidden", 
       "bg-background",
       theme === 'Swipess-style' && "Swipess-style"
     )}>
@@ -130,26 +148,40 @@ export function AppLayout({ children }: AppLayoutProps) {
         <NotificationSystem />
       </Suspense>
   
-      {!isAuthRoute && !isFullScreen && (!isPublicPreview || !!user) && (
-        <SentientHud side="top" className="fixed top-0 left-0 right-0 z-[10005]">
+      {!isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && (!isPublicPreview || !!user) && (
+        <SentientHud side="top" className="fixed top-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container">
           <TopBar
             userRole={userRole}
             onMessageActivationsClick={handleMessageActivationsClick}
             onFilterClick={handleFilterClick}
-            transparent={isImmersive}
-            showBack={location.pathname !== '/client/dashboard' && location.pathname !== '/owner/dashboard'}
+            transparent={location.pathname === '/client/dashboard' || location.pathname === '/owner/dashboard'}
+            showBack={!location.pathname.match(/^\/(client|owner|admin)\/dashboard\/?$/)}
+            onCenterTap={
+              !location.pathname.match(/^\/(client|owner|admin)\/dashboard\/?$/)
+                ? () => navigate(`/${activeMode}/dashboard`)
+                : undefined
+            }
           />
         </SentientHud>
       )}
 
+      {/* 🌑 ATMOSPHERIC VIGNETTE: Subtle edge darkening for focus depth */}
+      <div className="fixed inset-0 pointer-events-none z-[1] opacity-60 mix-blend-multiply" 
+        style={{ 
+          background: 'radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.15) 100%)' 
+        }} 
+      />
 
-      {/* 🛸 NO-LOCK MAIN CONTAINER: Allows children to expand the body natively */}
+      {/* SHELL CONTAINER: Always fixed-height. DashboardLayout handles scrolling inside. */}
       <main
         id="main-content"
         className={cn(
           "w-full flex-1 relative z-0 flex flex-col",
-          // 🛡️ RADIO PROTECTION: Ensure Radio/Camera routes are always fixed/fullscreen
-          isFullScreen && "h-screen overflow-hidden fixed inset-0"
+          // Push content down below the fixed header
+          !isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && "pt-[var(--top-bar-height)]",
+          // Dashboard pages: overflow-hidden, DashboardLayout scrolls internally
+          // Public/standalone pages: overflow-y-auto, scroll at this level
+          (isInsideDashboard || isFullScreen) ? "overflow-hidden" : "overflow-y-auto scroll-area-momentum pb-[var(--bottom-nav-height)]"
         )}
       >
         <div className="w-full flex-1 flex flex-col">
@@ -164,8 +196,8 @@ export function AppLayout({ children }: AppLayoutProps) {
 
 
 
-      {!isAuthRoute && !isFullScreen && (!isPublicPreview || !!user) && (
-        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[9999]">
+      {!isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && (!isPublicPreview || !!user) && (
+        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[9999]" scrollTargetSelector="#dashboard-scroll-container">
           <BottomNavigation
             userRole={userRole}
             onFilterClick={handleFilterClick}
@@ -173,6 +205,9 @@ export function AppLayout({ children }: AppLayoutProps) {
           />
         </SentientHud>
       )}
+
+      {/* 📻 CONNECTED RADIO: Floating player bubble - Hidden on radio/full-screen routes */}
+      {!isFullScreen && <RadioMiniPlayer />}
     </div>
   );
 }

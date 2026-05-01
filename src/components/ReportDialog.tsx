@@ -120,7 +120,7 @@ export function ReportDialog({
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <DialogDescription className="text-sm font-medium opacity-40 leading-relaxed pt-2">
+              <DialogDescription className="text-sm font-medium opacity-70 leading-relaxed pt-2">
                 Help us keep the Swipess ecosystem clean. Your report will be reviewed by our neural moderation matrix.
                 {(reportedUserName || reportedListingTitle) && (
                   <span className={cn(
@@ -137,7 +137,7 @@ export function ReportDialog({
           <div className="px-8 pb-8">
             <form onSubmit={handleSubmit} className="space-y-8 mt-4">
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 ml-1">Incident Category</Label>
+                <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-70 ml-1">Incident Category</Label>
 
                 <RadioGroup value={selectedReportType} onValueChange={(value) => setSelectedReportType(value as ReportType | '')}>
                   <div className="space-y-3">
@@ -163,7 +163,7 @@ export function ReportDialog({
                             <div className={cn("text-[14px] font-black uppercase italic tracking-tight", isLight ? "text-black" : "text-white")}>
                               {REPORT_TYPE_LABELS[type]}
                             </div>
-                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-30 mt-1 leading-relaxed">
+                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-1 leading-relaxed">
                               {REPORT_TYPE_DESCRIPTIONS[type]}
                             </div>
                           </div>
@@ -182,7 +182,7 @@ export function ReportDialog({
                     exit={{ opacity: 0, height: 0 }}
                     className="space-y-3"
                   >
-                    <Label htmlFor="description" className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40 ml-1">
+                    <Label htmlFor="description" className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-70 ml-1">
                       Neural Details <span className="text-red-500">*</span>
                     </Label>
                     <Textarea
@@ -196,7 +196,7 @@ export function ReportDialog({
                       )}
                       required
                     />
-                    <div className="flex items-center gap-2 px-2 opacity-30">
+                    <div className="flex items-center gap-2 px-2 opacity-70">
                        <Shield className="w-3 h-3" />
                        <p className="text-[9px] font-black uppercase tracking-widest">Confidential Submission • 24h SLA</p>
                     </div>

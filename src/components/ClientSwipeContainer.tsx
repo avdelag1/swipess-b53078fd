@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect, memo, lazy, Suspense } from 'react';
+import { useState, useCallback, useRef, useEffect, memo, lazy, Suspense, useMemo } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { useModalStore } from '@/state/modalStore';
 import { createPortal } from 'react-dom';
@@ -33,15 +33,16 @@ import { useStartConversation } from '@/hooks/useConversations';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '@/utils/prodLogger';
 import { SwipeExhaustedState } from './swipe/SwipeExhaustedState';
-import { Home, RefreshCw, ChevronLeft } from 'lucide-react';
+import { Home, RefreshCw, ChevronLeft, SlidersHorizontal } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
-import { SwipeLoadingSkeleton } from './swipe/SwipeLoadingSkeleton';
 
 // FIX: Lazy-load modals via portal 
 const ShareDialog = lazy(() => import('./ShareDialog').then(m => ({ default: m.ShareDialog })));
 const MessageConfirmationDialog = lazy(() => import('./MessageConfirmationDialog').then(m => ({ default: m.MessageConfirmationDialog })));
-import { POKER_CARDS, OWNER_INTENT_CARDS } from './swipe/SwipeConstants';
+const ReportDialog = lazy(() => import('./ReportDialog').then(m => ({ default: m.ReportDialog })));
+import { OWNER_INTENT_CARDS } from './swipe/CardData';
 
 
 
@@ -66,14 +67,13 @@ const ClientSwipeContainerComponent = ({
   error: externalError,
   insightsOpen: _insightsOpen = false,
   category = 'default',
-  filters
+  filters,
 }: ClientSwipeContainerProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { theme, isLight } = useAppTheme();
+  const { isLight } = useAppTheme();
   // PERF: Get userId from auth to pass to query (avoids getUser() inside queryFn)
   const { user } = useAuth();
-  const { data: userRole } = useUserRole(user?.id);
 
   // Dynamic labels based on category
   const getCategoryLabel = () => {
@@ -82,25 +82,43 @@ const ClientSwipeContainerComponent = ({
       case 'bicycle': return { singular: 'Bicycle', plural: 'Bicycles', searchText: 'Searching for Bicycles', Icon: Bike, color: 'text-rose-500' };
       case 'motorcycle': return { singular: 'Motorcycle', plural: 'Motorcycles', searchText: 'Searching for Motorcycles', Icon: MotorcycleIcon, color: 'text-orange-500' };
       case 'services':
-      case 'worker': return { singular: 'Job', plural: 'Jobs', searchText: 'Searching for Jobs', Icon: Wrench, color: 'text-purple-500' };
+      case 'worker':
+      case 'hire': return { singular: 'Service', plural: 'Services', searchText: 'Searching for Service Clients', Icon: Wrench, color: 'text-purple-500' };
+      case 'buyers': return { singular: 'Buyer', plural: 'Buyers', searchText: 'Searching for Buyers', Icon: Users, color: 'text-pink-500' };
+      case 'renters': return { singular: 'Renter', plural: 'Renters', searchText: 'Searching for Renters', Icon: Users, color: 'text-orange-500' };
+      case 'all-clients': return { singular: 'Client', plural: 'All Clients', searchText: 'Searching for Clients', Icon: Users, color: 'text-cyan-500' };
       default: return { singular: 'Client', plural: 'Clients', searchText: 'Searching for Clients', Icon: Users, color: 'text-pink-500' };
     }
   };
 
   const labels = getCategoryLabel();
+  const storeActiveCategory = useFilterStore((s) => s.activeCategory);
   const setActiveCategory = useFilterStore((s) => s.setActiveCategory);
 
-  const handleMapCategorySelect = useCallback((nextCategory: 'property' | 'motorcycle' | 'bicycle' | 'services') => {
-    setActiveCategory(nextCategory);
-  }, [setActiveCategory]);
+
+  // DEBUG: Monitor if activeCategory changes unexpectedly
+  useEffect(() => {
+    if (storeActiveCategory && storeActiveCategory !== category) {
+      console.warn('[ClientSwipeContainer] Store activeCategory differs from component category:', { storeActiveCategory, componentCategory: category });
+    }
+  }, [storeActiveCategory, category]);
+
+
 
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [_swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const cardRef = useRef<SimpleOwnerSwipeCardRef>(null);
+
+  // Prevent accidental back button clicks within 1.5 seconds of mount
+  const [canClickBack, setCanClickBack] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setCanClickBack(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // PERF: Use selective subscriptions to prevent re-renders on unrelated store changes
   // Only subscribe to actions (stable references) - NOT to ownerDecks object
@@ -126,6 +144,47 @@ const ClientSwipeContainerComponent = ({
 
   // PERF: Get initial state ONCE using getState() - no subscription
   // This is synchronous and doesn't cause re-renders when store updates
+  const radiusKm = useFilterStore(s => s.radiusKm);
+  const setRadiusKm = useFilterStore(s => s.setRadiusKm);
+  const userLatitude = useFilterStore(s => s.userLatitude);
+  const userLongitude = useFilterStore(s => s.userLongitude);
+  const setUserLocation = useFilterStore(s => s.setUserLocation);
+  
+  const [locationDetecting, setLocationDetecting] = useState(false);
+  const [locationDetected, setLocationDetected] = useState(false);
+
+  const handleCycleCategory = useCallback(() => {
+    triggerHaptic('heavy');
+    const cycle: string[] = ['buyers', 'renters', 'hire'];
+    const currentIdx = cycle.indexOf(storeActiveCategory as any);
+    const nextIdx = (currentIdx + 1) % cycle.length;
+    setActiveCategory(cycle[nextIdx] as any);
+  }, [storeActiveCategory, setActiveCategory]);
+
+  const radarNodes = useMemo(() => (externalProfiles || []).map(p => ({
+    id: p.user_id || p.id,
+    lat: p.latitude || 0,
+    lng: p.longitude || 0,
+    label: p.name || 'Found'
+  })), [externalProfiles]);
+
+  const detectLocation = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setLocationDetecting(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation(pos.coords.latitude, pos.coords.longitude);
+        setRadiusKm(5); // Auto-set to 5km when location is detected
+        setLocationDetected(true);
+        setLocationDetecting(false);
+      },
+      () => {
+        setLocationDetecting(false);
+      },
+      { timeout: 8000, maximumAge: 60000 }
+    );
+  }, [setUserLocation, setRadiusKm]);
+
   // CRITICAL: Filter out own profile from cached deck items
   const _filterOwnProfile = useCallback((items: any[], userId: string | undefined) => {
     if (!userId) return items;
@@ -158,6 +217,13 @@ const ClientSwipeContainerComponent = ({
   // Sync state with ref on mount
   useEffect(() => {
     setCurrentIndex(currentIndexRef.current);
+  }, []);
+
+  // FLICKER FIX: Track whether we've given the query a chance to start fetching.
+  const isMountSettledRef = useRef(false);
+  useEffect(() => {
+    const t = setTimeout(() => { isMountSettledRef.current = true; }, 400);
+    return () => clearTimeout(t);
   }, []);
 
   // PERF FIX: Create stable filter signature for deck versioning
@@ -666,29 +732,7 @@ const ClientSwipeContainerComponent = ({
     }
   }, [handleSwipe]);
 
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    setIsRefreshMode(false);
-    triggerHaptic('medium');
 
-    // Reset local state and refs
-    currentIndexRef.current = 0;
-    setCurrentIndex(0);
-    deckQueueRef.current = [];
-    swipedIdsRef.current.clear();
-    setPage(0);
-
-    // Reset store
-    resetOwnerDeck(category);
-
-    try {
-      await refetch();
-    } catch (_err) {
-      appToast.error('Refresh failed', 'Please try again.');
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, [refetch, resetOwnerDeck, category]);
 
   const handleInsights = useCallback((clientId: string) => {
     navigate(`/owner/view-client/${clientId}`);
@@ -758,17 +802,18 @@ const ClientSwipeContainerComponent = ({
   // isReady means we've fully initialized at least once - skip loading UI on return
   const hasHydratedData = isOwnerHydrated(category) || isOwnerReady(category) || deckQueue.length > 0;
 
-  const showLoadingSkeleton = !hasHydratedData && isLoading;
+  // Loading skeleton - only show if we have NO data and we are either actually loading OR just mounted
+  const showLoadingSkeleton = !hasHydratedData && (isLoading || !isMountSettledRef.current);
 
   // "All Caught Up" — user has swiped through every card in the current deck
   // Only true once past initial load and topCard is exhausted
-  const _isDeckFinished = !showLoadingSkeleton && topCard === null && (hasHydratedData || !isLoading);
+  const _isDeckFinished = !showLoadingSkeleton && topCard === null && (hasHydratedData || !isLoading || isMountSettledRef.current);
 
   // showInitialError: Only show if we have NO cards and a hard error occurred during initial load
   const _showInitialError = !hasHydratedData && error && deckQueue.length === 0;
 
   // showEmptyState: Only show if loading is DONE and we still have no cards
-  const _showEmptyState = !isLoading && deckQueue.length === 0 && !error;
+  const _showEmptyState = !isLoading && deckQueue.length === 0 && !error && isMountSettledRef.current;
 
   // ========================================
   // 🔥 SINGLE RETURN BLOCK - SAFE ORDER
@@ -779,9 +824,11 @@ const ClientSwipeContainerComponent = ({
   if (showLoadingSkeleton) {
     return (
       <div className="relative w-full h-full flex-1 flex flex-col">
+        {/* 📡 Radar HUD removed from skeleton to prevent double-render flash */}
+
         <div className="relative flex-1 w-full">
-          <div className="absolute inset-0 rounded-3xl overflow-hidden bg-muted/30 animate-pulse">
-            <div className="absolute inset-0 bg-gradient-to-br from-muted/50 via-muted/30 to-muted/50">
+          <div className="absolute inset-0 rounded-3xl overflow-hidden bg-white/8 animate-pulse">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-white/10">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"
                 style={{ animationDuration: '1.5s', backgroundSize: '200% 100%' }} />
             </div>
@@ -826,31 +873,46 @@ const ClientSwipeContainerComponent = ({
 
   return (
     <>
-      <div className="relative w-full h-full overflow-hidden flex flex-col bg-[#0a0a0b]">
+      <div className={cn(
+        "relative w-full h-full flex flex-col transition-colors duration-500 min-h-0",
+        isLight ? "bg-transparent" : "bg-black"
+      )}>
+        <div className={cn(
+          "absolute inset-0 pointer-events-none -z-10 transition-colors duration-500",
+          isLight ? "bg-transparent" : "bg-black"
+        )} />
+
         {/* Static ambient background */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10" />
 
-        {/* Top Controls — IN FLOW, not absolute (matches client-side pattern) */}
-        {deckQueue.length > 0 && currentIndex < deckQueue.length && (
-          <div className="absolute top-0 left-0 right-0 z-50 w-full flex flex-col items-center">
-              <div className="w-full flex items-center justify-between px-6 pt-10 pb-4">
-                {/* Back (Top Left) */}
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => navigate(-1)}
-                  className={cn(
-                    "w-10 h-10 flex items-center justify-center transition-all rounded-full backdrop-blur-md border",
-                    isLight ? "bg-white/10 border-black/5 text-black/40 hover:text-black" : "bg-black/20 border-white/5 text-white/40 hover:text-white"
-                  )}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </motion.button>
-
-                <div className="flex items-center gap-2" />
-              </div>
+        {/* Header Controls — ONLY visible when NO cards (e.g. radar/kilometer screen) */}
+        {!topCard && (
+          <div className="absolute top-[calc(var(--safe-top,0px)+64px)] left-4 z-[70] flex items-center gap-3 pointer-events-auto">
+            <button
+              onClick={() => {
+                if (!canClickBack) return;
+                triggerHaptic('light');
+                setActiveCategory(null);
+              }}
+              disabled={!canClickBack}
+              className={cn(
+                "flex items-center justify-center w-10 h-10 rounded-full border transition-all active:scale-90",
+                isLight ? "bg-white border-black/10 text-black" : "bg-black/80 border-white/20 text-white",
+                !canClickBack && "opacity-50 cursor-not-allowed"
+              )}
+              title="Back to Sectors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <span className={cn("text-sm font-black uppercase tracking-wider", isLight ? "text-black" : "text-white")}>
+              {labels.plural}
+            </span>
           </div>
         )}
-        <div className="flex-1 relative flex flex-col items-center justify-center px-1.5 pt-1 z-10 min-h-0">
+
+        {/* 📡 Radar HUD removed from here — now managed at the Dashboard level for persistence */}
+
+        <div className="flex-1 relative flex flex-col items-center justify-center z-10 min-h-0 pointer-events-auto">
         <div className="w-full h-full flex items-center justify-center pointer-events-auto">
           <AnimatePresence mode="popLayout" initial={false}>
             {topCard ? (
@@ -860,26 +922,9 @@ const ClientSwipeContainerComponent = ({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 1.1, y: -20 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full h-[calc(100%-20px)] max-w-xl mx-auto"
+                className="absolute inset-0 w-full h-[100dvh] sm:h-full sm:max-w-[480px] sm:mx-auto"
               >
-                {/* Back card (Peek) */}
-                {_nextCard && (
-                  <motion.div 
-                    className="absolute inset-0 z-10"
-                    style={{
-                      scale: nextCardScale,
-                      opacity: nextCardOpacity,
-                      willChange: 'transform, opacity',
-                    }}
-                  >
-                    <SimpleOwnerSwipeCard
-                      key={_nextCard.user_id}
-                      profile={_nextCard}
-                      onSwipe={() => { }}
-                      isTop={false}
-                    />
-                  </motion.div>
-                )}
+
 
                 {/* Front card */}
                 <SimpleOwnerSwipeCard
@@ -891,42 +936,62 @@ const ClientSwipeContainerComponent = ({
                   onInsights={() => handleInsights(topCard.user_id)}
                   onMessage={() => handleConnect(topCard.user_id)}
                   onShare={handleShare}
+                  onReport={() => { triggerHaptic('medium'); setReportDialogOpen(true); }}
                   onUndo={undoLastSwipe}
                   onLike={handleButtonLike}
                   onDislike={handleButtonDislike}
                   canUndo={canUndo}
                   isTop={true}
+                  fullScreen={true}
                   externalX={topCardX}
                 />
               </motion.div>
-            ) : !externalIsLoading ? (
-               <motion.div
-                 key="exhausted"
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
-                 exit={{ opacity: 0 }}
-                 className="w-full h-full z-50 overflow-hidden"
-               >
-                <SwipeExhaustedState
-                  isRefreshing={isRefreshing}
-                  onRefresh={handleRefresh}
-                  error={externalError}
-                />
-               </motion.div>
             ) : (
-              <motion.div 
-                key="loading-skeleton"
+              <motion.div
+                key="exhausted"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="w-full h-full flex items-center justify-center"
+                className="w-full h-full z-50 overflow-hidden"
               >
-                <SwipeLoadingSkeleton />
+                <SwipeExhaustedState
+                  radiusKm={radiusKm}
+                  onRadiusChange={setRadiusKm as any}
+                  onDetectLocation={detectLocation}
+                  detecting={locationDetecting}
+                  detected={locationDetected}
+                  categoryName={labels.plural}
+                  isLoading={isLoading || !isMountSettledRef.current}
+                  activeCategory={storeActiveCategory || category}
+                  onCategoryChange={(cat) => {
+                    setActiveCategory(cat as any);
+                  }}
+                  onOpenFilters={() => {
+                    navigate('/owner/filters');
+                  }}
+                  role="owner"
+                />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
         </div>
+
+
+        {/* 🛸 ACTION BAR: Floating over the card near the bottom nav */}
+        {topCard && (
+          <div className="absolute bottom-[calc(var(--bottom-nav-height,72px)+16px)] left-0 right-0 z-[60] flex justify-center pointer-events-auto">
+            <SwipeActionButtonBar
+              onLike={handleButtonLike}
+              onDislike={handleButtonDislike}
+              onShare={handleShare}
+              onInsights={() => handleInsights(topCard.user_id)}
+              onUndo={undoLastSwipe}
+              onMessage={() => handleConnect(topCard.user_id)}
+              canUndo={canUndo}
+            />
+          </div>
+        )}
       </div>
 
 
@@ -947,6 +1012,16 @@ const ClientSwipeContainerComponent = ({
               profileId={topCard.user_id}
               title={topCard.name ? `Check out ${String(topCard.name)}'s profile` : 'Check out this profile'}
               description={`Budget: $${topCard.budget_max?.toLocaleString() || 'N/A'} - Looking for: ${Array.isArray(topCard.preferred_listing_types) ? topCard.preferred_listing_types.join(', ') : 'Various properties'}`}
+            />
+          )}
+
+          {topCard && (
+            <ReportDialog
+              open={reportDialogOpen}
+              onOpenChange={setReportDialogOpen}
+              reportedUserId={topCard.user_id}
+              reportedUserName={topCard.name || undefined}
+              category="user_profile"
             />
           )}
         </Suspense>,

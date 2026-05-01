@@ -1,205 +1,142 @@
-import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { deckFadeVariants } from '@/utils/modernAnimations';
 import { cn } from '@/lib/utils';
-import { useFilterStore, useFilterActions } from '@/state/filterStore';
-import { triggerHaptic } from '@/utils/haptics';
 import useAppTheme from '@/hooks/useAppTheme';
-import { RefreshCw, RotateCcw, Zap, SlidersHorizontal, ChevronLeft, Home, Bike, Briefcase } from 'lucide-react';
-import { MotorcycleIcon } from '@/components/icons/MotorcycleIcon';
-import { Button } from '@/components/ui/button';
-import { useCardReset } from '@/hooks/useCardReset';
+import { triggerHaptic } from '@/utils/haptics';
+import { DistanceSlider } from './DistanceSlider';
+import { SlidersHorizontal } from 'lucide-react';
 
 interface SwipeExhaustedStateProps {
-  isRefreshing: boolean;
-  onRefresh: () => void;
-  error?: any;
-  isInitialLoad?: boolean;
+  radiusKm?: number;
+  onRadiusChange?: (km: number) => void;
+  onDetectLocation?: () => void;
+  detecting?: boolean;
+  detected?: boolean;
+  categoryName?: string;
+  isLoading?: boolean;
+  activeCategory?: string;
+  onCategoryChange?: (category: string) => void;
+  onOpenFilters?: () => void;
+  role?: 'client' | 'owner';
+  [key: string]: any;
 }
 
-const CATEGORY_ICONS: Record<string, { icon: any; label: string; color: string }> = {
-  all:        { icon: Zap,            label: 'All',         color: '#ec4899' },
-  property:   { icon: Home,           label: 'Property',    color: '#3b82f6' },
-  motorcycle: { icon: MotorcycleIcon, label: 'Motos',       color: '#f97316' },
-  bicycle:    { icon: Bike,           label: 'Bikes',       color: '#f43f5e' },
-  services:   { icon: Briefcase,      label: 'Work',        color: '#a855f7' },
-  worker:     { icon: Briefcase,      label: 'Work',        color: '#a855f7' },
-};
-
 export const SwipeExhaustedState = ({
-  isRefreshing,
-  onRefresh,
-  error,
-  isInitialLoad = false,
+  radiusKm = 50,
+  onRadiusChange,
+  onDetectLocation,
+  detecting = false,
+  detected = false,
+  categoryName = 'listings',
+  isLoading = false,
+  activeCategory = 'property',
+  onCategoryChange,
+  onOpenFilters,
+  role = 'client',
 }: SwipeExhaustedStateProps) => {
-  const { theme } = useAppTheme();
-  const { setCategories } = useFilterActions();
-  const activeCategory = useFilterStore(s => s.activeCategory);
-  const setActiveCategory = useFilterStore(s => s.setActiveCategory);
-  const resetMutation = useCardReset();
-  const [scanIteration, setScanIteration] = useState(0);
-  const [isScanBurstActive, setIsScanBurstActive] = useState(false);
+  const { isLight } = useAppTheme();
 
-  useEffect(() => {
-    if (scanIteration === 0) return;
-    setIsScanBurstActive(true);
-    const timeout = window.setTimeout(() => {
-      setIsScanBurstActive(false);
-    }, 6000);
-    return () => window.clearTimeout(timeout);
-  }, [scanIteration]);
+  const clientCategories = [
+    { id: 'property', label: 'Properties' },
+    { id: 'motorcycle', label: 'Motorcycles' },
+    { id: 'bicycle', label: 'Bicycles' },
+    { id: 'services', label: 'Services' },
+  ];
 
-  const handleCategorySwitch = (catId: string) => {
-    triggerHaptic('medium');
-    setCategories([catId as any]);
-  };
+  const ownerCategories = [
+    { id: 'buyers', label: 'Buyers' },
+    { id: 'renters', label: 'Renters' },
+    { id: 'hire', label: 'Services' },
+  ];
 
-  const handleRefreshClick = () => {
-    triggerHaptic('medium');
-    setScanIteration((current) => current + 1);
-    onRefresh();
-  };
-
-  const activeCatInfo = activeCategory ? CATEGORY_ICONS[activeCategory] : null;
-
-  if (error && isInitialLoad) {
-    return (
-      <AnimatePresence mode="wait">
-        <motion.div 
-          key="error" 
-          variants={deckFadeVariants} 
-          initial="initial" 
-          animate="animate" 
-          exit="exit" 
-          className="relative w-full z-50 flex flex-col items-center justify-center px-4 bg-background"
-          style={{ minHeight: 'calc(100dvh - 120px)' }}
-        >
-          <div className="text-center bg-destructive/5 border-destructive/20 p-10 rounded-[3rem] backdrop-blur-3xl border">
-            <div className="text-7xl mb-6">📡</div>
-            <h3 className="text-2xl font-black mb-3 text-destructive tracking-tighter uppercase">System Disconnected</h3>
-            <p className="text-muted-foreground/80 mb-8 max-w-[280px] mx-auto text-sm leading-relaxed">
-              We've lost the uplink. Recalibrate and try again.
-            </p>
-            <Button 
-              onClick={onRefresh} 
-              variant="outline" 
-              className="gap-3 h-14 px-8 rounded-full border-destructive/30 hover:bg-destructive/10 transition-all font-black uppercase text-xs"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Repair Connection
-            </Button>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    );
-  }
+  // Filter out the active category so the grid doesn't show "switch to current"
+  const allCategories = role === 'owner' ? ownerCategories : clientCategories;
+  const categories = allCategories.filter((c) => c.id !== activeCategory);
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div 
-        key="exhausted" 
-        variants={deckFadeVariants} 
-        initial="initial" 
-        animate="animate" 
-        exit="exit" 
-        className="relative z-50 h-full w-full overflow-hidden flex flex-col items-center justify-center bg-transparent px-6"
-      >
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[120px] opacity-20"
-            style={{ background: activeCatInfo?.color || '#ec4899' }}
-          />
-        </div>
-
-        {/* BACK TO QUICK FILTERS */}
-        <div className="absolute top-4 left-4 z-[90]">
-           <button
-             onClick={() => {
-               triggerHaptic('medium');
-               setActiveCategory(null);
-               setCategories([]);
-             }}
-             className="flex items-center gap-2 px-4 h-11 rounded-2xl shadow-2xl backdrop-blur-3xl border transition-all active:scale-95 group bg-black/60 border-white/10 text-white"
-           >
-             <ChevronLeft className="w-5 h-5 -ml-1 transition-transform group-hover:-translate-x-1" />
-             <span className="text-[10px] font-black uppercase tracking-[0.15em]">Back</span>
-           </button>
-        </div>
-
-        <div className="relative flex flex-col items-center text-center max-w-sm z-10">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', damping: 15 }}
-            className="mb-10 relative"
-          >
-            <div 
-              className="w-28 h-28 rounded-[2.5rem] bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl relative overflow-hidden group"
-              style={{ boxShadow: `0 20px 50px -10px ${activeCatInfo?.color || '#ec4899'}40` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              {activeCatInfo ? (
-                <activeCatInfo.icon className="w-12 h-12 text-white" strokeWidth={1.5} />
-              ) : (
-                <Zap className="w-12 h-12 text-white" strokeWidth={1.5} />
-              )}
-            </div>
-            <motion.div 
-              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="absolute -inset-4 border border-white/10 rounded-[3rem] -z-1" 
-            />
-          </motion.div>
-
-          <h3 className="text-3xl font-black italic tracking-tighter uppercase text-white mb-4 leading-none">
-            Discovery Complete
-          </h3>
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40 mb-10 leading-relaxed px-4">
-            You've analyzed all signals in this sector. Recalibrate your range or switch protocols to find new matches.
+    <div className="relative z-50 h-full w-full flex flex-col items-center justify-center bg-transparent px-6 pt-16">
+      <div className="flex flex-col items-center text-center w-full max-w-md gap-6">
+        {/* Message */}
+        <div className="space-y-2">
+          <p className={cn(
+            "text-[10px] font-black uppercase tracking-[0.3em] mb-1 italic",
+            isLoading ? (isLight ? "text-black/40" : "text-white/40") : "text-primary drop-shadow-[0_0_10px_rgba(236,72,153,0.3)]"
+          )}>
+            {isLoading ? `Initializing Sector Scan...` : `No ${categoryName} Found Nearby`}
           </p>
+          <h2 className={cn("text-3xl font-black tracking-tight uppercase italic", isLight ? "text-black" : "text-white")}>
+            {isLoading ? 'Scanning...' : 'Adjust Radius'}
+          </h2>
+        </div>
 
-          <div className="flex flex-col gap-3 w-full">
-            <Button
-              onClick={handleRefreshClick}
-              disabled={isRefreshing}
-              className="h-16 w-full rounded-[1.8rem] bg-primary text-black font-black uppercase italic tracking-widest shadow-[0_15px_35px_rgba(var(--color-brand-primary-rgb),0.3)] active:scale-95 transition-all flex items-center justify-center gap-3 border-none"
-            >
-              <RefreshCw className={cn("w-5 h-5", isRefreshing && "animate-spin")} />
-              {isRefreshing ? 'Tuning Intelligence...' : 'Relaunch Scan'}
-            </Button>
-            
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                disabled={resetMutation.isPending}
+        {/* Distance slider — centered, the main control */}
+        {onRadiusChange && onDetectLocation && (
+          <div className="w-full relative pt-12">
+            {/* Main filter icon button — top-right of slider, isolated above slider content */}
+            {onOpenFilters && (
+              <button
                 onClick={() => {
-                  triggerHaptic('heavy');
-                  resetMutation.mutate(activeCategory as any || 'all');
+                  triggerHaptic('light');
+                  onOpenFilters();
                 }}
-                className="flex-1 h-16 rounded-[1.8rem] bg-white/5 hover:bg-white/10 border-white/10 text-white font-black uppercase italic tracking-widest transition-all active:scale-95"
+                className={cn(
+                  "absolute top-0 right-0 z-10 w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-90 border",
+                  isLight ? "bg-white/80 border-black/10 hover:bg-white" : "bg-white/10 border-white/15 hover:bg-white/20"
+                )}
+                title="Open advanced filters"
+                aria-label="Open advanced filters"
               >
-                <RotateCcw className={cn("mr-2 w-5 h-5 text-orange-400", resetMutation.isPending && "animate-spin")} />
-                Reset
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => {
-                  triggerHaptic('medium');
-                  (window as any).dispatchEvent(new CustomEvent('open-filters'));
-                }}
-                className="w-16 h-16 rounded-[1.8rem] bg-white/5 hover:bg-white/10 border-white/10 flex items-center justify-center p-0 shadow-2xl transition-all active:scale-95"
-              >
-                <SlidersHorizontal className="h-5 w-5 text-primary" />
-              </Button>
+                <SlidersHorizontal className="w-4 h-4 text-primary" />
+              </button>
+            )}
+
+            <DistanceSlider
+              radiusKm={radiusKm}
+              onRadiusChange={onRadiusChange}
+              onDetectLocation={onDetectLocation}
+              detecting={detecting}
+              detected={detected}
+            />
+          </div>
+        )}
+
+        <p className={cn("text-xs", isLight ? "text-black/40" : "text-white/40")}>
+          Move the slider to search further
+        </p>
+
+        {/* Quick filter switcher — allows changing category without going back */}
+        {onCategoryChange && (
+          <div className="w-full space-y-2 mt-2">
+            <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-50", isLight ? "text-black" : "text-white")}>
+              Or try another
+            </p>
+            <div className={cn(
+              "grid gap-2",
+              categories.length >= 3 ? 'grid-cols-3' : categories.length === 2 ? 'grid-cols-2' : 'grid-cols-1'
+            )}>
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    onCategoryChange(cat.id);
+                  }}
+                  className={cn(
+                    "py-2 px-3 rounded-full text-xs font-black uppercase tracking-wider transition-all active:scale-95 border",
+                    activeCategory === cat.id
+                      ? isLight
+                        ? "bg-black text-white border-black/30"
+                        : "bg-white/20 text-white border-white/30"
+                      : isLight
+                      ? "bg-white/50 text-black border-black/10 hover:bg-white/70"
+                      : "bg-white/10 text-white border-white/10 hover:bg-white/20"
+                  )}
+                >
+                  {cat.label}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
-
-        <div className="absolute bottom-12 left-0 right-0 flex justify-center opacity-20 pointer-events-none">
-          <p className="text-[8px] font-black uppercase tracking-[0.6em] italic">Sector Scan Logic Verified</p>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        )}
+      </div>
+    </div>
   );
 };

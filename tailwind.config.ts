@@ -30,13 +30,35 @@ export default {
 			center: true,
 			padding: '2rem',
 			screens: {
+				'xs': '375px',
 				'2xl': '1400px'
 			}
 		},
+		screens: {
+			'xs': '375px',
+			'sm': '640px',
+			'md': '768px',
+			'lg': '1024px',
+			'xl': '1280px',
+			'2xl': '1400px',
+		},
 		extend: {
-		fontFamily: {
+			fontFamily: {
 				sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'system-ui', 'sans-serif'],
 				'brand': ['Quicksand', 'Poppins', 'system-ui', 'sans-serif'],
+			},
+			fontSize: {
+				// 🌊 FLUID TYPOGRAPHY: Automatically scales perfectly across all iOS/Android screen sizes
+				'xs': ['clamp(0.70rem, 0.65rem + 0.25vw, 0.75rem)', { lineHeight: '1rem' }],
+				'sm': ['clamp(0.80rem, 0.75rem + 0.25vw, 0.875rem)', { lineHeight: '1.25rem' }],
+				'base': ['clamp(0.95rem, 0.90rem + 0.25vw, 1rem)', { lineHeight: '1.5rem' }],
+				'lg': ['clamp(1.05rem, 1rem + 0.25vw, 1.125rem)', { lineHeight: '1.75rem' }],
+				'xl': ['clamp(1.20rem, 1.10rem + 0.50vw, 1.25rem)', { lineHeight: '1.75rem' }],
+				'2xl': ['clamp(1.35rem, 1.20rem + 0.75vw, 1.5rem)', { lineHeight: '2rem' }],
+				'3xl': ['clamp(1.5rem, 1.30rem + 1vw, 1.875rem)', { lineHeight: '2.25rem' }],
+				'4xl': ['clamp(1.75rem, 1.50rem + 1.25vw, 2.25rem)', { lineHeight: '2.5rem' }],
+				'5xl': ['clamp(2rem, 1.75rem + 1.5vw, 3rem)', { lineHeight: '1' }],
+				'6xl': ['clamp(2.5rem, 2rem + 2.5vw, 3.75rem)', { lineHeight: '1' }],
 			},
 			colors: {
 				// Brand color tokens (map from CSS vars in tokens.css)

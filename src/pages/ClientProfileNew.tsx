@@ -203,7 +203,7 @@ const ClientProfileNew = () => {
           </motion.div>
 
           {/* About & Interests Section */}
-          {(profile?.bio || profile?.interests?.length > 0) && (
+          {(profile?.bio || (profile?.interests?.length ?? 0) > 0) && (
             <motion.div
               variants={childVariant}
               className="space-y-3"
@@ -217,12 +217,12 @@ const ClientProfileNew = () => {
                 </Card>
               )}
 
-              {profile?.interests?.length > 0 && (
+              {(profile?.interests?.length ?? 0) > 0 && (
                 <Card className="bg-card border-border">
                   <CardContent className="p-4">
                     <h3 className="text-sm font-medium text-muted-foreground mb-2">Interests</h3>
                     <div className="flex flex-wrap gap-2">
-                      {profile.interests.map((interest) => (
+                      {(profile?.interests ?? []).map((interest) => (
                         <span
                           key={`interest-${interest}`}
                           className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"

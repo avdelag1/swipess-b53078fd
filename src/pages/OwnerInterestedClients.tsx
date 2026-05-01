@@ -13,6 +13,7 @@ import { useStartConversation } from "@/hooks/useConversations";
 import { PremiumLikedCard } from "@/components/PremiumLikedCard";
 import { pwaImagePreloader, getCardImageUrl } from "@/utils/imageOptimization";
 import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/PageHeader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -197,15 +198,9 @@ const OwnerInterestedClients = () => {
   );
 
   return (
-    <div className="w-full relative flex flex-col pb-40" data-no-swipe-nav="true">
-      <div className="p-4 pt-24 sm:p-8 sm:pt-24 max-w-7xl mx-auto">
-        {/* Badge */}
-        <div className="flex items-center justify-end mb-8 relative z-10">
-          <div className="px-4 py-2 rounded-2xl bg-[var(--color-brand-accent-2)]/10 border border-[var(--color-brand-accent-2)]/20 text-[var(--color-brand-accent-2)] text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-[0_0_15px_rgba(228,0,124,0.1)]">
-            <Sparkles className="w-4 h-4" />
-            Top Demand
-          </div>
-        </div>
+    <div className="w-full relative flex flex-col min-h-full" data-no-swipe-nav="true">
+      <div className="p-4 pt-4 sm:p-8 sm:pt-6 max-w-7xl mx-auto">
+        <PageHeader title="Interested Clients" subtitle="Top Demand Entities" showBack={true} />
 
         {/* Category filter tabs */}
         <div className="flex gap-3 mb-6 overflow-x-auto scrollbar-hide pb-2 pt-2">
@@ -217,9 +212,9 @@ const OwnerInterestedClients = () => {
               className={cn(
                 "flex items-center gap-2.5 px-6 py-3.5 rounded-3xl text-sm font-black whitespace-nowrap transition-all flex-shrink-0 border",
                 selectedCategory === id
-                  ? "bg-[var(--color-brand-accent-2)] border-[var(--color-brand-accent-2)] text-white shadow-[0_8px_24px_rgba(228,0,124,0.4)]"
+                  ? (isLight ? "bg-black text-white" : "bg-[var(--color-brand-accent-2)] border-[var(--color-brand-accent-2)] text-white shadow-[0_8px_24px_rgba(228,0,124,0.4)]")
                   : isLight
-                  ? "bg-white border-border/40 text-muted-foreground hover:text-foreground hover:bg-secondary shadow-sm"
+                  ? "bg-white border-border/40 text-black/60 font-black hover:text-black hover:bg-black/5 shadow-sm"
                   : "bg-white/[0.04] border-white/[0.08] text-white/50 hover:text-white hover:bg-white/[0.08]"
               )}
             >
@@ -266,6 +261,7 @@ const OwnerInterestedClients = () => {
               <div key={client.id} className="rounded-[2rem]" style={{ touchAction: 'pan-y' }}>
                 <PremiumLikedCard
                   type="profile"
+                  isLight={isLight}
                   data={client}
                   onAction={(action) => handleAction(action, client)}
                 />

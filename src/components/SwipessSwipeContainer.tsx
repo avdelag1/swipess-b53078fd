@@ -10,14 +10,16 @@ import { SwipeExhaustedState } from './swipe/SwipeExhaustedState';
 import { SwipeLoadingSkeleton } from './swipe/SwipeLoadingSkeleton';
 import type { QuickFilterCategory } from '@/types/filters';
 import { getActiveCategoryInfo, POKER_CARDS, OWNER_INTENT_CARDS } from './swipe/SwipeConstants';
-import { SwipeAllDashboard } from './swipe/SwipeAllDashboard';
 import { MatchCelebrateModal } from './swipe/MatchCelebrateModal';
+import { ClientPreferencesDialog } from './ClientPreferencesDialog';
+import { OwnerClientFilterDialog } from './OwnerClientFilterDialog';
 import { preloadImageToCache } from '@/lib/swipe/imageCache';
 import { imageCache } from '@/lib/swipe/cardImageCache';
 import { PrefetchScheduler } from '@/lib/swipe/PrefetchScheduler';
-import { useSmartListingMatching, ListingFilters } from '@/hooks/useSmartMatching';
+import { useSmartListingMatching, useSmartClientMatching, ListingFilters, MatchedClientProfile, ClientFilters } from '@/hooks/useSmartMatching';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useActiveMode } from '@/hooks/useActiveMode';
 import { swipeQueue } from '@/lib/swipe/SwipeQueue';
 import { imagePreloadController } from '@/lib/swipe/ImagePreloadController';
 import { useCanAccessMessaging } from '@/hooks/useMessaging';
@@ -31,7 +33,7 @@ import { useSwipeDeckStore, persistDeckToSession } from '@/state/swipeDeckStore'
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useSwipeDismissal } from '@/hooks/useSwipeDismissal';
-import { Home, Bike, Briefcase, ChevronLeft, Radar, SlidersHorizontal } from 'lucide-react';
+import { Home, Bike, Briefcase, ChevronLeft } from 'lucide-react';
 import { MotorcycleIcon } from '@/components/icons/MotorcycleIcon';
 import { useSwipeSounds } from '@/hooks/useSwipeSounds';
 import { appToast } from '@/utils/appNotification';
@@ -42,7 +44,8 @@ import { MessageConfirmationDialog } from './MessageConfirmationDialog';
 import { DirectMessageDialog } from './DirectMessageDialog';
 import { isDirectMessagingListing } from '@/utils/directMessaging';
 import { useQueryClient } from '@tanstack/react-query';
-import { LocationRadiusSelector } from './swipe/LocationRadiusSelector';
+import { SwipeAllDashboard } from './swipe/SwipeAllDashboard';
+
 import { ReportDialog } from './ReportDialog';
 
 
@@ -109,6 +112,7 @@ interface SwipessSwipeContainerProps {
 
 const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights, onMessageClick, locationFilter: _locationFilter, filters }: SwipessSwipeContainerProps) => {
   const navigate = useNavigate();
+  const { activeMode } = useActiveMode();
   const { theme, isLight } = useAppTheme();
   const [page, setPage] = useState(0);
   const [_swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
@@ -119,6 +123,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
   const [isRefreshMode, setIsRefreshMode] = useState(false);
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
   const [directMessageDialogOpen, setDirectMessageDialogOpen] = useState(false);
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState<any | null>(null);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
@@ -144,6 +149,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setUserLocation(pos.coords.latitude, pos.coords.longitude);
+        setRadiusKm(5); // Auto-set to 5km when location is detected
         setLocationDetected(true);
         setLocationDetecting(false);
       },
@@ -152,7 +158,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
       },
       { timeout: 8000, maximumAge: 60000 }
     );
-  }, [setUserLocation]);
+  }, [setUserLocation, setRadiusKm]);
 
 
 
@@ -233,6 +239,15 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
   useEffect(() => {
     const t = setTimeout(() => { isMountSettledRef.current = true; }, 400);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const handleOpenFilters = () => {
+      triggerHaptic('medium');
+      setFilterDialogOpen(true);
+    };
+    window.addEventListener('open-filters', handleOpenFilters);
+    return () => window.removeEventListener('open-filters', handleOpenFilters);
   }, []);
   // A single reset path prevents duplicate state mutations that cause React error #185.
 
@@ -459,35 +474,51 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
   // Get listings with filters - PERF: pass userId to avoid getUser() inside queryFn
   const {
     data: smartListings = [],
-    isLoading: smartLoading,
-    isFetching: smartFetching,
-    error: smartError,
-    refetch: refetchSmart
-  } = useSmartListingMatching(user?.id, [], stableFilters, page, 20, isRefreshMode);
+    isLoading: smartListingsLoading,
+    isFetching: smartListingsFetching,
+    error: smartListingsError,
+  } = useSmartListingMatching(user?.id, [], stableFilters, page, 20, isRefreshMode && activeMode === 'client');
 
-  const isLoading = smartLoading;
-  const isFetching = smartFetching;
-  const error = smartError;
+  const {
+    data: smartClients = [],
+    isLoading: smartClientsLoading,
+    isFetching: smartClientsFetching,
+    error: smartClientsError,
+  } = useSmartClientMatching(
+    user?.id, 
+    activeCategory as any, 
+    page, 
+    20, 
+    isRefreshMode && activeMode === 'owner', 
+    stableFilters as unknown as ClientFilters,
+    false,
+    activeMode !== 'owner'
+  );
+
+  const smartData = activeMode === 'owner' ? smartClients : smartListings;
+  const isLoading = activeMode === 'owner' ? smartClientsLoading : smartListingsLoading;
+  const isFetching = activeMode === 'owner' ? smartClientsFetching : smartListingsFetching;
+  const error = activeMode === 'owner' ? smartClientsError : smartListingsError;
 
   // PERF FIX: Cheap signature using first ID + last ID + length (avoids expensive join)
   // This prevents unnecessary deck updates when React Query returns same data with new reference
   const listingIdsSignature = useMemo(() => {
-    if (smartListings.length === 0) return '';
-    return `${smartListings[0]?.id || ''}_${smartListings[smartListings.length - 1]?.id || ''}_${smartListings.length}`;
-  }, [smartListings]);
+    if (smartData.length === 0) return '';
+    return `${smartData[0]?.id || ''}_${smartData[smartData.length - 1]?.id || ''}_${smartData.length}`;
+  }, [smartData]);
 
   // Determine if we have genuinely new data (not just reference change)
   if (listingIdsSignature !== prevListingIdsRef.current && listingIdsSignature.length > 0) {
     const currentIds = new Set(deckQueueRef.current.map(l => l.id));
-    const newIds = smartListings.filter(l => !currentIds.has(l.id) && !swipedIdsRef.current.has(l.id));
+    const newIds = smartData.filter(l => !currentIds.has(l.id) && !swipedIdsRef.current.has(l.id));
     hasNewListingsRef.current = newIds.length > 0;
     prevListingIdsRef.current = listingIdsSignature;
 
     // SPEED OF LIGHT: Synchronous Hydration
     // Populating the ref during render ensures zero skeleton flicker on mount
-    if (deckQueueRef.current.length === 0 && smartListings.length > 0) {
-      deckQueueRef.current = smartListings;
-      setDeckLength(smartListings.length);
+    if (deckQueueRef.current.length === 0 && smartData.length > 0) {
+      deckQueueRef.current = smartData;
+      setDeckLength(smartData.length);
     }
   }
 
@@ -825,7 +856,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
     logger.info('[SwipessSwipeContainer] Manual Refresh Triggered');
     setIsRefreshing(true);
     setIsRefreshMode(true);
-    haptics.heavy();
+    triggerHaptic('heavy');
 
     // Reset local state and refs
     currentIndexRef.current = 0;
@@ -839,7 +870,8 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
     resetClientDeck();
 
     try {
-      await refetchSmart();
+      await queryClient.invalidateQueries({ queryKey: ['smart-listing-matches'] });
+      await queryClient.invalidateQueries({ queryKey: ['smart-client-matches'] });
       const refreshCategoryInfo = getActiveCategoryInfo(filters, storeActiveCategory);
       const refreshLabel = String(refreshCategoryInfo?.plural || 'Listings').toLowerCase();
       appToast.success(`${String(refreshCategoryInfo?.plural || 'Listings')} Refreshed`, `Showing ${refreshLabel} you passed on. Liked ones stay saved!`);
@@ -848,7 +880,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
     } finally {
       setIsRefreshing(false);
     }
-  }, [filters, storeActiveCategory, refetchSmart, resetClientDeck]);
+  }, [filters, storeActiveCategory, queryClient, resetClientDeck]);
 
   const handleInsights = () => {
     // ALWAYS open the "cool window" (insights modal) instead of full page navigation
@@ -990,12 +1022,64 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
     }
   }, []);
 
-  // ── RENDER — UINFIED DISCOVERY REEL ──────────────────────────────────────
-  // The 'Premiums Dashboard' (SwipeAllDashboard) is now the interactive Slide 0
-  // of the vertical snap-scrolling reel.
+
+  const radarNodes = useMemo(() => (smartListings || []).map(l => ({
+    id: l.id,
+    lat: l.latitude || 0,
+    lng: l.longitude || 0,
+    label: l.title || 'Found'
+  })), [smartListings]);
+
+  // Category cycle for switcher button
+  const CLIENT_CYCLE: (QuickFilterCategory | null)[] = ['property', 'motorcycle', 'bicycle', 'services'];
+  const OWNER_CYCLE: (QuickFilterCategory | null)[] = ['buyers', 'renters', 'hire'];
+
+  const handleCycleCategory = useCallback(() => {
+    triggerHaptic('heavy');
+    const cycle = userRole === 'owner' ? OWNER_CYCLE : CLIENT_CYCLE;
+    const currentIdx = cycle.indexOf(storeActiveCategory as any);
+    const nextIdx = (currentIdx + 1) % cycle.length;
+    setActiveCategory(cycle[nextIdx] as any);
+  }, [storeActiveCategory, userRole, setActiveCategory]);
+
+  // ── RENDER ────────────────────────────────────────────────────────────────
+
+  // Phase 1: No category selected — show the category picker (POKER_CARDS)
+  if (!storeActiveCategory) {
+    return (
+      <>
+        <div className="relative w-full h-full flex flex-col">
+          <SwipeAllDashboard setCategories={(cat) => {
+            setActiveCategory(cat as any);
+            setCategories([cat] as any);
+          }} />
+        </div>
+        {typeof document !== 'undefined' && document.body && createPortal(
+          <Suspense fallback={null}>
+            {userRole === 'owner' ? (
+              <OwnerClientFilterDialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen} />
+            ) : (
+              <ClientPreferencesDialog open={filterDialogOpen} onOpenChange={setFilterDialogOpen} />
+            )}
+          </Suspense>,
+          document.body
+        )}
+      </>
+    );
+  }
+
+  const categoryNames: Record<string, string> = {
+    property: 'Properties', motorcycle: 'Motorcycles', bicycle: 'Bicycles',
+    services: 'Services', buyers: 'Buyers', renters: 'Renters', hire: 'Workers',
+  };
+  const currentCategoryName = categoryNames[storeActiveCategory] || storeActiveCategory;
+  const hasCards = deckQueue.length > 0 && currentIndex < deckQueue.length;
+  const isLoadingCards = isLoading || isFetching || !isMountSettledRef.current;
+
   return (
+    <>
     <div className={cn(
-      "relative w-full h-full overflow-hidden flex flex-col transition-colors duration-500",
+      "absolute inset-0 w-full h-full flex flex-col transition-colors duration-500 overflow-hidden",
       isLight ? "bg-transparent" : "bg-black"
     )}>
       <div className={cn(
@@ -1003,77 +1087,49 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
         isLight ? "bg-transparent" : "bg-black"
       )} />
 
-      {/* Top Controls — LEAVE ONLY BACK BUTTON AND RADAR HERE */}
-      {(!isLoading || deckQueue.length > 0) && !(storeActiveCategory && deckQueue.length === 0 && !isLoading) && (
-        <div className="absolute top-0 left-0 right-0 z-[60] w-full flex items-center justify-between px-6 pt-10 pb-4">
-            {/* Back / Reset Category */}
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => {
-                triggerHaptic('light');
-                setActiveCategory(null);
-              }}
-              className={cn(
-                "w-10 h-10 flex items-center justify-center transition-colors rounded-full backdrop-blur-md",
-                isLight ? "bg-white/10 text-black/40 hover:text-black" : "bg-black/20 text-white/40 hover:text-white"
-              )}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </motion.button>
-
-            {/* Radar Context (Top Right) */}
-            <LocationRadiusSelector
-              radiusKm={radiusKm}
-              onRadiusChange={setRadiusKm}
-              onDetectLocation={detectLocation}
-              detecting={locationDetecting}
-              detected={locationDetected}
-              lat={userLatitude}
-              lng={userLongitude}
-              variant="minimal"
-              nodes={useMemo(() => (smartListings || []).map(l => ({
-                id: l.id,
-                lat: l.latitude || 0,
-                lng: l.longitude || 0,
-                label: l.title || 'Found'
-              })), [smartListings])}
-            />
+      {/* Header Controls — ONLY visible when NO cards (radar/empty state) */}
+      {!hasCards && (
+        <div className="absolute top-[calc(var(--safe-top,0px)+64px)] left-4 z-[70] flex items-center gap-3 pointer-events-auto">
+          <button
+            onClick={() => {
+              triggerHaptic('light');
+              setActiveCategory(null as any);
+              setCategories([] as any);
+            }}
+            className={cn(
+              "flex items-center justify-center w-10 h-10 rounded-full border transition-all active:scale-90",
+              isLight ? "bg-white border-black/10 text-black" : "bg-black/80 border-white/20 text-white"
+            )}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className={cn("text-sm font-black uppercase tracking-wider", isLight ? "text-black" : "text-white")}>
+            {currentCategoryName}
+          </span>
         </div>
       )}
 
-
-      {/* Card area — flex-1 fills remaining space */}
+      {/* Card area — flex-1 fills remaining space; overflow-hidden here keeps swipe cards contained */}
       <div className={cn(
-        "flex-1 relative flex flex-col items-center justify-center px-0 pt-0 z-10 pointer-events-none min-h-0",
-        (storeActiveCategory && deckQueue.length > 0 && currentIndex < deckQueue.length) ? "pb-0" : ""
+        "flex-1 relative flex flex-col items-center justify-center px-0 z-10 pointer-events-auto min-h-0 overflow-hidden",
+        hasCards ? "pb-[var(--bottom-nav-height,72px)]" : ""
       )}>
 
         <div className="w-full h-full flex items-center justify-center pointer-events-auto">
           <AnimatePresence mode="sync" initial={false}>
-            {!storeActiveCategory ? (
-              <motion.div 
-                key="category-stack"
-                initial={false}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }}
-                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full h-full flex flex-col items-center justify-center max-w-[700px] mx-auto"
-              >
-                <SwipeAllDashboard setCategories={setActiveCategory} />
-              </motion.div>
-            ) : deckQueue.length > 0 && currentIndex < deckQueue.length ? (
-              <motion.div 
-                key={`deck-${storeActiveCategory}`}
+            {deckQueue.length > 0 && currentIndex < deckQueue.length ? (
+              <motion.div
+                key={`deck-${storeActiveCategory ?? 'all'}`}
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="relative w-full h-full max-w-[700px] mx-auto"
+                className="absolute inset-0 w-full h-full sm:max-w-[480px] sm:mx-auto flex flex-col items-center justify-center"
               >
                 {/* Back card (Peek) */}
                 {currentIndex + 1 < deckQueue.length && (
                   <motion.div
-                    className="absolute inset-0 z-10"
+                    className="absolute inset-0 w-full h-full z-10"
                     style={{
                       scale: nextCardScale,
                       opacity: nextCardOpacity,
@@ -1099,25 +1155,12 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                     handleInsights();
                     if (onListingTap) onListingTap(topCard.id);
                   }}
-                  onMessage={handleMessage}
                   onShare={handleShare}
-                  onReport={handleReport}
-                  onLike={handleButtonLike}
-                  onDislike={handleButtonDislike}
+                  onReport={() => console.log('Report', topCard.id)}
                   onDragStart={handleDragStart}
                   isTop={true}
                   externalX={topCardX}
                 />
-              </motion.div>
-            ) : (isLoading || isFetching || !isMountSettledRef.current) ? (
-              <motion.div 
-                key="loading-skeleton"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="w-full h-full flex items-center justify-center"
-              >
-                <SwipeLoadingSkeleton />
               </motion.div>
             ) : (
               <motion.div
@@ -1127,90 +1170,57 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
                 exit={{ opacity: 0 }}
                 className="w-full h-full z-50 overflow-hidden"
               >
-                <SwipeExhaustedState 
-                  onRefresh={handleRefresh}
-                  isRefreshing={isRefreshing}
-                  categoryLabel={storeActiveCategory || 'Listings'}
-                  CategoryIcon={Home}
+                <SwipeExhaustedState
                   radiusKm={radiusKm}
-                  onRadiusChange={setRadiusKm}
+                  onRadiusChange={setRadiusKm as any}
                   onDetectLocation={detectLocation}
                   detecting={locationDetecting}
                   detected={locationDetected}
-                  error={error}
+                  categoryName={currentCategoryName}
+                  isLoading={isLoading || isFetching}
+                  activeCategory={storeActiveCategory}
+                  onCategoryChange={(cat) => {
+                    triggerHaptic('medium');
+                    setActiveCategory(cat as any);
+                    setCategories([cat] as any);
+                  }}
+                  onOpenFilters={() => {
+                    triggerHaptic('medium');
+                    navigate(userRole === 'owner' ? '/owner/filters' : '/client/filters');
+                  }}
                   role={userRole === 'owner' ? 'owner' : 'client'}
-                  lat={userLatitude}
-                  lng={userLongitude}
                 />
               </motion.div>
             )}
           </AnimatePresence>
       </div>
-      {/* BUILD VERSION STAMP - VISUAL PROOF OF UPDATE */}
-      {/* 🚀 QUICK FILTERS: REPOSITIONED BY USER REQUEST (Split on Both Sides) */}
-      {(!isLoading || deckQueue.length > 0) && !(storeActiveCategory && deckQueue.length === 0 && !isLoading) && (
-        <div className="absolute bottom-[40px] left-0 right-0 z-[60] w-full md:max-w-[440px] md:mx-auto flex justify-between px-6 pointer-events-none">
-          
-          {/* LEFT SIDE: SECTOR ACQUISITION (Quick Categories) */}
-          <div className="flex gap-3 p-2 rounded-[2rem] backdrop-blur-3xl border border-white/10 bg-black/40 pointer-events-auto shadow-2xl">
-            {(userRole === 'owner' ? OWNER_INTENT_CARDS : POKER_CARDS).filter(c => 
-              userRole === 'owner' 
-                ? ['buyers', 'renters', 'hire'].includes(c.id) 
-                : ['property', 'motorcycle', 'services'].includes(c.id)
-            ).map((cat: any) => {
-              const Icon = cat.icon;
-              const isActive = storeActiveCategory === cat.id || (userRole === 'owner' && (filters as any).clientType === (cat as any).clientType);
-              return (
-                <motion.button
-                  key={cat.id}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => {
-                    triggerHaptic('medium');
-                    setActiveCategory(cat.id);
-                  }}
-                  className={cn(
-                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-all relative overflow-hidden border",
-                    isActive 
-                      ? "text-primary border-primary bg-primary/10 shadow-[0_0_20px_rgba(var(--color-brand-primary-rgb),0.3)] scale-110"
-                      : "text-white/40 border-white/5 hover:text-white/60 bg-white/5"
-                  )}
-                >
-                  <Icon className="w-5 h-5" />
-                  {isActive && <motion.div layoutId="activeCatLeft" className="absolute inset-0 bg-primary/10 -z-10" />}
-                </motion.button>
-              );
-            })}
-          </div>
 
-          {/* RIGHT SIDE: MARKET INTELLIGENCE (Advanced & Radar) */}
-          <div className="flex gap-3 p-2 rounded-[2rem] backdrop-blur-3xl border border-white/10 bg-black/40 pointer-events-auto shadow-2xl">
-             <motion.button
-               whileTap={{ scale: 0.9 }}
-               onClick={() => {
-                 triggerHaptic('medium');
-                 setRadiusKm(prev => prev === 100 ? 5 : prev + 10);
-               }}
-               className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center border border-white/5 bg-white/5 text-white/40"
-             >
-               <Radar className="w-5 h-5 mb-0.5" />
-               <span className="text-[7px] font-black uppercase text-primary">{radiusKm}K</span>
-             </motion.button>
+    </div>
 
-          </div>
+      {/* Action buttons — Floating over the card near bottom nav */}
+      {hasCards && (
+        <div className="absolute bottom-[calc(var(--bottom-nav-height,72px)+16px)] left-0 right-0 z-[100] flex justify-center pointer-events-auto">
+          <SwipeActionButtonBar
+            onLike={handleButtonLike}
+            onDislike={handleButtonDislike}
+            onShare={handleShare}
+            onInsights={() => {
+              handleInsights();
+              if (onListingTap) onListingTap(topCard.id);
+            }}
+            onUndo={undoLastSwipe}
+            onMessage={handleMessage}
+            onCycleCategory={handleCycleCategory}
+            canUndo={canUndo}
+          />
         </div>
       )}
 
 
-      {/* BUILD VERSION STAMP */}
-      <div className="absolute bottom-[85px] right-6 z-0 pointer-events-none opacity-20">
-          <span className={cn(
-            "text-[8px] font-black uppercase tracking-[0.4em]",
-            isLight ? "text-black" : "text-white"
-          )}>FLAGSHIP BUILD v1.0.96-rc4</span>
-      </div>
+
     </div>
 
-      {/* Action buttons now live inside the card via DiscoverySidebar */}
+      {/* Action buttons now live in the bar below the card */}
 
       {/* Epic Match Celebration Modal */}
       {matchData && (
@@ -1259,6 +1269,19 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
             category={selectedListing?.category}
           />
 
+          {/* DYNAMIC FILTER DIALOGS */}
+          {userRole === 'owner' ? (
+            <OwnerClientFilterDialog
+              open={filterDialogOpen}
+              onOpenChange={setFilterDialogOpen}
+            />
+          ) : (
+            <ClientPreferencesDialog
+              open={filterDialogOpen}
+              onOpenChange={setFilterDialogOpen}
+            />
+          )}
+
           {selectedListing && (
             <ReportDialog
               open={reportDialogOpen}
@@ -1272,7 +1295,7 @@ const SwipessSwipeContainerComponent = ({ onListingTap, onInsights: _onInsights,
         </Suspense>,
         document.body
       )}
-    </div>
+    </>
   );
 };
 

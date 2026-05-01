@@ -1,12 +1,12 @@
-import { memo, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { User, UserCheck, Loader2 } from 'lucide-react';
+import { memo, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { User, UserCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useActiveMode, ActiveMode } from '@/hooks/useActiveMode';
 import { triggerHaptic } from '@/utils/haptics';
 import { uiSounds } from '@/utils/uiSounds';
-import { prefetchRoute } from '@/utils/routePrefetcher';
 import { useFilterStore } from '@/state/filterStore';
+import useAppTheme from '@/hooks/useAppTheme';
 
 interface ModeSwitcherProps {
   className?: string;
@@ -14,8 +14,9 @@ interface ModeSwitcherProps {
   variant?: 'toggle' | 'pill' | 'icon';
 }
 
-function ModeSwitcherComponent({ className, size = 'sm' }: ModeSwitcherProps) {
+function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
   const { activeMode, isSwitching, switchMode, canSwitchMode } = useActiveMode();
+  const { isLight } = useAppTheme();
   const resetClientFilters = useFilterStore((state) => state.resetClientFilters);
   const resetOwnerFilters = useFilterStore((state) => state.resetOwnerFilters);
 
@@ -33,33 +34,65 @@ function ModeSwitcherComponent({ className, size = 'sm' }: ModeSwitcherProps) {
 
   const isClient = activeMode === 'client';
 
+  // Single segmented pill containing both halves — eliminates the "two random
+  // glass squares floating" look and visually anchors the mode-switch as one
+  // control. Only the active half shows colored fill.
+  const containerStyle: React.CSSProperties = {
+    background: isLight
+      ? 'rgba(255, 255, 255, 0.92)'
+      : 'rgba(15, 25, 55, 0.55)',
+    backdropFilter: 'blur(32px) saturate(210%)',
+    WebkitBackdropFilter: 'blur(32px) saturate(210%)',
+    borderRadius: '1.5rem',
+    boxShadow: isLight
+      ? '0 10px 30px -5px rgba(0,0,0,0.1)'
+      : '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
+  };
+
+  const halfBase = "w-8 h-8 flex items-center justify-center transition-all duration-200 relative rounded-xl";
+
   return (
-    <div 
-      className={cn('flex items-center gap-4', className)}
+    <div
+      className={cn('flex items-center gap-0.5 p-1 pointer-events-auto', className)}
+      style={containerStyle}
     >
-      <button
+      <motion.button
+        whileTap={{ scale: 0.92 }}
         onClick={() => handleModeSwitch('client')}
         disabled={!canSwitchMode || isSwitching}
-        className={cn(
-          "transition-all duration-300 relative rounded-full active:bg-[var(--hud-active-bg)]",
-          isClient ? "opacity-100 scale-110" : "opacity-30 hover:opacity-100"
-        )}
+        className={cn(halfBase, isClient && 'shadow-sm')}
+        style={{
+          background: isClient
+            ? (isLight ? 'rgba(244, 63, 94, 0.12)' : 'rgba(244, 63, 94, 0.22)')
+            : 'transparent',
+        }}
+        title="Client Mode"
+        aria-pressed={isClient}
       >
-        <User className={cn("h-4 w-4", isClient ? "text-[#f43f5e]" : "text-[var(--hud-text)]")} strokeWidth={isClient ? 3 : 2} />
-      </button>
+        <User
+          className={cn('h-[18px] w-[18px]', isClient ? 'text-[#f43f5e]' : 'text-[var(--hud-text)] opacity-60')}
+          strokeWidth={isClient ? 2.5 : 1.8}
+        />
+      </motion.button>
 
-      <div className="w-[1px] h-3 bg-[var(--hud-text)]/20" />
-
-      <button
+      <motion.button
+        whileTap={{ scale: 0.92 }}
         onClick={() => handleModeSwitch('owner')}
         disabled={!canSwitchMode || isSwitching}
-        className={cn(
-          "transition-all duration-300 relative rounded-full active:bg-[var(--hud-active-bg)]",
-          !isClient ? "opacity-100 scale-110" : "opacity-30 hover:opacity-100"
-        )}
+        className={cn(halfBase, !isClient && 'shadow-sm')}
+        style={{
+          background: !isClient
+            ? (isLight ? 'rgba(249, 115, 22, 0.14)' : 'rgba(249, 115, 22, 0.24)')
+            : 'transparent',
+        }}
+        title="Owner Mode"
+        aria-pressed={!isClient}
       >
-        <UserCheck className={cn("h-4 w-4", !isClient ? "text-[#f97316]" : "text-[var(--hud-text)]")} strokeWidth={!isClient ? 3 : 2} />
-      </button>
+        <UserCheck
+          className={cn('h-[18px] w-[18px]', !isClient ? 'text-[#f97316]' : 'text-[var(--hud-text)] opacity-60')}
+          strokeWidth={!isClient ? 2.5 : 1.8}
+        />
+      </motion.button>
     </div>
   );
 }

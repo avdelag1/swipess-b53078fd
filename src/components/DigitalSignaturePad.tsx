@@ -112,7 +112,7 @@ export const DigitalSignaturePad: React.FC<LiquidSignaturePadProps> = ({
     <div className="w-full space-y-6">
       <div className="relative group">
         {/* 🛸 Swipess BRAND GLOW */}
-        <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-indigo-500/20 to-primary/20 rounded-[2.5rem] blur-2xl opacity-40 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
+        <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-indigo-500/20 to-primary/20 rounded-[2.5rem] blur-2xl opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
         
         {/* 🛸 MATTE CONTAINER */}
         <div className={cn(
@@ -156,7 +156,7 @@ export const DigitalSignaturePad: React.FC<LiquidSignaturePadProps> = ({
                 <div className={cn("w-20 h-20 rounded-full border flex items-center justify-center mb-6 animate-pulse", isLight ? "bg-black/5 border-black/5" : "bg-white/5 border-white/10")}>
                   <Fingerprint className="w-10 h-10 text-primary/60" />
                 </div>
-                <h4 className={cn("text-base font-black uppercase tracking-[0.3em] italic", isLight ? "text-black/40" : "text-white/40")}>Hold and sign here</h4>
+                <h4 className={cn("text-base font-black uppercase tracking-[0.3em] italic", isLight ? "text-black/70" : "text-white/70")}>Hold and sign here</h4>
                 <div className="flex items-center gap-3 mt-4">
                   <MousePointer2 className="w-4 h-4 text-primary/40 animate-bounce" />
                   <span className={cn("text-[10px] font-black uppercase tracking-widest opacity-20", isLight ? "text-black" : "text-white")}>Liquid Signature Pad v2</span>
@@ -166,7 +166,7 @@ export const DigitalSignaturePad: React.FC<LiquidSignaturePadProps> = ({
           </AnimatePresence>
 
           {/* 🛸 TELEMETRY INFO */}
-          <div className="absolute bottom-6 left-8 flex items-center gap-3 opacity-30">
+          <div className="absolute bottom-6 left-8 flex items-center gap-3 opacity-70">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className={cn("text-[9px] font-black uppercase tracking-[0.5em] italic", isLight ? "text-black" : "text-white")}>Encrypted Digital Hash</span>
           </div>

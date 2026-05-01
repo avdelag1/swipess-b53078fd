@@ -1,68 +1,70 @@
+## Goal
 
+Three things, no scope creep:
 
-## Fix Build Errors + Cheers Theme + Profile Solidity + Map Polish
+1. Owner side must load again (currently white-screens / boundary error).
+2. The owner poker-card deck and the quick-filter row must sit centered within the safe area between the TopBar and BottomNav on a 393×779 viewport.
+3. No extra background frames around cards or filter rails. The TopBar pill, mode-switcher pill, bottom-nav pill, and notification circle stay exactly as they are.
 
-### What's broken right now
-1. **9 TypeScript build errors** are blocking the entire app from compiling — that's why nothing renders cleanly.
-2. **Cheers theme** (the third "Ivana" theme) only restyles a few CSS variables; many hard-coded `bg-black`, `bg-[#0d0d0f]`, `border-white/10` classes ignore it, so the theme bleeds through inconsistently.
-3. **Client/Owner Profile pages** use translucent `bg-[#0d0d0f]/95` cards over a transparent body — looks washed out and Apple reviewers will flag it.
-4. **Discovery map** still works but has untyped category casts and unused imports causing build warnings.
+## Findings
 
-### Plan
+- Console shows React **error #426** (a Suspense boundary received an update before it finished hydrating). On the Owner route this fires through `EnhancedOwnerDashboard → OwnerAllDashboard`, which lazy-resolves modal/route state inside its render path and reads `useModalStore.getState()` from inside a click handler created during the same Suspense pass.
+- `OwnerAllDashboard` sizes the deck with `height: min(75svh, 600px)`. With `--top-bar-height` + `--safe-top` + `--bottom-nav-height` + `--safe-bottom` already eating ~150–170px on a 779-tall device, 75svh = ~584px overflows the parent flex container, so the deck visually pushes under the bottom nav and the quick-filter row gets clipped.
+- `EnhancedOwnerDashboard` wraps the deck in two stacked centering layers (`flex flex-col items-center` + `flex flex-col justify-center`) which together with the loader/skeleton block create an extra translucent panel behind the cards.
+- `OwnerKilometerView` adds a `rounded-[3.5rem] border ... backdrop-blur-xl` panel — that is the extra "frame background" the user is calling out on the owner side.
+- `OwnerClientSwipeDialog` still passes `onClientTap` correctly; no schema mismatch there.
 
-**1. Fix all 9 build errors so the app compiles.**
+## Plan
 
-| File | Fix |
-|---|---|
-| `DiscoveryMapView.tsx:60` | Type-guard the fallback: `userLatitude && userLongitude ? [userLatitude, userLongitude] : tulumCenter` so TS sees both as `number`. |
-| `DiscoveryMapView.tsx:144` | Move `lightTiles` / `darkTiles` constants to module scope (above the component) so both `useEffect`s can reference them, and actually swap the tile layer on style/theme change. |
-| `ClientDashboard.tsx:87` | Update `SwipeAllDashboardProps.setCategories` signature to `(category: QuickFilterCategory) => void` (it only ever passes one) and adjust `handleSelect` accordingly. |
-| `ClientProfile.tsx:181` & `OwnerProfile.tsx:136` | `triggerHaptic('selection')` → `triggerHaptic('light')` (selection isn't in the union). |
-| `PublicListingPreview.tsx:86,93` | Normalize `listing.images` once at the top: `const images = Array.isArray(listing.images) ? (listing.images as string[]) : []` and use `images.length` everywhere. |
-| `PublicListingPreview.tsx:177` | Remove the non-existent `invert` prop and pass `variant="white"` instead (the SwipessLogo already supports a white variant via filter). |
+### 1. Fix owner-side crash (React #426)
 
-**2. Polish the "Cheers / Ivana" third theme so it covers everything.**
+Edit `src/pages/EnhancedOwnerDashboard.tsx`:
+- Wrap the `<AnimatePresence>` body in a single `<Suspense fallback={null}>` so Framer Motion's deferred children cannot bubble a suspending update past the route boundary.
+- Remove the `typeof document !== 'undefined' && document.body && (...)` guard around `<SwipeInsightsModal>` — it forces the modal to mount/unmount on every render and is part of what triggers the boundary update; render the modal unconditionally with its own `open` prop.
 
-The cheers theme defines tokens but the app is full of hard-coded `bg-black`, `bg-[#0d0d0f]`, `text-white/70` that ignore it. To fix without rewriting every component:
-- In `src/styles/matte-themes.css`, add `.cheers` overrides that map common hard-coded classes via CSS:
-  ```css
-  .cheers .bg-black { background-color: hsl(22 90% 6%) !important; }
-  .cheers .bg-\[\#0d0d0f\] { background-color: hsl(22 80% 10%) !important; }
-  .cheers .bg-\[\#0d0d0f\]\/95 { background-color: hsl(22 80% 10% / 0.95) !important; }
-  .cheers .border-white\/10 { border-color: hsl(38 92% 52% / 0.18) !important; }
-  ```
-- Set the cheers status-bar / `body` background to `hsl(22 90% 6%)` so the page feels fully wrapped in the theme.
-- Update `index.css` so `.cheers #root, .cheers body` use the cheers background instead of the dark mode override.
+Edit `src/components/swipe/OwnerAllDashboard.tsx`:
+- Move the `useModalStore.getState()` lookup out of the inline `handleSelect` closure into a top-level `const openAIListing = useModalStore(s => s.openAIListing)` so the click path is pure and stable.
+- Keep the existing image preload effect (already safe).
 
-**3. Make Client + Owner Profile cards solid (not transparent).**
+### 2. Center the owner deck in the safe viewport
 
-In `ClientProfile.tsx` and `OwnerProfile.tsx`, replace every `bg-[#0d0d0f]/95` and `backdrop-blur-3xl` translucent card with a solid token-driven background:
-- Dark mode: `bg-[#0a0a0a]` (solid)
-- Light mode: `bg-white` (solid)
-- Cheers: `bg-[hsl(22_80%_10%)]` (solid, picked up by the CSS override above)
-- Strengthen text contrast: `text-white/30` → `text-white/60` for secondary labels; primary headings stay `text-white`.
-- Increase border opacity from `border-white/5` to `border-white/12` for crisp button edges.
+Edit `src/pages/EnhancedOwnerDashboard.tsx` (cards phase only):
+- Replace the deck wrapper sizing with a true safe-area calculation:
+  - parent: `flex-1 min-h-0` (already there) and remove the inner duplicate `flex flex-col justify-center` wrapper.
+  - the motion container keeps `paddingTop: calc(var(--top-bar-height) + var(--safe-top))` and `paddingBottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 16px)`.
 
-**4. Discovery map small polish (not a rewrite).**
+Edit `src/components/swipe/OwnerAllDashboard.tsx`:
+- Replace the hard `height: min(75svh, 600px)` with a container-relative size:
+  - `height: min(100%, 600px)` on the deck stage,
+  - `width: calc(min(100%, 600px) * ${PK_ASPECT})`,
+  - keep `aspect-ratio` as fallback for older WebKit.
+- Remove `min-height: auto` inline style (redundant).
 
-The map already works after build fixes. Just:
-- Re-add the `tileLayer` swap in the existing sync `useEffect` (currently has a dangling `tileUrl` that never gets applied) — when `mapStyle` or theme changes, remove old tile layer and add new one.
-- Strengthen the radar center marker: change inner dot from `bg-black border-white` to `bg-white border-[3px] border-[#EB4898]` with a stronger blue/pink ring (per memory: the user wants the blue radar indicator visible).
+This makes the deck consume only the height actually available between TopBar and BottomNav, so it's mathematically centered on every device including 393×779.
 
-**5. Verify end-to-end.**
+### 3. Strip extra frames, preserve existing button pills
 
-After build succeeds:
-- Visit `/client/dashboard` → tap a poker card → confirm map opens with visible radar center, working KM presets, and back button on left.
-- Switch theme to Cheers → confirm Profile page, Dashboard, and Discovery map all adopt the cheetah palette with no black bleed-through.
-- Open Client Profile and Owner Profile → confirm cards are solid, all text readable.
+Edit `src/pages/EnhancedOwnerDashboard.tsx`:
+- Drop the loader's `bg-white/5 rounded-3xl` skeleton blocks; keep the spinner only (no panel chrome behind it).
+- Remove the `OwnerKilometerView` outer `rounded-[3.5rem] border bg-white/80|bg-black/60 backdrop-blur-*` panel. Keep the slider, the radius readout, and the buttons exactly as they are — they already carry their own surfaces.
+- Remove the absolute `Swipess FLAGSHIP v1.0.97` watermark (visual noise the user did not ask for).
 
-### Files to modify
-- `src/components/swipe/DiscoveryMapView.tsx` — fix tuple type, hoist tile constants, polish radar center, apply tile swap
-- `src/components/swipe/SwipeAllDashboard.tsx` — fix `setCategories` signature
-- `src/pages/ClientDashboard.tsx` — already correct after signature fix
-- `src/pages/ClientProfile.tsx` — solidify card backgrounds, fix haptic
-- `src/pages/OwnerProfile.tsx` — solidify card backgrounds, fix haptic
-- `src/pages/PublicListingPreview.tsx` — normalize images array, fix logo prop
-- `src/styles/matte-themes.css` — add cheers coverage overrides
-- `src/index.css` — adjust `.cheers` body/root background
+Edit `src/components/swipe/SwipeExhaustedState.tsx`:
+- Confirm the quick-filter row has no wrapper card; if a `bg-*/border-*/backdrop-blur-*` parent is present around the category grid + filter button, remove it. Buttons retain their per-button glass pill (already implemented in the previous turn).
 
+Do **not** touch:
+- `TopBar.tsx`, `ModeSwitcher.tsx`, `BottomNavigation.tsx`, `NotificationPopover.tsx` — user explicitly likes the current pill/circle treatment.
+- Swipe physics, `SimpleOwnerSwipeCard`, or any routing.
+
+## Files to edit
+
+```
+src/pages/EnhancedOwnerDashboard.tsx
+src/components/swipe/OwnerAllDashboard.tsx
+src/components/swipe/SwipeExhaustedState.tsx
+```
+
+## Verification
+
+- `npx tsc --noEmit` → 0 errors.
+- Manual: `/owner/dashboard` renders the fanned poker deck centered with no console error #426; quick-filter row sits within the safe area; no halo panel behind the slider on the kilometer step; TopBar / BottomNav pills unchanged.

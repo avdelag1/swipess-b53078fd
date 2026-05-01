@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useAppNavigate } from "@/hooks/useAppNavigate";
 import { motion } from 'framer-motion';
-import { ChevronLeft, Radio, UserCircle } from 'lucide-react';
+import { ChevronLeft, UserCircle, Ticket, Radio, Ghost, Zap, SlidersHorizontal, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -12,10 +12,10 @@ import { haptics } from '@/utils/microPolish';
 import { ModeSwitcher } from './ModeSwitcher';
 import { NotificationPopover } from './NotificationPopover';
 import { ThemeToggle } from './ThemeToggle';
-import { useModalStore } from '@/state/modalStore';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
+import { useModalStore } from '@/state/modalStore';
+import { TAP_SPRING } from './BottomNavigation';
 import { AIListingTrigger } from './AIListingTrigger';
-import { appToast } from '@/utils/appNotification';
 
 interface TopBarProps {
   onNotificationsClick?: () => void;
@@ -23,6 +23,7 @@ interface TopBarProps {
   onAISearchClick?: () => void;
   onFilterClick?: (e?: React.PointerEvent | React.MouseEvent) => void;
   onBack?: () => void;
+  onCenterTap?: () => void;
   className?: string;
   showFilters?: boolean;
   userRole?: 'client' | 'owner' | 'admin';
@@ -34,35 +35,41 @@ interface TopBarProps {
 }
 
 function TopBarComponent({
-  onFilterClick: _onFilterClick,
+  onFilterClick,
   onBack: propOnBack,
+  onMessageActivationsClick,
   className,
   userRole,
   transparent: _transparent = false,
   minimal = false,
+  showBack,
+  onCenterTap,
 }: TopBarProps) {
   const { navigate } = useAppNavigate();
   const { user } = useAuth();
   const { isLight } = useAppTheme();
-  
+  const setModal = useModalStore(s => s.setModal);
+
   const activeCategory = useFilterStore(s => s.activeCategory);
   const { setActiveCategory } = useFilterActions();
 
-
-
   const isOwner = userRole === 'owner';
   
-  const onBack = propOnBack || (activeCategory ? () => setActiveCategory(null) : undefined);
+  const onBack = propOnBack || (showBack ? () => window.history.length > 2 ? navigate(-1) : navigate(`/${isOwner ? 'owner' : 'client'}/dashboard`) : (activeCategory ? () => setActiveCategory(null) : undefined));
 
   const glassPillStyle: React.CSSProperties = {
-    background: 'var(--hud-bg)',
+    background: isLight
+      ? 'rgba(255, 255, 255, 0.92)'
+      : 'rgba(15, 25, 55, 0.55)',
     backdropFilter: 'blur(32px) saturate(210%)',
     WebkitBackdropFilter: 'blur(32px) saturate(210%)',
     borderRadius: '3rem',
-    border: isLight ? '1px solid rgba(0,0,0,0.1)' : '1px solid rgba(255,255,255,0.08)',
-    boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.03)' : '0 8px 32px rgba(0, 0, 0, 0.15)',
+    border: 'none',
+    boxShadow: isLight
+      ? '0 10px 30px -5px rgba(0,0,0,0.1)'
+      : '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
     pointerEvents: 'auto',
-    color: 'var(--hud-text)',
+    color: isLight ? '#000000' : 'var(--hud-text)',
   };
 
   const { data: profile } = useQuery({
@@ -83,82 +90,142 @@ function TopBarComponent({
   return (
     <header 
       className={cn(
-        "absolute top-0 left-0 right-0 z-[10005] transition-all duration-700 pointer-events-none",
-        _transparent ? "h-20" : "h-16",
+        "relative w-full transition-all duration-500 pointer-events-none",
         className
       )}
       style={{
-        paddingTop: 'var(--safe-top)',
-        height: 'calc(var(--top-bar-height) + var(--safe-top))'
+        paddingTop: 'calc(var(--safe-top, 0px) + 6px)',
+        height: 'calc(var(--top-bar-height) + var(--safe-top, 0px))',
+        background: 'transparent',
+        border: 'none'
       }}
     >
       <div className="h-full w-full px-4 flex items-center justify-between relative">
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pointer-events-auto">
           {onBack ? (
             <motion.button
+              transition={TAP_SPRING}
               whileTap={{ scale: 0.9 }}
-              onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); haptics.tap(); onBack(); }}
-              className="w-11 h-11 flex shrink-0 items-center justify-center rounded-full"
+              onClick={() => { haptics.tap(); onBack(); }}
+              className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full"
               style={glassPillStyle}
             >
-              <ChevronLeft className="w-5 h-5" style={{ color: 'var(--hud-text)' }} />
+              <ChevronLeft className="w-5 h-5" style={{ color: isLight ? '#000000' : 'var(--hud-text)' }} />
             </motion.button>
           ) : (
             user && (
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onPointerDown={(e) => {
-                e.preventDefault(); e.stopPropagation();
-                haptics.tap();
-                navigate(isOwner ? '/owner/profile' : '/client/profile');
-              }}
-              className="flex shrink-0 items-center gap-3 px-2.5 py-2 pr-4 rounded-2xl"
-              style={glassPillStyle}
-            >
-              {/* Rounded Square avatar — 'window' style */}
-              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center"
-                style={{
-                  background: profile?.avatar_url ? 'transparent' : (isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)'),
-                  border: isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(255,255,255,0.12)',
-                }}
-              >
-                {profile?.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt="Profile"
-                    className="w-full h-full object-cover rounded-lg"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                  />
-                ) : (
-                  <UserCircle className="w-5 h-5" style={{ color: 'var(--hud-text)', opacity: 0.4 }} strokeWidth={1.5} />
-                )}
+              <div className="flex items-center gap-2">
+                <motion.button
+                  transition={TAP_SPRING}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    haptics.tap();
+                    navigate(isOwner ? '/owner/profile' : '/client/profile');
+                  }}
+                  className="flex shrink-0 items-center gap-2.5 px-2 py-1.5 pr-3.5 rounded-2xl"
+                  style={glassPillStyle}
+                >
+                  <div className="w-7 h-7 rounded-[0.6rem] overflow-hidden shrink-0 flex items-center justify-center relative"
+                    style={{
+                      background: profile?.avatar_url ? 'transparent' : (isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)'),
+                      border: 'none',
+                    }}
+                  >
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                        onError={(e) => { 
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div 
+                      className="absolute inset-0 flex items-center justify-center"
+                      style={{ display: profile?.avatar_url ? 'none' : 'flex' }}
+                    >
+                      <UserCircle className="w-5 h-5" style={{ color: 'var(--hud-text)', opacity: 0.35 }} strokeWidth={1.5} />
+                    </div>
+                  </div>
+                  {profile?.full_name && (
+                    <span className="text-[11px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: 'var(--hud-text)' }}>
+                      {profile.full_name.split(' ')[0]}
+                    </span>
+                  )}
+                </motion.button>
+                
+                {/* Brand Logo - The "Heather Bottle" / Glass Pill Logo */}
+                <div 
+                  className="hidden md:flex h-11 items-center px-5 rounded-full"
+                  style={glassPillStyle}
+                >
+                  <span className="swipess-logo-sm text-lg">Swipess</span>
+                </div>
               </div>
-              {profile?.full_name && (
-                <span className="text-[10px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: 'var(--hud-text)' }}>
-                  {profile.full_name.split(' ')[0]}
-                </span>
-              )}
-            </motion.button>
-          )
-        )}
+            )
+          )}
 
+          {/* Mode Switcher — Standalone buttons next to profile */}
+          {!minimal && (
+            <ModeSwitcher />
+          )}
         </div>
 
-        <div className="flex-1" />
+        {onCenterTap ? (
+          <motion.button
+            className="flex-1 h-full pointer-events-auto"
+            whileTap={{ opacity: 0.7 }}
+            onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); haptics.tap(); onCenterTap(); }}
+            aria-label="Go to dashboard"
+          />
+        ) : (
+          <div className="flex-1" />
+        )}
 
         {/* RIGHT CLUSTER: Individual Action Pills */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 pointer-events-auto">
           {!minimal && (
             <>
               <motion.button
+                transition={TAP_SPRING}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => { haptics.tap(); setModal('showTokensModal', true); }}
+                className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full relative overflow-hidden"
+                style={{
+                  ...glassPillStyle,
+                  background: isLight
+                    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(79, 70, 229, 0.18))'
+                    : 'linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(79, 70, 229, 0.28))',
+                  boxShadow: isLight
+                    ? '0 8px 24px -6px rgba(124, 58, 237, 0.4)'
+                    : '0 12px 32px -8px rgba(124, 58, 237, 0.5)',
+                }}
+                aria-label="Tokens"
+              >
+                <Ticket
+                  className="w-4 h-4"
+                  style={{
+                    color: '#8b5cf6',
+                    filter: 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))',
+                  }}
+                  strokeWidth={2.4}
+                />
+              </motion.button>
+
+              <motion.button
+                transition={TAP_SPRING}
                 whileTap={{ scale: 0.9 }}
                 onPointerDown={(e) => {
                   e.preventDefault(); e.stopPropagation();
                   haptics.tap();
                   navigate('/radio');
                 }}
-                  className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
+                className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
                 style={glassPillStyle}
                 title="Radio"
               >
@@ -168,10 +235,68 @@ function TopBarComponent({
                 />
               </motion.button>
 
+              <motion.button
+                transition={TAP_SPRING}
+                whileTap={{ scale: 0.9 }}
+                onPointerDown={(e) => {
+                  e.preventDefault(); e.stopPropagation();
+                  haptics.tap();
+                  navigate(isOwner ? '/owner/dashboard' : '/client/dashboard');
+                }}
+                className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
+                style={glassPillStyle}
+                title="Dashboard"
+              >
+                <Zap 
+                  className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-yellow-500" 
+                  strokeWidth={2.5} 
+                />
+              </motion.button>
+
+              {onFilterClick && (
+                <motion.button
+                  transition={TAP_SPRING}
+                  whileTap={{ scale: 0.9 }}
+                  onPointerDown={(e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    haptics.tap();
+                    onFilterClick(e);
+                  }}
+                  className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
+                  style={glassPillStyle}
+                  title="Filters"
+                >
+                  <SlidersHorizontal 
+                    className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-blue-500" 
+                    strokeWidth={2.5} 
+                  />
+                </motion.button>
+              )}
+
+              {onMessageActivationsClick && (
+                <motion.button
+                  transition={TAP_SPRING}
+                  whileTap={{ scale: 0.9 }}
+                  onPointerDown={(e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    haptics.tap();
+                    onMessageActivationsClick();
+                  }}
+                  className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
+                  style={glassPillStyle}
+                  title="Messages & Activations"
+                >
+                  <MessageCircle 
+                    className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-indigo-500" 
+                    strokeWidth={2.5} 
+                  />
+                </motion.button>
+              )}
+
               <AIListingTrigger glassPillStyle={glassPillStyle} />
 
               <ThemeToggle glassPillStyle={glassPillStyle} />
-              
+
               <NotificationPopover glassPillStyle={glassPillStyle} />
             </>
           )}
@@ -191,5 +316,3 @@ function TopBarComponent({
 }
 
 export const TopBar = memo(TopBarComponent);
-
-

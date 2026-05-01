@@ -22,7 +22,7 @@ import {
   Users2, ShieldCheck,
   Megaphone, PartyPopper, Scale,
   Zap, SlidersHorizontal, Sparkles,
-  Ticket, IdCard, BadgePercent, Radio
+  IdCard, BadgePercent, Radio, Ticket
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadMessageCount } from '@/hooks/useUnreadMessageCount';
@@ -35,11 +35,12 @@ import { useTranslation } from 'react-i18next';
 import { useAppNavigate } from '@/hooks/useAppNavigate';
 import { useFilterStore } from '@/state/filterStore';
 import { useModalStore } from '@/state/modalStore';
+import { useActiveMode } from '@/hooks/useActiveMode';
 
-const ICON_SIZE = 23;
-const ICON_SIZE_COMPACT = 20;
+const ICON_SIZE = 20;
+const ICON_SIZE_COMPACT = 18;
 const ICON_SIZE_TABLET = 26;
-const TOUCH_TARGET = 46;
+const TOUCH_TARGET = 40;
 const TOUCH_TARGET_TABLET = 54;
 
 interface BottomNavigationProps {
@@ -64,7 +65,7 @@ interface NavItem {
 
 // ── SPRING CONFIGS ────────────────────────────────────────────────────────────
 
-const TAP_SPRING = {
+export const TAP_SPRING = {
   type: 'spring' as const,
   stiffness: 1000, // OVERCLOCKED
   damping: 30,
@@ -74,15 +75,19 @@ const TAP_SPRING = {
 export const BottomNavigation = memo(({
   userRole,
   onFilterClick,
+  onListingsClick,
   className,
 }: BottomNavigationProps) => {
   const { navigate, prefetch } = useAppNavigate();
   const location = useLocation();
   const setCategories = useFilterStore((s) => s.setCategories);
   const setModal = useModalStore((s) => s.setModal);
+  const showAIListing = useModalStore((s) => s.showAIListing);
+  const showAIChat = useModalStore((s) => s.showAIChat);
   const { unreadCount: _unreadCount } = useUnreadMessageCount();
   const { unreadCount: _unreadNotifCount } = useUnreadNotifications();
   const { theme, isLight } = useAppTheme();
+  const { activeMode, switchMode, isSwitching } = useActiveMode();
 
   const { t } = useTranslation();
 
@@ -109,20 +114,20 @@ export const BottomNavigation = memo(({
   }, []);
 
 
-  // Client nav items
+  // Client nav items — Legal lives inside Profile, not in the bar
   const clientNavItems: NavItem[] = [
     { id: 'dashboard', icon: Zap, label: 'Dashboard', path: '/client/dashboard' },
     { id: 'profile', icon: CircleUser, label: 'Profile', path: '/client/profile' },
-    { id: 'likes', icon: Flame, label: 'Likes', path: '/client/liked-properties' },
+    { id: 'likes', icon: Flame, label: 'Likes', path: '/client/liked-properties', onClick: onListingsClick },
     { id: 'ai', icon: Sparkles, label: 'AI Bot', onClick: openAIChat, isSpecial: true },
     { id: 'messages', icon: MessageCircle, label: 'Messages', path: '/messages' },
+    { id: 'vapid', icon: IdCard, label: 'ID Card', onClick: () => setModal('showVapId', true) },
+    { id: 'events', icon: PartyPopper, label: 'Events', path: '/explore/eventos' },
     { id: 'roommates', icon: Users2, label: 'Roommates', path: '/explore/roommates' },
     { id: 'tokens', icon: Ticket, label: 'Tokens', onClick: () => setModal('showTokensModal', true) },
-    { id: 'vapid', icon: IdCard, label: 'ID Card', onClick: () => setModal('showVapId', true) },
     { id: 'search', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
-    { id: 'events', icon: PartyPopper, label: 'Events', path: '/explore/eventos' },
-    { id: 'radio', icon: Radio, label: 'Radio', path: '/radio' },
     { id: 'perks', icon: BadgePercent, label: 'Perks', path: '/client/perks' },
+    { id: 'radio', icon: Radio, label: 'Radio', path: '/radio' },
   ];
 
   // Owner nav items
@@ -131,11 +136,11 @@ export const BottomNavigation = memo(({
     { id: 'profile', icon: CircleUser, label: 'Profile', path: '/owner/profile' },
     { id: 'likes', icon: Flame, label: 'Likes', path: '/owner/liked-clients' },
     { id: 'ai', icon: Sparkles, label: 'AI Bot', onClick: openAIChat, isSpecial: true },
-    { id: 'listings', icon: Building2, label: 'Listings', path: '/owner/properties' },
+    { id: 'listings', icon: Building2, label: 'Listings', path: '/owner/properties', onClick: onListingsClick },
     { id: 'messages', icon: MessageCircle, label: 'Messages', path: '/messages' },
-    { id: 'promote', icon: Megaphone, label: 'Promote', path: '/client/advertise' },
+    { id: 'ai-listing', icon: Sparkles, label: 'AI Listing', onClick: () => setModal('showAIListing', true), isSpecial: true },
     { id: 'legal', icon: Scale, label: 'Legal', path: '/owner/legal-services' },
-    { id: 'radio', icon: Radio, label: 'Radio', path: '/radio' },
+    { id: 'promote', icon: Megaphone, label: 'Promote', path: '/client/advertise' },
     { id: 'filters', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
   ];
 
@@ -204,6 +209,12 @@ export const BottomNavigation = memo(({
         setTimeout(() => setRipple(null), 800);
       }
 
+      // Close any open full-screen modals before navigating to a new page
+      if (item.path) {
+        if (showAIListing) setModal('showAIListing', false);
+        if (showAIChat) setModal('showAIChat', false);
+      }
+
       // Haptics already triggered on PointerDown if applicable
       if (item.onClick) {
         item.onClick();
@@ -211,7 +222,7 @@ export const BottomNavigation = memo(({
         navigate(item.path);
       }
     },
-    [navigate, location.pathname, setCategories],
+    [navigate, location.pathname, setCategories, showAIListing, showAIChat, setModal],
   );
 
   const handleNavKeyDown = useCallback(
@@ -241,22 +252,28 @@ export const BottomNavigation = memo(({
 
 
   return (
-    <nav role="navigation" aria-label="Main navigation" className={cn('app-bottom-bar px-3 pb-2 pt-1', className)}>
+    <nav role="navigation" aria-label="Main navigation" className={cn('app-bottom-bar px-2 pb-2 pt-1', className, isTablet ? 'px-3' : '')} style={{ paddingBottom: 'calc(8px + max(0px, env(safe-area-inset-bottom)))' }}>
       {/* ── Liquid Glass bar surface ────────────────────────────────────────
           The bar itself is a glass layer so the swipe card content shows
           through, reinforcing the "floating above" feeling. */}
       <div
         className={cn(
-          "pointer-events-auto w-full max-w-[440px] mx-auto glass-pill-nav px-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
+          "pointer-events-auto glass-pill-nav px-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]",
+          isTablet ? "mx-auto w-fit max-w-full" : "w-full"
         )}
         style={{
-          background: 'var(--hud-bg)',
-          backdropFilter: 'blur(32px) saturate(280%)',
-          WebkitBackdropFilter: 'blur(32px) saturate(280%)',
+          background: isLight ? 'rgba(255, 255, 255, 0.92)' : 'rgba(10, 15, 30, 0.55)',
+          // Reduced from blur(40) — visually equivalent against a busy
+          // background, but ~3x cheaper per frame on the always-on bar.
+          backdropFilter: 'blur(22px) saturate(220%)',
+          WebkitBackdropFilter: 'blur(22px) saturate(220%)',
+          // Always a fully rounded pill — feels premium on every viewport.
           borderRadius: '3rem',
           padding: '4px',
-          boxShadow: '0 20px 50px -10px rgba(0,0,0,0.15)',
-          border: '1px solid var(--hud-border)',
+          boxShadow: isLight
+            ? '0 15px 40px rgba(0,0,0,0.14), inset 0 0 0 1px rgba(0,0,0,0.06)'
+            : '0 25px 60px -10px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.08)',
+          border: 'none',
         }}
 
       >
@@ -267,7 +284,7 @@ export const BottomNavigation = memo(({
           data-scroll-axis="x"
           onPointerMove={handlePointerMove}
           className={cn(
-            'relative flex items-center w-full justify-start gap-1 px-4 py-1.5 nav-scroll-hide transform-gpu select-none',
+            'relative flex items-center w-full gap-1 px-4 py-1.5 nav-scroll-hide transform-gpu select-none',
           )}
           style={{
             zIndex: 2,
@@ -284,6 +301,9 @@ export const BottomNavigation = memo(({
             touchAction: 'pan-x',
             overscrollBehaviorX: 'contain',
             overscrollBehaviorY: 'none',
+            // 'safe center' centers the items when they fit, but falls back to
+            // start-alignment when they overflow so nothing gets clipped.
+            justifyContent: 'safe center',
           }}
         >
           {navItems.map((item) => {
@@ -301,23 +321,25 @@ export const BottomNavigation = memo(({
                   isDraggingRef.current = false;
                   touchState.current = { x: e.clientX, y: e.clientY };
                 }}
-                onPointerEnter={() => {
-                  if (item.path) prefetch(item.path);
+                onPointerMove={handlePointerMove}
+                onPointerUp={(e) => {
+                  handleNavClick(item, e);
+                  handlePointerUp();
                 }}
-                onPointerUp={() => handlePointerUp()}
+                onPointerCancel={handlePointerUp}
                 onKeyDown={(e) => handleNavKeyDown(e, item)}
-                onClick={(e) => handleNavClick(item, e)}
+
                 aria-label={item.label}
                 aria-current={isActive(item) ? 'page' : undefined}
                 className={cn(
                   'relative flex flex-col items-center justify-center rounded-full gap-1 w-auto flex-shrink-0 h-full',
-                  'touch-manipulation focus-visible:outline-none transform-gpu active:bg-[var(--hud-active-bg)]',
+                  'touch-manipulation focus-visible:outline-none transform-gpu',
                 )}
                 style={{
-                  minWidth: isTablet ? '100px' : (isNarrow ? '54px' : '64px'),
+                  minWidth: 'clamp(42px, 10vw, 54px)',
                   scrollSnapAlign: 'start',
                   minHeight: isTablet ? TOUCH_TARGET_TABLET : TOUCH_TARGET,
-                  padding: isTablet ? '8px 12px' : '6px 8px',
+                  padding: isTablet ? '8px 12px' : (isNarrow ? '4px' : 'clamp(4px, 1.2vw, 8px)'),
                   borderRadius: '3rem',
                   cursor: 'pointer',
                   flexShrink: 0,
@@ -327,11 +349,18 @@ export const BottomNavigation = memo(({
                   transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               >
-                <motion.div
+                {/* No per-button frame — the bar is already a pill. Active
+                    state is communicated by the icon color alone. */}
+
+                <div
                   className="relative z-10"
-                  animate={{ scale: active ? 1.1 : 1 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30, mass: 0.6 }}
-                  style={{ zIndex: 1, display: 'flex', alignItems: 'center', justifyItems: 'center' }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transform: active ? 'scale(1.06)' : 'scale(1)',
+                    transition: 'transform 180ms cubic-bezier(0.32, 0.72, 0, 1)',
+                  }}
                 >
 
                   {/* Notification badge */}
@@ -342,7 +371,7 @@ export const BottomNavigation = memo(({
                         animate={{ scale: 1 }}
                         exit={{ scale: 0 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                        className="absolute -top-1 -right-1 rounded-full px-1.5 h-[16px] z-20 shadow-[0_2px_8px_rgba(255,140,0,0.4)] border-2 border-[var(--hud-bg)] flex items-center justify-center text-[10px] font-black text-white"
+                        className="absolute -top-1 -right-1 rounded-full px-1.5 h-[16px] z-20 shadow-[0_2px_8px_rgba(255,140,0,0.4)] border-2 border-[var(--hud-bg)] flex items-center justify-center text-[11px] font-black text-white"
                         style={{ background: 'linear-gradient(135deg,#ff4d00,#ff8c00)' }}
                       >
                         {item.badge}
@@ -350,33 +379,34 @@ export const BottomNavigation = memo(({
                     )}
                   </AnimatePresence>
 
-                  {/* Icon: filled with brand color when active, outline when inactive */}
+                  {/* Icon: brand-colored when active, muted when inactive.
+                      No frame, no glow — just color. */}
                   <Icon
-                    className="transition-all duration-300 ease-out"
                     style={{
-                      width: isTablet ? ICON_SIZE_TABLET : (isNarrow ? ICON_SIZE_COMPACT : ICON_SIZE),
-                      height: isTablet ? ICON_SIZE_TABLET : (isNarrow ? ICON_SIZE_COMPACT : ICON_SIZE),
-                      color: active 
-                        ? (isLight ? 'black' : 'white') 
-                        : (isLight ? 'black' : 'white'),
-                      opacity: active ? 1 : 0.65,
-                      fill: active ? activeColor : 'none',
-                      strokeWidth: active ? 2 : 1.5,
-                      filter: 'none',
+                      width: isTablet ? ICON_SIZE_TABLET : (isNarrow ? 16 : ICON_SIZE),
+                      height: isTablet ? ICON_SIZE_TABLET : (isNarrow ? 16 : ICON_SIZE),
+                      color: active
+                        ? '#FF4D00'
+                        : (isLight ? 'rgba(0,0,0,0.62)' : 'rgba(255,255,255,0.7)'),
+                      fill: 'none',
+                      strokeWidth: active ? 2.4 : 1.9,
+                      transition: 'color 160ms ease-out, stroke-width 160ms ease-out',
                     }}
                   />
-                </motion.div>
-                {/* Label: Natural height, no clipping */}
+                </div>
+                {/* Label */}
                 {!isNarrow && (
-                  <div className="flex items-center justify-center w-full min-h-[14px] px-1">
+                  <div className="flex items-center justify-center w-full min-h-[12px] px-0.5">
                     <span
                       className={cn(
-                        'tracking-tight transition-all duration-300 relative font-black uppercase italic truncate max-w-[56px]',
-                        isTablet ? 'text-[10px]' : 'text-[8.5px]',
+                        'tracking-wide relative font-black uppercase truncate',
+                        isTablet ? 'text-[11px] max-w-[56px]' : 'text-[8px] max-w-[40px]',
                       )}
                       style={{
-                        color: 'var(--hud-text)',
-                        opacity: active ? 1 : 0.65,
+                        color: active
+                          ? '#FF4D00'
+                          : (isLight ? 'rgba(0,0,0,0.62)' : 'rgba(255,255,255,0.7)'),
+                        transition: 'color 160ms ease-out',
                         zIndex: 1,
                       }}
                     >
@@ -404,5 +434,3 @@ export const BottomNavigation = memo(({
 });
 
 BottomNavigation.displayName = 'BottomNavigation';
-
-

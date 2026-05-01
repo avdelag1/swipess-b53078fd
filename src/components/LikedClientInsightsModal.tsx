@@ -2,12 +2,12 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, User, Calendar, MessageCircle, CheckCircle, Trash2, Ban, Flag, ChevronLeft, ChevronRight, X, Briefcase, Sparkles, Star } from 'lucide-react';
+import { MapPin, User, Calendar, MessageCircle, CheckCircle, Trash2, Ban, Flag, ChevronLeft, ChevronRight, X, Briefcase, Sparkles, Star, Share2, TrendingUp, Zap, Clock, Target, Users, Shield, Award, ThumbsUp, Eye } from 'lucide-react';
 import { PropertyImageGallery } from './PropertyImageGallery';
 import { useNavigate } from 'react-router-dom';
 import { useStartConversation } from '@/hooks/useConversations';
 import { toast } from '@/components/ui/sonner';
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { logger } from '@/utils/prodLogger';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,6 +27,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ReportDialog } from './ReportDialog';
+import { ShareDialog } from './ShareDialog';
 
 interface LikedClient {
   id: string;
@@ -64,12 +66,50 @@ function LikedClientInsightsModalComponent({ open, onOpenChange, client }: Liked
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const [showRatingDialog, setShowRatingDialog] = useState(false);
-  const [reportReason, setReportReason] = useState('');
-  const [reportDetails, setReportDetails] = useState('');
 
   // Fetch rating aggregate for this client
   const { data: ratingAggregate } = useUserRatingAggregate(client?.user_id);
+
+  // Calculate renter insights based on client data
+  const renterInsights = useMemo(() => {
+    if (!client) return null;
+
+    const interestCount = client.interests?.length || 0;
+    const hasBio = !!client.bio && client.bio.length > 50;
+    const hasOccupation = !!client.occupation;
+    const isVerified = !!client.verified;
+    const hasIncome = !!client.monthly_income;
+
+    // Calculate readiness score (0-100)
+    let readinessScore = 0;
+    if (isVerified) readinessScore += 30;
+    if (hasOccupation) readinessScore += 20;
+    if (hasIncome) readinessScore += 20;
+    if (hasBio) readinessScore += 15;
+    if (interestCount >= 3) readinessScore += 15;
+    else if (interestCount >= 1) readinessScore += 5;
+
+    // Activity level based on profile completion
+    const activityLevel = readinessScore >= 80 ? 'Very High' : readinessScore >= 50 ? 'High' : 'Moderate';
+    
+    // Match potential
+    const matchPotential = readinessScore >= 75 ? 'Excellent' : readinessScore >= 50 ? 'Strong' : 'Good';
+
+    // Determining the "Why this renter" highlight
+    let highlight = "Serious candidate with verified background.";
+    if (!isVerified && hasOccupation) highlight = "Professionally stable candidate.";
+    if (readinessScore < 50) highlight = "New explorer looking for the right fit.";
+
+    return {
+      readinessScore: Math.min(100, readinessScore),
+      activityLevel,
+      matchPotential,
+      highlight,
+      isHotProspect: readinessScore >= 85,
+    };
+  }, [client]);
 
   const clientImages = client?.profile_images || client?.images || [];
 
@@ -165,44 +205,7 @@ function LikedClientInsightsModalComponent({ open, onOpenChange, client }: Liked
     }
   });
 
-  // Report mutation
-  const reportMutation = useMutation({
-    mutationFn: async ({ reason, details }: { reason: string; details: string }) => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user || !client) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('user_reports')
-        .insert({
-          reporter_id: user.user.id,
-          reported_user_id: client.user_id,
-          report_reason: reason,
-          report_details: details,
-          status: 'pending'
-        });
-
-      if (error) {
-        logger.error('Report submission error:', error);
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      toast({
-        title: 'Report submitted',
-        description: "We'll review it shortly.",
-      });
-      setShowReportDialog(false);
-      setReportReason('');
-      setReportDetails('');
-    },
-    onError: () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to submit report.',
-        variant: 'destructive',
-      });
-    }
-  });
 
   const handleDelete = () => {
     setShowDeleteDialog(true);
@@ -225,17 +228,6 @@ function LikedClientInsightsModalComponent({ open, onOpenChange, client }: Liked
     setShowReportDialog(true);
   };
 
-  const handleSubmitReport = () => {
-    if (!reportReason) {
-      toast({
-        title: 'Error',
-        description: 'Please select a reason for your report.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    reportMutation.mutate({ reason: reportReason, details: reportDetails });
-  };
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? clientImages.length - 1 : prev - 1));
@@ -291,288 +283,307 @@ function LikedClientInsightsModalComponent({ open, onOpenChange, client }: Liked
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
-          className="w-full max-w-2xl h-[95dvh] max-h-[95dvh] p-0 overflow-hidden bg-background border-0 sm:rounded-[32px] rounded-none sm:h-[90vh]"
+          className="w-full max-w-lg h-[92dvh] max-h-[92dvh] p-0 overflow-hidden bg-[#0a0a0f] border-0 rounded-[2.5rem]"
           hideCloseButton
         >
           <div className="flex flex-col h-full">
-            {/* Persistent Back/Close — always visible */}
-            <div className="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+            {/* Floating nav buttons */}
+            <div className="absolute top-4 left-4 right-4 z-30 flex items-center justify-between pointer-events-none">
               <button
                 onClick={() => onOpenChange(false)}
-                title="Back"
                 aria-label="Back"
-                className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-sm"
+                className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-xl border border-white/10"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={() => onOpenChange(false)}
-                title="Close"
                 aria-label="Close"
-                className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-sm"
+                className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-xl border border-white/10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Hero Image Section */}
+            {/* Hero Image */}
             <div className="relative flex-shrink-0">
               {clientImages.length > 0 ? (
-                <div className="relative aspect-[3/4] max-h-[45vh] w-full">
+                <div className="relative h-[50vw] max-h-[320px] min-h-[220px] w-full overflow-hidden rounded-t-[2.5rem]">
                   <img
                     src={clientImages[currentImageIndex]}
                     alt={`${client.name} photo ${currentImageIndex + 1}`}
                     className="w-full h-full object-cover cursor-pointer"
                     onClick={handleImageClick}
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/10 to-transparent pointer-events-none" />
 
-                  {/* Navigation Arrows */}
                   {clientImages.length > 1 && (
                     <>
-                      <button
-                        onClick={handlePrevImage}
-                        title="Previous image"
-                        aria-label="Previous image"
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-sm"
-                      >
-                        <ChevronLeft className="w-6 h-6" />
+                      <button onClick={handlePrevImage} aria-label="Previous image"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center backdrop-blur-md border border-white/10 active:scale-90 transition-all">
+                        <ChevronLeft className="w-5 h-5" />
                       </button>
-                      <button
-                        onClick={handleNextImage}
-                        title="Next image"
-                        aria-label="Next image"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-sm"
-                      >
-                        <ChevronRight className="w-6 h-6" />
+                      <button onClick={handleNextImage} aria-label="Next image"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center backdrop-blur-md border border-white/10 active:scale-90 transition-all">
+                        <ChevronRight className="w-5 h-5" />
                       </button>
                     </>
                   )}
 
-                  {/* Photo Counter & Badges */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 px-3 py-1">
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        Liked
-                      </Badge>
-                      {client.verified && (
-                        <Badge className="bg-rose-500/90 text-white border-0 px-3 py-1">
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Verified
-                        </Badge>
-                      )}
-                      <Badge className="bg-black/60 text-white border-0 px-3 py-1 backdrop-blur-sm">
-                        <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-                        {ratingAggregate?.displayed_rating?.toFixed(1) || '5.0'}
-                        <span className="text-white/70 ml-1">({ratingAggregate?.total_ratings || 0})</span>
-                      </Badge>
-                    </div>
-                    {clientImages.length > 1 && (
-                      <div className="bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
-                        {currentImageIndex + 1} / {clientImages.length}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Thumbnail Strip */}
                   {clientImages.length > 1 && (
-                    <div className="absolute bottom-[-28px] left-0 right-0 flex justify-center gap-1.5 px-4 z-20">
+                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
                       {clientImages.slice(0, 8).map((_, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentImageIndex(idx)}
-                          title={`Go to image ${idx + 1}`}
-                          aria-label={`Go to image ${idx + 1}`}
-                          className={`h-1.5 rounded-full transition-all duration-200 ${
-                            idx === currentImageIndex
-                              ? 'w-6 bg-primary'
-                              : 'w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground/60'
-                          }`}
+                        <button key={idx} onClick={() => setCurrentImageIndex(idx)} aria-label={`Image ${idx + 1}`}
+                          className={`rounded-full transition-all duration-300 ${idx === currentImageIndex ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40'}`}
                         />
                       ))}
                     </div>
                   )}
+
+                  {/* Badges */}
+                  <div className="absolute bottom-8 left-4 flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EB4898]/90 backdrop-blur-md">
+                      <Sparkles className="w-3 h-3 text-white" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white">Liked</span>
+                    </div>
+                    {renterInsights?.isHotProspect && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-600/90 backdrop-blur-md">
+                        <Zap className="w-3 h-3 text-white" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Hot Prospect</span>
+                      </div>
+                    )}
+                    {client.verified && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/80 backdrop-blur-md">
+                        <CheckCircle className="w-3 h-3 text-white" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Verified</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      <span className="text-[11px] font-black text-white">{ratingAggregate?.displayed_rating?.toFixed(1) || '5.0'}</span>
+                      <span className="text-[10px] text-white/50">({ratingAggregate?.total_ratings || 0})</span>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="aspect-[3/4] max-h-[45vh] w-full bg-muted flex items-center justify-center pt-14">
-                  <User className="w-16 h-16 text-muted-foreground" />
+                <div className="h-[220px] w-full bg-[#1a1a2e] rounded-t-[2.5rem] flex items-center justify-center">
+                  <User className="w-16 h-16 text-white/10" />
                 </div>
               )}
             </div>
 
-            {/* 🚀 LIQUID SCROLL AREA — Flex-1 ensures footer is ALWAYS docked */}
+            {/* Scrollable Content */}
             <div className="flex-1 min-h-0 relative flex flex-col">
               <ScrollArea className="h-full w-full">
-                <div className="p-4 sm:p-6 space-y-5 pt-10 pb-8">
-                  {/* Name & Basic Info */}
-                  <div className="space-y-2">
-                    <h2 className="text-xl sm:text-2xl font-bold leading-tight flex items-center gap-2">
+                <div className="px-5 pt-4 pb-6 space-y-5">
+
+                  {/* Name & info */}
+                  <div>
+                    <h2 className="text-[22px] font-black text-white leading-tight tracking-tight flex items-center gap-2">
                       {client.name}
-                      {client.verified && (
-                        <CheckCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
-                      )}
+                      {client.verified && <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />}
                     </h2>
-
-                    {/* Quick Info Row */}
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    {client.age && (
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{client.age} years</span>
-                      </div>
-                    )}
-                    {client.gender && (
-                      <div className="flex items-center gap-1">
-                        <User className="w-4 h-4" />
-                        <span>{client.gender}</span>
-                      </div>
-                    )}
-                    {(client.location || client.city) && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        <span>{client.city || 'Location verified'}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Occupation Card */}
-                {client.occupation && (
-                  <div className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-xl">
-                    <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                      <Briefcase className="w-5 h-5 text-blue-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Occupation</p>
-                      <p className="font-medium">{client.occupation}</p>
+                    <div className="flex flex-wrap items-center gap-3 mt-2">
+                      {client.age && (
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-white/30" />
+                          <span className="text-[12px] text-white/50 font-medium">{client.age} yrs</span>
+                        </div>
+                      )}
+                      {client.gender && (
+                        <div className="flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5 text-white/30" />
+                          <span className="text-[12px] text-white/50 font-medium">{client.gender}</span>
+                        </div>
+                      )}
+                      {(client.location || client.city) && (
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-white/30" />
+                          <span className="text-[12px] text-white/50 font-medium">{client.city || 'Location verified'}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
 
-                {/* Bio */}
-                {client.bio && (
+                  {/* Occupation */}
+                  {client.occupation && (
+                    <div className="flex items-center gap-3 p-4 bg-blue-500/[0.07] rounded-2xl border border-blue-500/15">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                        <Briefcase className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-white/35 uppercase font-black tracking-widest mb-0.5">Occupation</p>
+                        <p className="text-[14px] font-bold text-white">{client.occupation}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bio */}
+                  {client.bio && (
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">About</h4>
+                      <p className="text-[13px] leading-relaxed text-white/70 font-medium">{client.bio}</p>
+                    </div>
+                  )}
+
+                  {/* Interests */}
+                  {client.interests && client.interests.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Interests</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {client.interests.map((interest) => (
+                          <span key={`interest-${interest}`}
+                            className="px-3 py-1.5 rounded-xl bg-[#EB4898]/[0.08] border border-[#EB4898]/20 text-[11px] font-bold text-[#EB4898]/90">
+                            {interest}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className={`flex items-center gap-3 p-3.5 rounded-2xl border ${
+                      client.verified
+                        ? 'bg-emerald-500/[0.07] border-emerald-500/20'
+                        : 'bg-white/[0.03] border-white/[0.07]'
+                    }`}>
+                      <CheckCircle className={`w-5 h-5 flex-shrink-0 ${client.verified ? 'text-emerald-400' : 'text-white/20'}`} />
+                      <div>
+                        <p className="text-[12px] font-black text-white">ID Verified</p>
+                        <p className="text-[10px] text-white/35">{client.verified ? 'Confirmed' : 'Pending'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3.5 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                      <Eye className="w-5 h-5 text-white/20 flex-shrink-0" />
+                      <div>
+                        <p className="text-[12px] font-black text-white">Photos</p>
+                        <p className="text-[10px] text-white/35">{clientImages.length} uploaded</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Behavioral Insights */}
+                  {renterInsights && (
+                    <div className="space-y-3">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Behavioral Insights</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="p-3 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                          <div className="flex items-center gap-2 mb-1">
+                            <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                            <span className="text-[10px] text-white/40 uppercase font-black">Readiness</span>
+                          </div>
+                          <div className="text-lg font-black text-white">{renterInsights.readinessScore}%</div>
+                        </div>
+                        <div className="p-3 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Zap className="w-3.5 h-3.5 text-rose-400" />
+                            <span className="text-[10px] text-white/40 uppercase font-black">Activity</span>
+                          </div>
+                          <div className="text-sm font-black text-white">{renterInsights.activityLevel}</div>
+                        </div>
+                        <div className="p-3 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Target className="w-3.5 h-3.5 text-emerald-400" />
+                            <span className="text-[10px] text-white/40 uppercase font-black">Match Pot.</span>
+                          </div>
+                          <div className="text-sm font-black text-white">{renterInsights.matchPotential}</div>
+                        </div>
+                        <div className="p-3 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Clock className="w-3.5 h-3.5 text-amber-400" />
+                            <span className="text-[10px] text-white/40 uppercase font-black">Last Seen</span>
+                          </div>
+                          <div className="text-sm font-black text-white">Today</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Readiness Assessment */}
+                  {renterInsights && (
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Readiness Assessment</h4>
+                      <div className={cn(
+                        "p-4 rounded-2xl border backdrop-blur-md",
+                        renterInsights.readinessScore >= 80 ? 'bg-emerald-500/5 border-emerald-500/20' :
+                        renterInsights.readinessScore >= 50 ? 'bg-blue-500/5 border-blue-500/20' :
+                        'bg-amber-500/5 border-amber-500/20'
+                      )}>
+                        <div className="flex items-center gap-2 mb-2">
+                          {renterInsights.readinessScore >= 80 ? <Award className="w-4 h-4 text-emerald-400" /> :
+                           renterInsights.readinessScore >= 50 ? <ThumbsUp className="w-4 h-4 text-blue-400" /> :
+                           <CheckCircle className="w-4 h-4 text-amber-400" />}
+                          <span className={cn(
+                            "text-[12px] font-black uppercase tracking-wider",
+                            renterInsights.readinessScore >= 80 ? 'text-emerald-400' :
+                            renterInsights.readinessScore >= 50 ? 'text-blue-400' :
+                            'text-amber-400'
+                          )}>
+                            {renterInsights.readinessScore >= 80 ? 'Elite Candidate' :
+                             renterInsights.readinessScore >= 50 ? 'Strong Candidate' :
+                             'Regular Candidate'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-white/50 leading-relaxed font-medium">
+                          {renterInsights.highlight}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Rating */}
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">About</h4>
-                    <p className="text-sm leading-relaxed">{client.bio}</p>
-                  </div>
-                )}
-
-                {/* Interests */}
-                {client.interests && client.interests.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Interests</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {client.interests.map((interest) => (
-                        <Badge
-                          key={`interest-${interest}`}
-                          variant="secondary"
-                          className="bg-primary/10 text-primary border-0"
-                        >
-                          {interest}
-                        </Badge>
-                      ))}
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Rating & Reviews</h4>
+                    <div className="p-4 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                      <CompactRatingDisplay aggregate={ratingAggregate || null} showReviews={true} />
+                      <Button variant="outline" size="sm" onClick={() => setShowRatingDialog(true)}
+                        className="mt-3 w-full rounded-xl bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20">
+                        <Star className="w-4 h-4 mr-2" />
+                        Rate this Client
+                      </Button>
                     </div>
                   </div>
-                )}
 
-                {/* Profile Stats */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className={`flex items-center gap-3 p-3 rounded-xl border ${
-                    client.verified
-                      ? 'bg-rose-500/10 border-rose-500/30'
-                      : 'bg-muted/30 border-muted'
-                  }`}>
-                    <CheckCircle className={`w-5 h-5 ${client.verified ? 'text-rose-500' : 'text-muted-foreground'}`} />
-                    <div>
-                      <p className="text-sm font-medium">ID Verified</p>
-                      <p className="text-xs text-muted-foreground">{client.verified ? 'Confirmed' : 'Pending'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl border border-muted">
-                    <MapPin className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">Photos</p>
-                      <p className="text-xs text-muted-foreground">{clientImages.length} uploaded</p>
-                    </div>
+                  <div className="text-[10px] text-white/20 font-medium">
+                    Connected {new Date(client.liked_at).toLocaleDateString()}
                   </div>
                 </div>
+              </ScrollArea>
+            </div>
 
-                {/* Rating Section */}
-                <div className="space-y-3 pt-2">
-                  <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Rating & Reviews</h4>
-                  <div className="p-4 bg-muted/30 rounded-xl">
-                    <CompactRatingDisplay aggregate={ratingAggregate || null} showReviews={true} />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowRatingDialog(true)}
-                      className="mt-3 w-full rounded-xl"
-                    >
-                      <Star className="w-4 h-4 mr-2" />
-                      Rate this Client
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Liked Date */}
-                <div className="pt-2 text-xs text-muted-foreground">
-                  Liked on {new Date(client.liked_at).toLocaleDateString()}
-                </div>
-              </div>
-            </ScrollArea>
-
-            {/* Scroll Gradient Indicator — Sentient Cue */}
-            <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
-          </div>
-
-          {/* ⚡ ACTION DOCK — MEXICAN PINK PREMIUM — HARD-DOCKED */}
-          <div className="flex-shrink-0 p-5 border-t border-white/5 bg-background/95 backdrop-blur-md shadow-[0_-15px_35px_rgba(0,0,0,0.6)] z-20">
-            <div className="grid grid-cols-1 gap-3">
-              {/* Primary Action — Ultra High Priority */}
+            {/* Action Dock */}
+            <div className="flex-shrink-0 px-4 pb-5 pt-3 border-t border-white/[0.06] bg-[#0d0d14]/95 backdrop-blur-xl z-20 space-y-2.5">
               <Button
                 onClick={handleMessage}
                 disabled={isCreatingConversation || !client}
-                className="w-full h-14 bg-gradient-to-r from-brand-accent-1 to-brand-accent-2 hover:brightness-110 active:scale-[0.98] transition-all font-black text-lg uppercase tracking-wider rounded-2xl shadow-[0_0_20px_rgba(255,107,53,0.35)] border-0"
+                className="w-full h-13 bg-gradient-to-r from-[#EB4898] to-[#FF4D00] hover:brightness-110 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-lg shadow-[#EB4898]/20 border-0 active:scale-[0.98] transition-all"
               >
-                <MessageCircle className="w-6 h-6 mr-3 text-white" />
-                <span className="text-white">{isCreatingConversation ? 'Starting...' : 'Send Message'}</span>
+                <MessageCircle className="w-5 h-5 mr-2" />
+                {isCreatingConversation ? 'Starting...' : 'Send Message'}
               </Button>
 
-              {/* Secondary Actions — Discovery Suite */}
-              <div className="grid grid-cols-3 gap-2 mt-1">
-                <Button
-                  onClick={handleDelete}
-                  variant="outline"
-                  size="sm"
-                  className="h-11 bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-600 dark:text-red-400 rounded-xl"
-                  disabled={deleteMutation.isPending}
-                >
-                  <Trash2 className="w-4 h-4 mr-1.5" />
-                  Delete
+              <div className="grid grid-cols-4 gap-2">
+                <Button onClick={() => setShowShareDialog(true)} variant="ghost" size="sm"
+                  className="h-10 bg-blue-500/[0.07] hover:bg-blue-500/[0.15] border border-blue-500/20 text-blue-400 rounded-xl text-[11px] font-black uppercase tracking-wide">
+                  <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share
                 </Button>
-                <Button
-                  onClick={handleBlock}
-                  variant="outline"
-                  size="sm"
-                  className="h-11 bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/30 text-orange-600 dark:text-orange-400 rounded-xl"
-                  disabled={blockMutation.isPending}
-                >
-                  <Ban className="w-4 h-4 mr-1.5" />
-                  Block
+                <Button onClick={handleDelete} variant="ghost" size="sm"
+                  className="h-10 bg-red-500/[0.07] hover:bg-red-500/[0.15] border border-red-500/20 text-red-400 rounded-xl text-[11px] font-black uppercase tracking-wide"
+                  disabled={deleteMutation.isPending}>
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Remove
                 </Button>
-                <Button
-                  onClick={handleReport}
-                  variant="outline"
-                  size="sm"
-                  className="h-11 bg-yellow-500/10 hover:bg-yellow-500/20 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 rounded-xl"
-                  disabled={reportMutation.isPending}
-                >
-                  <Flag className="w-4 h-4 mr-1.5" />
-                  Report
+                <Button onClick={handleBlock} variant="ghost" size="sm"
+                  className="h-10 bg-orange-500/[0.07] hover:bg-orange-500/[0.15] border border-orange-500/20 text-orange-400 rounded-xl text-[11px] font-black uppercase tracking-wide"
+                  disabled={blockMutation.isPending}>
+                  <Ban className="w-3.5 h-3.5 mr-1.5" /> Block
+                </Button>
+                <Button onClick={handleReport} variant="ghost" size="sm"
+                  className="h-10 bg-amber-500/[0.07] hover:bg-amber-500/[0.15] border border-amber-500/20 text-amber-400 rounded-xl text-[11px] font-black uppercase tracking-wide">
+                  <Flag className="w-3.5 h-3.5 mr-1.5" /> Report
                 </Button>
               </div>
             </div>
-          </div>
           </div>
         </DialogContent>
 
@@ -636,64 +647,26 @@ function LikedClientInsightsModalComponent({ open, onOpenChange, client }: Liked
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Report Dialog */}
-      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Flag className="w-5 h-5 text-yellow-500" />
-              <h3 className="text-lg font-semibold">Report Client</h3>
-            </div>
-            <div className="space-y-3">
-              <Label>Reason for report</Label>
-              <RadioGroup value={reportReason} onValueChange={setReportReason} className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="fake_profile" id="fake_profile" />
-                  <Label htmlFor="fake_profile" className="font-normal">Fake or misleading profile</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="inappropriate" id="inappropriate" />
-                  <Label htmlFor="inappropriate" className="font-normal">Inappropriate content</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="harassment" id="harassment" />
-                  <Label htmlFor="harassment" className="font-normal">Harassment or abusive behavior</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="spam" id="spam" />
-                  <Label htmlFor="spam" className="font-normal">Spam or scam</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="other" id="other" />
-                  <Label htmlFor="other" className="font-normal">Other</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="details">Additional details (optional)</Label>
-              <Textarea
-                id="details"
-                placeholder="Please provide any additional information..."
-                value={reportDetails}
-                onChange={(e) => setReportDetails(e.target.value)}
-                className="min-h-[100px] rounded-xl"
-              />
-            </div>
-            <div className="flex gap-2 pt-2">
-              <Button variant="outline" onClick={() => setShowReportDialog(false)} className="flex-1 rounded-xl">
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSubmitReport}
-                disabled={!reportReason || reportMutation.isPending}
-                className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded-xl"
-              >
-                {reportMutation.isPending ? "Submitting..." : "Submit Report"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Report and Share Dialogs */}
+      {client && (
+        <>
+          <ReportDialog
+            open={showReportDialog}
+            onOpenChange={setShowReportDialog}
+            targetId={client.user_id}
+            targetType="user_profile"
+            reportedUserId={client.user_id}
+            targetName={client.name}
+          />
+          <ShareDialog
+            open={showShareDialog}
+            onOpenChange={setShowShareDialog}
+            profileId={client.user_id}
+            title={client.name}
+            description={client.bio}
+          />
+        </>
+      )}
 
       {/* Rating Submission Dialog */}
       {client && (

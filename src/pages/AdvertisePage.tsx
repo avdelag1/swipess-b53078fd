@@ -26,7 +26,7 @@ const PACKAGES = [
     price: 4.99,
     duration: "week",
     durationLabel: "/ week",
-    image: "/images/promo/card_starter.jpg",
+    image: "/starter_promo_card_1777061850096.png",
     perks: [
       "Your event shown to property owners, renters & digital nomads",
       "1 photo with your listing card",
@@ -45,7 +45,7 @@ const PACKAGES = [
     price: 6.99,
     duration: "3months",
     durationLabel: "/ 3 months",
-    image: "/images/promo/card_growth.jpg",
+    image: "/growth_promo_card_1777061867792.png",
     perks: [
       "Featured badge — stand out in the feed",
       "Up to 5 photos to showcase your event",
@@ -65,7 +65,7 @@ const PACKAGES = [
     price: 9.99,
     duration: "6months",
     durationLabel: "/ 6 months",
-    image: "/images/promo/card_premium.jpg",
+    image: "/premium_promo_card_1777061887805.png",
     perks: [
       "Top of feed — first thing users see",
       "Unlimited photos & rich media",
@@ -175,16 +175,23 @@ function PromoSwipeCard({
           : "0 4px 20px rgba(0,0,0,0.2)",
       }}
     >
+      {/* Background image fallback color */}
+      <div className="absolute inset-0 bg-[#1a1a1a]" />
+      
       {/* Background image */}
       <img 
         src={pkg.image} 
         className="absolute inset-0 w-full h-full object-cover" 
         alt={pkg.name}
         loading={index === 0 ? "eager" : "lazy"}
+        onError={(e) => {
+          // Fallback if image fails to load
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
       />
       
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+      {/* Gradient overlay — intensified for text clarity */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
       
       {/* Popular badge */}
       {(pkg as any).popular && (
@@ -213,11 +220,11 @@ function PromoSwipeCard({
         {/* Package name & icon */}
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl flex items-center justify-center"
-            style={{ background: `rgba(${pkg.colorRgb}, 0.3)`, backdropFilter: "blur(12px)", border: `1px solid rgba(${pkg.colorRgb}, 0.5)` }}>
+            style={{ background: `rgba(${pkg.colorRgb}, 0.65)`, backdropFilter: "blur(12px)", border: `1px solid rgba(${pkg.colorRgb}, 0.8)` }}>
             <span className="text-white">{pkg.icon}</span>
           </div>
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">{pkg.tagline}</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white">{pkg.tagline}</div>
             <div className="text-xl font-black text-white tracking-tight">{pkg.name}</div>
           </div>
         </div>
@@ -225,15 +232,15 @@ function PromoSwipeCard({
         {/* Price */}
         <div className="flex items-baseline gap-2">
           <span className="text-5xl font-black text-white">${pkg.price.toFixed(2)}</span>
-          <span className="text-sm font-bold text-white/50 uppercase tracking-wider">USD {pkg.durationLabel}</span>
+          <span className="text-sm font-bold text-white uppercase tracking-wider">USD {pkg.durationLabel}</span>
         </div>
 
         {/* Perks */}
         <div className="space-y-2">
           {pkg.perks.map(perk => (
-            <div key={perk} className="flex items-start gap-2 text-[11px] text-white/80 font-medium leading-relaxed">
+            <div key={perk} className="flex items-start gap-2 text-[11px] text-white font-medium leading-relaxed">
               <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                style={{ background: `rgba(${pkg.colorRgb}, 0.4)` }}>
+                style={{ background: `rgba(${pkg.colorRgb}, 0.6)` }}>
                 <Check className="w-2.5 h-2.5 text-white" />
               </div>
               <span>{perk}</span>
@@ -330,7 +337,6 @@ export default function AdvertisePage() {
           .eq("user_id", user.id)
           .in("status", ["approved", "pending"])
           .order("created_at", { ascending: false });
-        
         if (!error && data && data.length > 0) {
           const approved = data.find((s: any) => s.status === 'approved');
           const pending = data.find((s: any) => s.status === 'pending');
@@ -477,7 +483,7 @@ export default function AdvertisePage() {
   // ── LANDING PAGE ────────────────────────────────────────────────────────────
   if (view === "landing") {
     return (
-      <div className="w-full relative pb-20" style={{ background: th.pageBg }}>
+      <div className="w-full relative pb-64 min-h-[110vh]" style={{ background: th.pageBg }}>
         {/* Subtle gradient blobs */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full blur-[120px]"
@@ -487,7 +493,7 @@ export default function AdvertisePage() {
         </div>
 
         {/* ── COMPACT HERO ── */}
-        <div className="relative px-5 pt-28 pb-3 text-center">
+        <div className="relative px-5 pt-4 pb-3 text-center">
           <motion.div
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -664,9 +670,9 @@ export default function AdvertisePage() {
 
   // ── FORM ────────────────────────────────────────────────────────────────────
   return (
-    <div className="w-full min-h-screen flex flex-col pb-20" style={{ background: th.pageBg }}>
+    <div className="w-full h-auto flex flex-col pb-20" style={{ background: th.pageBg }}>
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-20 pb-3">
+      <div className="flex items-center gap-3 px-4 pt-4 pb-3">
         <div className="flex-1">
           <h1 className="text-sm font-black" style={{ color: th.text }}>Promote Your Event</h1>
           <p className="text-[11px]" style={{ color: th.textDim }}>Step {stepIdx + 1} of {steps.length}</p>

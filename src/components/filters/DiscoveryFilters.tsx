@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -71,11 +71,19 @@ interface DiscoveryFiltersProps {
   hideApplyButton?: boolean;
 }
 
-export function DiscoveryFilters({ category, onApply, initialFilters = {}, activeCount: _activeCount, hideApplyButton = false }: DiscoveryFiltersProps) {
+export const DiscoveryFilters = memo(function DiscoveryFilters({ category, onApply, initialFilters = {}, activeCount: _activeCount, hideApplyButton = false }: DiscoveryFiltersProps) {
   const savePreferencesMutation = useSaveClientFilterPreferences();
-  const radiusKm = useFilterStore(s => s.radiusKm);
+  const storeRadiusKm = useFilterStore(s => s.radiusKm);
   const setRadiusKm = useFilterStore(s => s.setRadiusKm);
-  const { setServiceTypes: setStoreServiceTypes, setPropertyTypes: setStorePropertyTypes } = useFilterActions();
+  const { setServiceTypes: setStoreServiceTypes, setPropertyTypes: setStorePropertyTypes } = useFilterActions() as any;
+
+  // LOCAL UI STATE FOR SMOOTH SLIDERS
+  const [localRadiusKm, setLocalRadiusKm] = useState(storeRadiusKm);
+  
+  // Sync local radius with store if store changes externally
+  useEffect(() => {
+    setLocalRadiusKm(storeRadiusKm);
+  }, [storeRadiusKm]);
 
   // SHARED STATE
   const [interestType, setInterestType] = useState(initialFilters.interest_type || 'both');
@@ -161,17 +169,22 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
     });
   };
 
-  // Auto-notify with debounce
+  // Auto-notify with debounce to prevent re-render loops and UI lag
   useEffect(() => {
-    const budgetValues = getBudgetValues();
-    onApply({
-      category, interest_type: interestType, selected_budget_range: selectedBudgetRange,
-      budget_min: budgetValues.min, budget_max: budgetValues.max,
-      location_neighborhoods: locationNeighborhoods,
-      property_types: propertyTypes, bedrooms_min: bedrooms,
-      moto_types: motoTypes, engine_cc_min: engineRange[0]
-    });
-  }, [category, interestType, selectedBudgetRange, locationNeighborhoods, propertyTypes, bedrooms, motoTypes, engineRange]);
+    const timer = setTimeout(() => {
+      const budgetValues = getBudgetValues();
+      onApply({
+        category, interest_type: interestType, selected_budget_range: selectedBudgetRange,
+        budget_min: budgetValues.min, budget_max: budgetValues.max,
+        location_neighborhoods: locationNeighborhoods,
+        property_types: propertyTypes, bedrooms_min: bedrooms,
+        moto_types: motoTypes, engine_cc_min: engineRange[0],
+        radius_km: localRadiusKm
+      });
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [category, interestType, selectedBudgetRange, locationNeighborhoods, propertyTypes, bedrooms, motoTypes, engineRange, localRadiusKm, onApply]);
 
   const toggleItem = (arr: string[], item: string, setter: (val: string[]) => void) => {
     setter(arr.includes(item) ? arr.filter(i => i !== item) : [...arr, item]);
@@ -191,7 +204,7 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
           )}>
             Discovery Filters
           </h3>
-          <span className="text-xs font-black uppercase tracking-widest opacity-40">Active Range</span>
+          <span className="text-xs font-black uppercase tracking-widest opacity-70">Active Range</span>
         </div>
         <Badge variant="outline" className="text-[9px] font-bold border-primary/20 text-primary uppercase">{category}</Badge>
       </div>
@@ -200,7 +213,7 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
       <div className="space-y-3 px-1 mt-6">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Intent</h2>
-            <span className="text-[10px] font-black uppercase tracking-widest opacity-40">{category}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest opacity-70">{category}</span>
           </div>
 
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 px-1">
@@ -218,15 +231,15 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
                     className={cn(
                        "flex-shrink-0 flex flex-col items-center justify-center gap-3 min-w-[100px] py-6 border transition-all duration-300 rounded-[2rem] text-[11px] font-black uppercase tracking-[0.2em]",
                        isActive
-                        ? "bg-primary text-white border-primary shadow-[0_10px_30px_rgba(var(--brand-primary-rgb),0.3)] scale-[1.05] z-10 relative"
+                        ? cn("bg-primary border-primary shadow-[0_10px_30px_rgba(var(--brand-primary-rgb),0.3)] scale-[1.05] z-10 relative", "text-primary-foreground")
                         : isLight 
-                          ? "bg-slate-100 border-slate-200 text-slate-900 font-black hover:bg-slate-200 shadow-sm" 
-                          : "bg-black/40 border-white/10 text-white font-black hover:bg-white/5 hover:text-white"
+                          ? "bg-white/80 border-black/10 text-black shadow-sm backdrop-blur-md hover:bg-black/10" 
+                          : "bg-white/10 border-white/10 text-white font-black hover:bg-white/20"
                      )}
                 >
                   <div className={cn(
                     "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300",
-                    isActive ? "text-white" : "text-primary/60"
+                    isActive ? "text-primary-foreground" : "text-primary/60"
                   )}>
                     <Icon className="w-8 h-8" />
                   </div>
@@ -284,15 +297,16 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
           <div className="pt-2 space-y-4">
              <div className="flex justify-between items-center">
                <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Search Radius</Label>
-               <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-black">{radiusKm} KM</Badge>
+               <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-black">{localRadiusKm} KM</Badge>
              </div>
              <Slider 
-                value={[radiusKm]} 
-                onValueChange={(v) => setRadiusKm(v[0])} 
+                value={[localRadiusKm]} 
+                onValueChange={(v) => setLocalRadiusKm(v[0])}
+                onValueCommit={(v) => setRadiusKm(v[0])}
                 min={1} max={200} step={1} 
-                className="py-2"
+                className="py-4 cursor-pointer"
              />
-             <p className={cn("text-[9px] font-medium", isLight ? "text-black/40" : "text-white/20")}>Radius filtering uses your current GPS or selected location.</p>
+             <p className={cn("text-[9px] font-medium", isLight ? "text-black/70" : "text-white/40")}>Radius filtering uses your current GPS or selected location.</p>
           </div>
         </CardContent>
       </Card>
@@ -315,9 +329,9 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
                 className={cn(
                   "py-4 px-6 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all border",
                   selectedBudgetRange === range.value
-                    ? "bg-primary text-white border-primary shadow-xl shadow-primary/30 scale-[1.02]" 
+                    ? cn("bg-primary border-primary shadow-xl shadow-primary/30 scale-[1.02]", "text-primary-foreground") 
                     : isLight 
-                      ? "bg-slate-100 border-slate-200 text-slate-900 font-black hover:bg-slate-200" 
+                      ? "bg-white border-black/10 text-black shadow-sm backdrop-blur-md hover:bg-black/5" 
                       : "bg-white/5 text-white border-white/10 hover:bg-white/10"
                 )}
             >
@@ -351,14 +365,14 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
                        <button 
                          key={n} 
                          onClick={() => setBedrooms(n)}
-                         className={cn(
-                           "w-14 h-14 rounded-full text-[11px] font-black transition-all border flex items-center justify-center shadow-sm",
-                           bedrooms === n 
-                             ? "bg-primary text-white border-primary shadow-xl scale-110" 
-                             : isLight 
-                               ? "bg-slate-100 border-slate-200 text-slate-900 hover:bg-slate-200 font-black"
-                               : "bg-white/5 border-white/10 text-muted-foreground"
-                         )}
+                          className={cn(
+                            "w-14 h-14 rounded-full text-[11px] font-black transition-all border flex items-center justify-center shadow-sm",
+                            bedrooms === n 
+                              ? cn("bg-primary border-primary shadow-xl scale-110", "text-primary-foreground") 
+                              : isLight 
+                                ? "bg-white border-black/10 text-black shadow-sm backdrop-blur-md hover:bg-black/5"
+                                : "bg-white/5 border-white/10 text-white/60"
+                          )}
                        >
                          {n}+
                        </button>
@@ -377,14 +391,14 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
                        <button 
                          key={n} 
                          onClick={() => setBathrooms(n)}
-                         className={cn(
-                           "w-12 h-12 rounded-full text-[11px] font-black transition-all border flex items-center justify-center shadow-sm",
-                           bathrooms === n 
-                             ? "bg-primary text-white border-primary shadow-xl scale-110" 
-                             : isLight 
-                               ? "bg-slate-100 border-slate-200 text-slate-900 hover:bg-slate-200 font-black"
-                               : "bg-white/5 border-white/10 text-muted-foreground"
-                         )}
+                          className={cn(
+                            "w-12 h-12 rounded-full text-[11px] font-black transition-all border flex items-center justify-center shadow-sm",
+                            bathrooms === n 
+                              ? cn("bg-primary border-primary shadow-xl scale-110", "text-primary-foreground") 
+                              : isLight 
+                                ? "bg-white border-black/10 text-black shadow-sm backdrop-blur-md hover:bg-black/5"
+                                : "bg-white/5 border-white/10 text-white/60"
+                          )}
                        >
                          {n}+
                        </button>
@@ -438,14 +452,14 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
                 <button
                   key={type.value}
                   onClick={() => toggleItem(serviceTypes, type.value, setServiceTypes)}
-                  className={cn(
-                    "py-3 px-3 rounded-2xl text-[10px] font-black uppercase tracking-tight text-left transition-all border",
-                    serviceTypes.includes(type.value)
-                      ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
-                      : isLight 
-                        ? "bg-black/[0.06] text-black/90 border-black/10 hover:bg-black/[0.12] font-black" 
-                        : "bg-muted/30 text-muted-foreground border-white/5 hover:bg-muted/50"
-                  )}
+                    className={cn(
+                      "py-3 px-3 rounded-2xl text-[10px] font-black uppercase tracking-tight text-left transition-all border",
+                      serviceTypes.includes(type.value)
+                        ? cn("bg-primary border-primary shadow-lg shadow-primary/20", "text-primary-foreground")
+                        : isLight 
+                          ? "bg-white border-black/10 text-black shadow-sm backdrop-blur-md hover:bg-black/5" 
+                          : "bg-white/10 border-white/10 text-white hover:bg-white/20"
+                    )}
                 >
                   {type.label}
                 </button>
@@ -462,4 +476,4 @@ export function DiscoveryFilters({ category, onApply, initialFilters = {}, activ
       )}
     </div>
   );
-}
+});

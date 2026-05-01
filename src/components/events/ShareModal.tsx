@@ -85,7 +85,7 @@ export function ShareModal({
               </button>
             </div>
             
-            <button onClick={onClose} className="w-full py-4 mt-8 rounded-2xl bg-white/5 text-white/40 font-black text-xs uppercase tracking-widest">
+            <button onClick={onClose} className="w-full py-4 mt-8 rounded-2xl bg-white/5 text-white/70 font-black text-xs uppercase tracking-widest">
               Close
             </button>
           </motion.div>

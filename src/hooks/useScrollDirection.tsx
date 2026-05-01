@@ -59,7 +59,6 @@ export function useScrollDirection({
   const showAtTopRef = useRef(showAtTop);
   const targetSelectorRef = useRef(targetSelector);
   const currentTargetRef = useRef<Element | null>(null);
-  const rebindIntervalRef = useRef<number | null>(null);
   
   // Update refs when props change
   thresholdRef.current = threshold;
@@ -79,6 +78,8 @@ export function useScrollDirection({
     // Fallback chain for common scroll containers
     const fallbacks = [
       '#dashboard-scroll-container',
+      '#chat-scroll-container',
+      '#messages-scroll-container',
       'main[class*="overflow"]',
       '[id*="scroll-container"]',
       'main',
@@ -158,16 +159,6 @@ export function useScrollDirection({
       });
     };
 
-    // ⚡ INTERACTION RECOVERY: Reset visibility on ANY user input
-    // This allows the bars to reappear if the user touches the screen, 
-    // even if they are still scrolled halfway down.
-    const resetOnInteraction = () => {
-      setIsVisible(true);
-      // Reset the baseline so the next scroll 'down' hides them again
-      const target = findScrollContainer();
-      lastTriggerY.current = getCurrentScrollY(target);
-    };
-
     // DOCUMENT-LEVEL CAPTURE: Catches ALL scroll events in the capture phase
     // This ensures we catch scrolls in any container, not just the target
     document.addEventListener('scroll', handleScroll, { capture: true, passive: true });
@@ -175,23 +166,12 @@ export function useScrollDirection({
     // Also listen on window for page-level scrolls
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Listen for interaction events (click, touch) to force visibility
-    document.addEventListener('touchstart', resetOnInteraction, { capture: true, passive: true });
-    document.addEventListener('mousedown', resetOnInteraction, { capture: true, passive: true });
-    
-    // REBIND CHECK: Periodically verify we're tracking the right container
-    // This handles cases where the DOM changes after navigation
-    rebindIntervalRef.current = window.setInterval(() => {
-      const newTarget = findScrollContainer();
-      if (newTarget !== currentTargetRef.current) {
-        currentTargetRef.current = newTarget;
-        // Reset baseline when container changes
-        if (newTarget) {
-          lastTriggerY.current = newTarget.scrollTop;
-        }
-      }
-    }, 1000);
-    
+    // The container is rebound when `resetTrigger` (route pathname) changes
+    // because that's when the React tree actually swaps it. The previous
+    // 1Hz polling fired forever in the background and forced a DOM query
+    // every second — pure waste on every device.
+
+
     // Initialize scroll position
     const initialTarget = findScrollContainer();
     currentTargetRef.current = initialTarget;
@@ -208,15 +188,9 @@ export function useScrollDirection({
     return () => {
       document.removeEventListener('scroll', handleScroll, { capture: true });
       window.removeEventListener('scroll', handleScroll);
-      document.removeEventListener('touchstart', resetOnInteraction, { capture: true });
-      document.removeEventListener('mousedown', resetOnInteraction, { capture: true });
-      
+
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
-      }
-      
-      if (rebindIntervalRef.current) {
-        clearInterval(rebindIntervalRef.current);
       }
     };
   }, [findScrollContainer, getCurrentScrollY, resetTrigger]);

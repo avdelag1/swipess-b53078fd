@@ -277,7 +277,7 @@ export function MessageActivationPackages({
         </div>
       ) : packagesUI.length === 0 ? (
         <div className={cn("text-center py-16 rounded-3xl border", isDark ? "bg-white/5 border-white/10" : "bg-gray-50 border-gray-200")}>
-          <p className={cn("text-lg font-medium", isDark ? "text-white/40" : "text-gray-500")}>No premium packages available at this time.</p>
+          <p className={cn("text-lg font-medium", isDark ? "text-white/70" : "text-gray-500")}>No premium packages available at this time.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
@@ -334,9 +334,9 @@ export function MessageActivationPackages({
                         <span className={cn("text-4xl font-black italic tracking-tighter", isDark ? "text-white" : "text-gray-900")}>
                           {formatPriceMXN(pkg.price)}
                         </span>
-                        <span className={cn("text-xs font-bold", isDark ? "text-white/40" : "text-gray-500")}>MXN</span>
+                        <span className={cn("text-xs font-bold", isDark ? "text-white/70" : "text-gray-500")}>MXN</span>
                       </div>
-                      <p className={cn("text-[10px] font-bold uppercase tracking-widest", isDark ? "text-white/40" : "text-gray-500")}>
+                      <p className={cn("text-[10px] font-bold uppercase tracking-widest", isDark ? "text-white/70" : "text-gray-500")}>
                         {formatPriceMXN(pkg.pricePerToken)} per connection
                       </p>
                     </div>
@@ -346,7 +346,7 @@ export function MessageActivationPackages({
                     {/* Tokens Display */}
                     <div className={cn("text-center py-6 rounded-3xl border shadow-inner transition-transform duration-500 group-hover:scale-[1.03]", isDark ? "bg-black/40 border-white/5" : "bg-gray-50 border-gray-100")}>
                       <div className={cn("text-5xl font-black tracking-tighter mb-1", isDark ? "text-white" : "text-gray-900")}>{pkg.tokens}</div>
-                      <div className={cn("text-xs font-black uppercase tracking-[0.2em]", isDark ? "text-white/30" : "text-gray-400")}>Activations</div>
+                      <div className={cn("text-xs font-black uppercase tracking-[0.2em]", isDark ? "text-white/60" : "text-gray-400")}>Activations</div>
                     </div>
 
                     {/* Features */}
@@ -417,7 +417,7 @@ export function MessageActivationPackages({
             onClick={() => restorePurchases()}
             className={cn(
               "text-[10px] font-black uppercase tracking-[0.2em] px-6 py-2 rounded-xl border transition-all",
-              isDark ? "bg-white/5 border-white/10 text-white/40 hover:text-white" : "bg-gray-50 border-gray-200 text-gray-400 hover:text-gray-900"
+              isDark ? "bg-white/5 border-white/10 text-white/70 hover:text-white" : "bg-gray-50 border-gray-200 text-gray-400 hover:text-gray-900"
             )}
           >
             Restore Previous Purchases

@@ -30,23 +30,24 @@ function ThemeToggleComponent({ className, glassPillStyle }: ThemeToggleProps) {
 
     const icon =
         theme === 'light' ? (
-            <Sun strokeWidth={1.5} className="h-5 w-5 sm:h-6 sm:w-6 text-amber-500" />
+            <Sun strokeWidth={1.5} className="h-5 w-5 text-amber-500" />
         ) : (
-            <Moon strokeWidth={1.5} className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+            <Moon strokeWidth={1.5} className="h-5 w-5 text-primary" />
         );
 
 
     return (
         <button
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={handleToggle}
+            onClick={(e) => {
+                handleToggle(e as any);
+            }}
             className={cn(
                 'relative flex items-center justify-center rounded-full',
                 'transition-all duration-100 ease-out active:scale-[0.9]',
-                'touch-manipulation h-11 w-11 flex-shrink-0',
+                'touch-manipulation h-9 w-9 flex-shrink-0',
                 className,
             )}
-            style={{ ...glassPillStyle, backgroundColor: 'transparent' }}
+            style={glassPillStyle}
             aria-label={`Theme: ${theme}. Tap to cycle`}
             title={`Current: ${theme}`}
         >

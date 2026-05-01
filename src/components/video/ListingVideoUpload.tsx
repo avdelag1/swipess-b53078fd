@@ -89,7 +89,7 @@ export function ListingVideoUpload({
                     </div>
                     <div className="text-center px-4">
                         <p className="font-semibold text-sm">Upload Looping Video</p>
-                        <p className="text-xs text-white/40 mt-1 max-w-[250px] mx-auto">Upload a video to create a 10-second boomerang. Stand out to clients!</p>
+                        <p className="text-xs text-white/70 mt-1 max-w-[250px] mx-auto">Upload a video to create a 10-second boomerang. Stand out to clients!</p>
                     </div>
                 </button>
             )}

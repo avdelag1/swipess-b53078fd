@@ -102,7 +102,7 @@ const ConciergePrivacyPortal = memo(({ onAccept, isSwipess }: { onAccept: () => 
       Initialize the discovery interface. Your inquiries are handled with absolute confidentiality and processed by flagship-grade intelligence.
     </p>
     
-    <div className="p-5 rounded-2xl border text-[10px] leading-tight text-center bg-white/5 border-white/5 text-white/40">
+    <div className="p-5 rounded-2xl border text-[10px] leading-tight text-center bg-white/5 border-white/5 text-white/70">
       <p className="font-black uppercase tracking-[0.2em] mb-2 text-[11px] text-white/80">AI Disclaimer</p>
       Swipess AI provides automated recommendations for informational purposes only. It is not a substitute for professional real estate, legal, or financial advice.
     </div>
@@ -180,16 +180,16 @@ const MessageBubble = memo(({ message, isUser, isSwipess, onCopy, onDelete, onTr
             className={cn("flex items-center gap-1.5 mt-1 px-1", isUser ? "flex-row-reverse" : "flex-row")}
           >
             <button onClick={(e) => { e.stopPropagation(); onCopy(); }} className="p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-              <Copy className="w-3.5 h-3.5 opacity-40" />
+              <Copy className="w-3.5 h-3.5 opacity-70" />
             </button>
             {!isUser && onTranslate && (
               <button onClick={(e) => { e.stopPropagation(); onTranslate('Spanish'); }} className="p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                <Languages className="w-3.5 h-3.5 opacity-40" />
+                <Languages className="w-3.5 h-3.5 opacity-70" />
               </button>
             )}
             {isUser && onResend && (
               <button onClick={(e) => { e.stopPropagation(); onResend(); }} className="p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-                <RefreshCw className="w-3.5 h-3.5 opacity-40" />
+                <RefreshCw className="w-3.5 h-3.5 opacity-70" />
               </button>
             )}
             <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
@@ -296,9 +296,9 @@ const ConversationSidebar = memo(({
     )}
   >
     <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
-      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 italic">ARCHIVES</h3>
+      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70 italic">ARCHIVES</h3>
       <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-all">
-        <X className="w-4 h-4 opacity-40" />
+        <X className="w-4 h-4 opacity-70" />
       </button>
     </div>
     
@@ -322,7 +322,7 @@ const ConversationSidebar = memo(({
               activeId === c.id ? "bg-white/5 border-white/10" : "hover:bg-white/[0.02] border-transparent"
             )}
           >
-            <span className={cn("text-[11px] font-black uppercase tracking-tight truncate w-full text-left", activeId === c.id ? "text-primary" : "text-white/40")}>
+            <span className={cn("text-[11px] font-black uppercase tracking-tight truncate w-full text-left", activeId === c.id ? "text-primary" : "text-white/70")}>
               {c.title || 'Untitled Discovery'}
             </span>
             <span className="text-[9px] font-bold opacity-20 uppercase tracking-tighter mt-1">{formatConvoDate(new Date(c.updatedAt))}</span>
@@ -403,70 +403,115 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
     if (messages.length > 0) localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
   }, [messages]);
 
-  // Voice Interaction Logic
+  // ── Voice + Auto-Send Logic ────────────────────────────────────────────────
   const [isListening, setIsListening] = useState(false);
-  const { pulse: voicePulse } = useAudioVisualizer(isListening);
-  const [autoSend, setAutoSend] = useState(() => {
-    try { return localStorage.getItem('concierge-auto-send') === 'true'; } catch { return false; }
-  });
   const [countdown, setCountdown] = useState<number | null>(null);
   const recognitionRef = useRef<any>(null);
-  const countdownRef = useRef<any>(null);
-  const autoSendRef = useRef(autoSend);
-  const speechSupported = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const inputValueRef = useRef('');          // always tracks latest input value
+  const isListeningRef = useRef(false);      // stable ref for recognition callbacks
+  const SILENCE_SECONDS = 3;
+
+  // Keep inputValueRef in sync so the send callback never has a stale closure
+  useEffect(() => { inputValueRef.current = input; }, [input]);
+  useEffect(() => { isListeningRef.current = isListening; }, [isListening]);
+
+  const speechSupported = typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+  // Cancel the silence countdown without sending
+  const cancelCountdown = useCallback(() => {
+    if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
+    setCountdown(null);
+    triggerHaptic('light');
+  }, []);
+
+  // Start/reset the 3-second silence countdown
+  const armSilenceCountdown = useCallback(() => {
+    if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
+    setCountdown(SILENCE_SECONDS);
+    countdownRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev !== null && prev <= 1) {
+          clearInterval(countdownRef.current!);
+          countdownRef.current = null;
+          // Fire send with the freshest input value
+          const text = inputValueRef.current.trim();
+          if (text) {
+            sendMessage(text);
+            setInput('');
+            triggerHaptic('heavy');
+            uiSounds.playTap();
+          }
+          // Keep mic on so user can keep talking
+          return null;
+        }
+        return prev !== null ? prev - 1 : null;
+      });
+    }, 1000);
+  }, [sendMessage]);
 
   const startListening = useCallback(() => {
     if (!speechSupported) return;
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SR();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.onstart = () => { setIsListening(true); triggerHaptic('medium'); uiSounds.playMicOn(); };
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      triggerHaptic('medium');
+      uiSounds.playMicOn();
+    };
+
     recognition.onresult = (e: any) => {
       let interim = '';
-      let final = '';
+      let finalText = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) final += e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
         else interim += e.results[i][0].transcript;
       }
-      setInput(prev => final ? final : prev + interim);
-      if (autoSendRef.current && final) {
-         if (countdownRef.current) clearInterval(countdownRef.current);
-         setCountdown(2);
-         countdownRef.current = setInterval(() => {
-           setCountdown(p => {
-             if (p && p <= 1) {
-               clearInterval(countdownRef.current);
-               sendMessage(input);
-               setInput('');
-               setIsListening(false);
-               recognition.stop();
-               return null;
-             }
-             return p ? p - 1 : null;
-           });
-         }, 1000);
+      // Show interim text; overwrite with final when available
+      if (finalText) {
+        setInput(finalText);
+        // Final speech = silence is coming → arm countdown
+        armSilenceCountdown();
+      } else {
+        setInput(interim);
+        // New interim speech = user is still talking → cancel any countdown
+        cancelCountdown();
       }
     };
-    recognition.onend = () => { if (isListening) recognition.start(); };
+
+    // soundend fires when mic stops picking up any audio at all
+    recognition.onsoundend = () => { armSilenceCountdown(); };
+
+    // Restart recognition if it stops by itself (browser idle timeout)
+    recognition.onend = () => {
+      if (isListeningRef.current) {
+        try { recognition.start(); } catch { /* already restarting */ }
+      }
+    };
+
     recognitionRef.current = recognition;
     recognition.start();
-  }, [speechSupported, sendMessage, input]);
+  }, [speechSupported, armSilenceCountdown, cancelCountdown]);
 
   const stopListening = useCallback(() => {
+    isListeningRef.current = false;
     setIsListening(false);
-    if (recognitionRef.current) recognitionRef.current.stop();
-    if (countdownRef.current) clearInterval(countdownRef.current);
-    setCountdown(null);
+    recognitionRef.current?.stop();
+    cancelCountdown();
     uiSounds.playMicOff();
-  }, []);
+  }, [cancelCountdown]);
 
   const handleSend = () => {
     if (!input.trim() || isLoading) return;
     sendMessage(input.trim());
     setInput('');
     triggerHaptic('medium');
-    uiSounds.playMessageSent();
+    uiSounds.playTap();
   };
 
   const handleCopy = (text: string) => {
@@ -556,7 +601,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                        <span className={cn("text-[13px] font-black uppercase tracking-[0.4em] italic", isSwipess ? "text-[#FF3D00] brand-glow drop-shadow-[0_0_10px_rgba(255,61,0,0.5)]" : isLight ? "text-primary" : "text-[#FF3D00]")}>INTEL INTERFACE</span>
                        <div className="flex items-center gap-1.5">
                           <div className={cn("w-1 h-1 rounded-full animate-pulse", isSwipess ? "bg-[#FF3D00]" : "bg-primary")} />
-                          <span className={cn("text-[9px] font-bold tracking-widest uppercase", isLight && !isSwipess ? "text-slate-400" : "text-white/30")}>System: Operational</span>
+                          <span className={cn("text-[9px] font-bold tracking-widest uppercase", isLight && !isSwipess ? "text-slate-400" : "text-white/60")}>System: Operational</span>
                        </div>
                     </div>
                   </div>
@@ -575,14 +620,14 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                               <ArcGauge level={egoLevel} color={arcColor} isLoading={isLoading} icon={currentChar.icon} />
                              </div>
                               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-black rounded-full border border-white/10 flex items-center justify-center">
-                                 <ChevronDown className="w-2.5 h-2.5 text-white/40" />
+                                 <ChevronDown className="w-2.5 h-2.5 text-white/70" />
                               </div>
                            </div>
                         </button>
                       </PopoverTrigger>
                       <PopoverContent className="w-64 p-2 rounded-[2.5rem] bg-black border-white/10 shadow-3xl z-[10001]" align="end">
                          <div className="p-4 border-b border-white/5 mb-2">
-                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30 italic">SELECT ARCHETYPE</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/60 italic">SELECT ARCHETYPE</span>
                          </div>
                          <div className="space-y-1">
                             {CHARACTER_OPTIONS.map(char => (
@@ -599,7 +644,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                                 </div>
                                 <div className="text-left">
                                    <p className="text-[11px] font-black uppercase tracking-wider text-white">{char.label}</p>
-                                   <p className="text-[9px] font-bold opacity-30 uppercase">{char.subtitle}</p>
+                                   <p className="text-[9px] font-bold opacity-70 uppercase">{char.subtitle}</p>
                                 </div>
                                 {activeCharacter === char.key && <Check className="ml-auto w-4 h-4 text-primary" />}
                               </button>
@@ -640,7 +685,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                             </h3>
                             <p className={cn(
                               "text-[10px] uppercase tracking-[0.3em] font-black",
-                              isLight ? "text-black/40" : "text-[#FF3D00]/60"
+                              isLight ? "text-black/70" : "text-[#FF3D00]/60"
                             )}>
                               {isSwipess ? "AWAITING COMMAND SIGNAL" : "Awaiting user inquiry"}
                             </p>
@@ -704,7 +749,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                                     onClick={isListening ? stopListening : startListening}
                                     className={cn(
                                       "w-12 h-12 flex items-center justify-center rounded-2xl transition-all relative overflow-hidden",
-                                       isListening ? "bg-red-500 text-white" : isLight && !isSwipess ? "bg-slate-200 text-slate-500 hover:text-slate-800" : "bg-white/5 text-white/40 hover:text-white"
+                                       isListening ? "bg-red-500 text-white" : isLight && !isSwipess ? "bg-slate-200 text-slate-500 hover:text-slate-800" : "bg-white/5 text-white/70 hover:text-white"
                                     )}
                                   >
                                      <Mic className={cn("w-5 h-5", isListening && "animate-pulse")} />
@@ -726,14 +771,31 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
 
                                   <AnimatePresence>
                                      {countdown !== null && (
-                                       <motion.div 
-                                         initial={{ opacity: 0, x: -10 }}
-                                         animate={{ opacity: 1, x: 0 }}
-                                         exit={{ opacity: 0, x: -10 }}
-                                         className="px-4 h-12 rounded-2xl bg-primary text-black flex items-center gap-2 text-[10px] font-black"
+                                       <motion.div
+                                         initial={{ opacity: 0, scale: 0.8 }}
+                                         animate={{ opacity: 1, scale: 1 }}
+                                         exit={{ opacity: 0, scale: 0.8 }}
+                                         className="flex items-center gap-1.5"
                                        >
-                                          <Timer className="w-4 h-4" />
-                                          AUTO-SEND: {countdown}S
+                                         {/* Countdown pill */}
+                                         <div className="relative h-10 px-3 rounded-2xl flex items-center gap-2 text-[10px] font-black overflow-hidden"
+                                           style={{ background: 'linear-gradient(135deg,#ff3d00,#ff7c40)', boxShadow: '0 0 18px rgba(255,61,0,0.5)' }}>
+                                           <motion.div
+                                             className="absolute inset-0 bg-white/15"
+                                             animate={{ opacity: [0.1, 0.3, 0.1] }}
+                                             transition={{ duration: 0.8, repeat: Infinity }}
+                                           />
+                                           <Timer className="w-3.5 h-3.5 text-white relative z-10" />
+                                           <span className="text-white relative z-10 tabular-nums">SENDING IN {countdown}s</span>
+                                         </div>
+                                         {/* Cancel X button */}
+                                         <button
+                                           onClick={cancelCountdown}
+                                           className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/10 hover:bg-white/20 active:scale-90 transition-all"
+                                           aria-label="Cancel auto-send"
+                                         >
+                                           <X className="w-4 h-4 text-white/70" />
+                                         </button>
                                        </motion.div>
                                      )}
                                   </AnimatePresence>

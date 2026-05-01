@@ -16,6 +16,7 @@ import type {
   QuickFilters,
   ListingFilters
 } from '@/types/filters';
+import { logger } from '@/utils/prodLogger';
 
 // Accent color lookup for categories (from SwipeConstants)
 const CATEGORY_ACCENTS: Record<string, string> = {
@@ -68,9 +69,14 @@ interface FilterState {
   
   filterVersion: number;
   lastChangedAt: number;
-  
+
+  kmHudExpanded: boolean;
+  ownerPhase: 'cards' | 'kilometer' | 'swipe';
+
   // ACTIONS
   setActiveCategory: (category: QuickFilterCategory | null) => void;
+  setOwnerPhase: (phase: 'cards' | 'kilometer' | 'swipe') => void;
+  setKmHudExpanded: (v: boolean) => void;
   toggleCategory: (category: QuickFilterCategory) => void;
   setCategories: (categories: QuickFilterCategory[]) => void;
   setListingType: (type: QuickFilterListingType) => void;
@@ -118,7 +124,6 @@ interface ClientFiltersShape {
   propertyTypes?: string[];
   motoTypes?: string[];
   bicycleTypes?: string[];
-  genders?: string[];
 }
 
 export const useFilterStore = create<FilterState>()(
@@ -134,7 +139,7 @@ export const useFilterStore = create<FilterState>()(
     clientAgeRange: null,
     clientBudgetRange: null,
     clientNationalities: [],
-    radiusKm: 1,
+    radiusKm: 50,
     userLatitude: null,
     userLongitude: null,
     priceRange: null,
@@ -150,9 +155,18 @@ export const useFilterStore = create<FilterState>()(
     filterVersion: 0,
     lastChangedAt: Date.now(),
 
+    kmHudExpanded: false,
+    ownerPhase: 'cards',
+
     // ACTIONS
+    setKmHudExpanded: (v) => set({ kmHudExpanded: v }),
+    setOwnerPhase: (phase) => {
+      console.info('[FilterStore] ownerPhase changed to:', phase);
+      set({ ownerPhase: phase });
+    },
+
     setRadiusKm: (radius) => {
-      logger.info('[FilterStore] radiusKm changed to:', radius);
+      console.info('[FilterStore] radiusKm changed to:', radius);
       set((state) => ({
         radiusKm: radius,
         filterVersion: state.filterVersion + 1,
@@ -160,7 +174,7 @@ export const useFilterStore = create<FilterState>()(
       }));
     },
     setUserLocation: (lat, lon) => {
-      logger.info('[FilterStore] userLocation changed:', lat, lon);
+      console.info('[FilterStore] userLocation changed:', lat, lon);
       set((state) => ({ 
         userLatitude: lat, 
         userLongitude: lon,
@@ -169,7 +183,7 @@ export const useFilterStore = create<FilterState>()(
       }));
     },
     updateFilters: (filters: Record<string, any>) => {
-      logger.info('[FilterStore] updateFilters called with:', filters);
+      console.info('[FilterStore] updateFilters called with:', filters);
       set((state) => {
         const mapped: any = {};
         // Map snake_case from UI components to camelCase store state
@@ -202,7 +216,7 @@ export const useFilterStore = create<FilterState>()(
       });
     },
     clearUserLocation: () => {
-      logger.info('[FilterStore] clearUserLocation');
+      console.info('[FilterStore] clearUserLocation');
       set((state) => ({ 
         userLatitude: null, 
         userLongitude: null,
@@ -212,7 +226,7 @@ export const useFilterStore = create<FilterState>()(
     },
     setActiveCategory: (category) => {
       if (get().activeCategory === category) return;
-      logger.info('[FilterStore] activeCategory changed to:', category);
+      console.info('[FilterStore] activeCategory changed to:', category);
       set((state) => ({
         activeCategory: category,
         categories: category ? [category] : [],

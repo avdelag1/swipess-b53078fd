@@ -294,7 +294,7 @@ export function SavedSearchesDialog({ open, onOpenChange }: SavedSearchesDialogP
                 </div>
               ) : savedSearches.length === 0 ? (
                 <div className="text-center py-12">
-                  <Search className="w-16 h-16 mx-auto mb-4 text-white/30" />
+                  <Search className="w-16 h-16 mx-auto mb-4 text-white/60" />
                   <p className="text-white/60 mb-4">No saved searches yet</p>
                   <Button
                     onClick={() => setActiveTab('create')}
@@ -333,7 +333,7 @@ export function SavedSearchesDialog({ open, onOpenChange }: SavedSearchesDialogP
                                 {search.alerts_enabled ? (
                                   <Bell className="w-4 h-4 text-rose-400" />
                                 ) : (
-                                  <BellOff className="w-4 h-4 text-white/40" />
+                                  <BellOff className="w-4 h-4 text-white/70" />
                                 )}
                               </Button>
                               <Button
@@ -381,7 +381,7 @@ export function SavedSearchesDialog({ open, onOpenChange }: SavedSearchesDialogP
                               )}
                             </div>
                             {search.last_match_at && (
-                              <span className="text-white/40 text-xs">
+                              <span className="text-white/70 text-xs">
                                 Last match: {new Date(search.last_match_at).toLocaleDateString()}
                               </span>
                             )}

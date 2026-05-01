@@ -16,16 +16,17 @@ import { motion, useMotionValue, useTransform, PanInfo, animate, useDragControls
 import { triggerHaptic } from '@/utils/haptics';
 import { getCardImageUrl } from '@/utils/imageOptimization';
 import { Listing } from '@/hooks/useListings';
-import { MatchedListing } from '@/hooks/useSmartMatching';
+import { MatchedListing, MatchedClientProfile } from '@/hooks/useSmartMatching';
 import { useMagnifier } from '@/hooks/useMagnifier';
-import { PropertyCardInfo, VehicleCardInfo, ServiceCardInfo } from '@/components/ui/CardInfoHierarchy';
+import { PropertyCardInfo, VehicleCardInfo, ServiceCardInfo, ClientCardInfo } from '@/components/ui/CardInfoHierarchy';
 import { CompactRatingDisplay } from '@/components/RatingDisplay';
 import { useListingRatingAggregate } from '@/hooks/useRatingSystem';
 import CardImage from '@/components/CardImage';
 import { imageCache } from '@/lib/swipe/cardImageCache';
-import { DiscoverySidebar } from '@/components/DiscoverySidebar';
-import { useSwipeUndo } from '@/hooks/useSwipeUndo';
 import { useDeviceParallax } from '@/hooks/useDeviceParallax';
+import useAppTheme from '@/hooks/useAppTheme';
+import { cn } from '@/lib/utils';
+import { Flag, Share2 } from 'lucide-react';
 
 // Exposed interface for parent to trigger swipe animations
 export interface SimpleSwipeCardRef {
@@ -38,7 +39,7 @@ const VELOCITY_THRESHOLD = 280; // Velocity to trigger swipe
 const FALLBACK_PLACEHOLDER = ''; // Empty → CardImage renders branded PlaceholderImage
 
 // Max rotation angle (degrees) based on horizontal position
-const MAX_ROTATION = 18; // Elegant, less dramatic rotation
+const MAX_ROTATION = 14; // Even smoother, more premium pivot
 
 // Calculate exit distance dynamically
 const getExitDistance = () => typeof window !== 'undefined' ? window.innerWidth * 1.5 : 800;
@@ -90,45 +91,39 @@ const GlassShine = ({ x, y }: { x: MotionValue<number>; y: MotionValue<number> }
 };
 
 interface SimpleSwipeCardProps {
-  listing: Listing | MatchedListing;
+  listing: Listing | MatchedListing | MatchedClientProfile;
   onSwipe: (direction: 'left' | 'right') => void;
   onInsights?: () => void;
-  onShare?: () => void;
-  onMessage?: () => void;
-  onLike?: () => void;
-  onDislike?: () => void;
-  onReport?: () => void;
   isTop?: boolean;
   /** Optional shared MotionValue from parent — lets container animate the card below in real-time */
   externalX?: MotionValue<number>;
   externalY?: MotionValue<number>;
   /** Called when drag gesture starts — lets parent kick off N+2 image preload */
   onDragStart?: () => void;
+  onShare?: () => void;
+  onReport?: () => void;
 }
 
 const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardProps>(({
   listing,
   onSwipe,
   onInsights,
-  onShare,
-  onMessage,
-  onLike,
-  onDislike,
-  onReport,
   isTop = true,
   externalX,
   externalY,
   onDragStart,
+  onShare,
+  onReport,
 }, ref) => {
+  const { isLight } = useAppTheme();
   const isDragging = useRef(false);
   const hasExited = useRef(false);
   const isExitingRef = useRef(false);
-  const lastListingIdRef = useRef(listing.id);
+  const lastListingIdRef = useRef(listing.id || (listing as any).user_id);
   const dragStartY = useRef(0);
   const dragControls = useDragControls();
   const dragStartedRef = useRef(false);
   const storedPointerEventRef = useRef<React.PointerEvent | null>(null);
-  const { undoLastSwipe, canUndo } = useSwipeUndo();
 
   // Motion values for BOTH X and Y - enables diagonal movement
   // Always create internal values (hooks must not be conditional)
@@ -199,20 +194,32 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
 
   const images = useMemo(() => {
     let result: string[] = [];
-    if (listing.video_url) {
-      result.push('video_attachment');
-    }
-    if (Array.isArray(listing.images) && listing.images.length > 0) {
-      result = [...result, ...listing.images];
-    } else if (listing.image_url) {
-      result.push(listing.image_url);
+    
+    // Check if it's a profile or a listing
+    const isProfile = (listing as any).profile_images || (listing as any).name;
+    
+    if (isProfile) {
+      if (Array.isArray((listing as any).profile_images) && (listing as any).profile_images.length > 0) {
+        result = (listing as any).profile_images;
+      } else if ((listing as any).avatar_url) {
+        result = [(listing as any).avatar_url];
+      }
+    } else {
+      if ((listing as any).video_url) {
+        result.push((listing as any).video_url);
+      }
+      if (Array.isArray((listing as any).images) && (listing as any).images.length > 0) {
+        result = [...result, ...(listing as any).images];
+      } else if ((listing as any).image_url) {
+        result.push((listing as any).image_url);
+      }
     }
 
     if (result.length === 0) {
       return [FALLBACK_PLACEHOLDER];
     }
     return result;
-  }, [listing.images, listing.image_url, listing.video_url]);
+  }, [listing]);
 
   const imageCount = images.length;
   const currentImage = images[currentImageIndex] || FALLBACK_PLACEHOLDER;
@@ -234,9 +241,10 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
   // Reset state when listing changes - but ONLY if we're not mid-exit
   // This prevents the snap-back glitch caused by resetting during exit animation
   useEffect(() => {
+    const currentId = listing.id || (listing as any).user_id;
     // Check if this is a genuine listing change (not a re-render during exit)
-    if (listing.id !== lastListingIdRef.current) {
-      lastListingIdRef.current = listing.id;
+    if (currentId !== lastListingIdRef.current) {
+      lastListingIdRef.current = currentId;
 
       // Only reset if we're not currently in an exit animation
       if (!isExitingRef.current) {
@@ -246,17 +254,17 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
         y.set(0);
       }
     }
-  }, [listing.id, x, y]);
+  }, [listing.id, (listing as any).user_id, x, y]);
 
   // Magnifier hook for press-and-hold zoom
   const { containerRef, pointerHandlers: magnifierPointerHandlers, isActive: isMagnifierActive } = useMagnifier({
     scale: 2.8, // Edge-to-edge zoom level
-    holdDelay: 450,
+    holdDelay: 300,
     enabled: isTop,
   });
 
   // Fetch rating aggregate for this listing
-  const { data: ratingAggregate, isLoading: isRatingLoading } = useListingRatingAggregate(listing.id, listing.category);
+  const { data: ratingAggregate, isLoading: isRatingLoading } = useListingRatingAggregate(listing.id, (listing as any).category);
 
   // Unified pointer down handler: starts magnifier hold timer AND stores event for potential drag
   const handleUnifiedPointerDown = useCallback((e: React.PointerEvent) => {
@@ -279,10 +287,12 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
       const dy = Math.abs(e.clientY - (storedPointerEventRef.current as any).clientY);
       
       // Start drag only if we move more than a minor threshold
-      if (dx > 5 || dy > 5) {
+      if (dx > 10 || dy > 10) {
+        // Cancel any pending magnifier hold timer
+        magnifierPointerHandlers.onPointerUp(e);
         dragStartedRef.current = true;
-        dragControls.start(storedPointerEventRef.current);
-        storedPointerEventRef.current = null;
+        isDragging.current = true;
+        dragControls.start((storedPointerEventRef.current as any).nativeEvent);
       }
     }
   }, [isMagnifierActive, magnifierPointerHandlers, dragControls]);
@@ -353,22 +363,20 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
     const clickX = e.clientX - rect.left;
     const width = rect.width;
 
-    if (imageCount > 1) {
-      if (clickX < width * 0.33) {
-        setPhotoDirection('left');
-        setCurrentImageIndex(prev => prev === 0 ? imageCount - 1 : prev - 1);
-        triggerHaptic('light');
-      }
-      else if (clickX > width * 0.67) {
-        setPhotoDirection('right');
-        setCurrentImageIndex(prev => prev === imageCount - 1 ? 0 : prev + 1);
-        triggerHaptic('light');
-      }
-      else if (onInsights) {
-        triggerHaptic('light');
-        onInsights();
-      }
-    } else if (onInsights) {
+    // LEFT 33% - Prev image
+    if (imageCount > 1 && clickX < width * 0.33) {
+      setPhotoDirection('left');
+      setCurrentImageIndex(prev => prev === 0 ? imageCount - 1 : prev - 1);
+      triggerHaptic('light');
+    }
+    // RIGHT 33% - Next image
+    else if (imageCount > 1 && clickX > width * 0.67) {
+      setPhotoDirection('right');
+      setCurrentImageIndex(prev => prev === imageCount - 1 ? 0 : prev + 1);
+      triggerHaptic('light');
+    }
+    // MIDDLE 34% or any click on single image - Open Insights
+    else if (onInsights) {
       triggerHaptic('light');
       onInsights();
     }
@@ -415,7 +423,7 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
   if (!isTop) {
     return (
       <div
-        className="absolute inset-x-2 bottom-4 top-4 rounded-[32px] overflow-hidden shadow-sm"
+        className="absolute inset-x-2 bottom-4 top-4 rounded-[28px] overflow-hidden shadow-sm"
         style={{
           pointerEvents: 'none',
           backgroundColor: 'rgba(255, 255, 255, 0.03)',
@@ -423,9 +431,9 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           border: '1px solid rgba(255, 255, 255, 0.05)',
         }}
       >
-        {currentImage === 'video_attachment' && listing.video_url ? (
+        {currentImage === 'video_attachment' && (listing as any).video_url ? (
           <video
-            src={listing.video_url}
+            src={(listing as any).video_url}
             autoPlay
             muted
             loop
@@ -437,8 +445,8 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           <div className="absolute inset-0 opacity-60">
             <CardImage 
               src={currentImage} 
-              alt={listing.title || 'Listing'} 
-              name={listing.title} 
+              alt={(listing as any).title || 'Listing'} 
+              name={(listing as any).title} 
               direction={photoDirection} 
               priority={false} 
             />
@@ -449,11 +457,9 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
   }
 
   return (
-    <div className="absolute inset-0 flex flex-col pointer-events-none">
+    <div className="absolute inset-x-2 top-1 bottom-0 flex flex-col pointer-events-auto">
       <motion.div
         drag
-        dragControls={dragControls}
-        dragListener={false}
         dragMomentum={false}
         dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
         dragElastic={0.55}
@@ -463,7 +469,11 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
         onPointerDown={handleUnifiedPointerDown}
         onPointerMove={(e) => {
           handleUnifiedPointerMove(e);
-          handlePointerMoveForTilt(e);
+          // Skip the parallax tilt entirely while dragging — its rotateX/rotateY
+          // fights the drag rotation and produces visible flicker on touch.
+          if (!isDragging.current) {
+            handlePointerMoveForTilt(e);
+          }
         }}
         onPointerLeave={handlePointerLeaveForTilt}
         onPointerUp={(e) => {
@@ -475,13 +485,13 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           handlePointerLeaveForTilt();
         }}
         initial={{ scale: 0.97, opacity: 0.85 }}
-        animate={{ 
+        animate={{
           scale: 1,
           opacity: 1,
           transition: { type: 'spring', stiffness: 400, damping: 28, mass: 0.6 }
         }}
         // Photo swim effect now lives on the <img> inside CardImage (CSS keyframes)
-        className="flex-1 cursor-grab active:cursor-grabbing select-none touch-none relative rounded-[32px] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5),0_16px_32px_-8px_rgba(0,0,0,0.3)] glass-nano-texture pointer-events-auto border border-white/10 zenith-interaction-isolation gpu-ultra"
+        className="flex-1 cursor-grab active:cursor-grabbing select-none touch-none relative w-full h-full overflow-hidden rounded-[24px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5),0_16px_32px_-8px_rgba(0,0,0,0.3)] pointer-events-auto border-none gpu-ultra"
         style={{
           x,
           y,
@@ -492,11 +502,13 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           willChange: 'transform, opacity',
           transformStyle: 'preserve-3d',
           perspective: '1000px',
-          transform: 'translate3d(0,0,0)',
+          transform: 'translate3d(0,0,0)', // 🏎️ FORCE GPU LAYER
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
           background: 'rgba(255, 255, 255, 0.01)',
-          backdropFilter: 'blur(20px)',
+          // No backdrop-filter on the moving card — backdrop-filter forces
+          // the browser to recomposite the entire card area on every drag
+          // frame, which is the primary source of the shake/flicker.
         }}
       >
         <GlassShine x={x} y={y} />
@@ -505,9 +517,9 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           className="absolute inset-0 overflow-hidden" 
           onClick={handleImageTap}
         >
-          {currentImage === 'video_attachment' && listing.video_url ? (
+          {currentImage === 'video_attachment' && (listing as any).video_url ? (
             <video
-              src={listing.video_url}
+              src={(listing as any).video_url}
               autoPlay
               muted
               loop
@@ -518,15 +530,26 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           ) : (
             <CardImage 
               src={currentImage} 
-              alt={listing.title || 'Listing'} 
-              name={listing.title} 
+              alt={(listing as any).title || 'Listing'} 
+              name={(listing as any).title} 
               direction={photoDirection} 
               priority={isTop}
             />
           )}
+
+          {/* Cinema Top Fade — theme-aware vignette behind header buttons */}
+          <div
+            className="absolute top-0 left-0 right-0 pointer-events-none z-20"
+            style={{
+              height: '28%',
+              background: isLight
+                ? 'linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.4) 40%, rgba(255,255,255,0.05) 75%, transparent 100%)'
+                : 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.05) 75%, transparent 100%)',
+            }}
+          />
           
           {imageCount > 1 && (
-            <div className="absolute top-3 left-3 right-3 flex gap-1.5 z-20">
+            <div className="absolute top-[calc(var(--safe-top,0px)+56px)] left-3 right-3 flex gap-1.5 z-20">
               {Array.from({ length: imageCount }).map((_, idx) => (
                 <div
                   key={idx}
@@ -544,6 +567,32 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
               ))}
             </div>
           )}
+
+          {/* In-Card Navigation Buttons (Tinder Style) */}
+          <div className="absolute top-[calc(var(--safe-top,0px)+80px)] left-6 right-6 z-40 flex justify-between pointer-events-none">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerHaptic('light');
+                onShare?.();
+              }}
+              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-90 transition-all pointer-events-auto"
+              title="Share Listing"
+            >
+              <Share2 className="w-5 h-5" strokeWidth={1.5} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerHaptic('medium');
+                onReport?.();
+              }}
+              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/70 active:scale-90 transition-all pointer-events-auto"
+              title="Report Listing"
+            >
+              <Flag className="w-5 h-5" strokeWidth={1.5} />
+            </button>
+          </div>
         </div>
 
         <motion.div
@@ -555,11 +604,11 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           }}
         >
           <div
-            className="px-6 py-3 rounded-xl border-4 border-rose-500 text-rose-500 font-black text-3xl tracking-wider"
+            className="px-6 py-3 rounded-xl border-4 border-emerald-500 text-emerald-500 font-black text-3xl tracking-wider"
             style={{
               transform: 'rotate(-12deg) translateZ(0)', // GPU Composite
               backfaceVisibility: 'hidden',
-              textShadow: '0 0 10px rgba(244, 63, 94, 0.6), 0 0 20px rgba(244, 63, 94, 0.4)',
+              textShadow: '0 0 10px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.4)',
               willChange: 'opacity, transform',
             }}
           >
@@ -591,7 +640,7 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
         {/* 🚀 PREMIUM INFUSION: Dissolving Info Overlay in bottom-left */}
         <div
           key={`info-${currentImageIndex % 4}`}
-          className="absolute left-6 bottom-24 z-30 pointer-events-none max-w-[80%]"
+          className="absolute left-6 bottom-[210px] z-30 pointer-events-none max-w-[80%]"
           style={{ 
             contain: 'layout paint',
             transform: 'translateZ(0)',
@@ -614,77 +663,91 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
                   className="text-white"
                 />
               </div>
-              {listing.has_verified_documents && (
+              {(listing as any).has_verified_documents && (
                 <div className="px-2.5 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30">
                   <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">Elite</span>
                 </div>
               )}
             </div>
 
-            {listing.category === 'vehicle' || listing.vehicle_type ? (
-              <VehicleCardInfo
-                price={listing.price || 0}
-                priceType={listing.rental_duration_type === 'monthly' ? 'month' : 'day'}
-                make={listing.vehicle_brand ?? undefined}
-                model={listing.vehicle_model ?? undefined}
-                year={listing.year ?? undefined}
-                location={listing.city ?? undefined}
-                isVerified={(listing as any).has_verified_documents ?? undefined}
-                photoIndex={currentImageIndex}
-                className="!text-white !space-y-0"
-              />
-            ) : listing.category === 'worker' || listing.category === 'services' || (listing as any).service_category ? (
-              <ServiceCardInfo
-                hourlyRate={listing.price || 0}
-                pricingUnit={(listing as any).pricing_unit || 'hr'}
-                serviceName={(listing as any).service_category || listing.title || 'Service'}
-                name={listing.title}
-                location={listing.city ?? undefined}
-                isVerified={(listing as any).has_verified_documents ?? undefined}
-                photoIndex={currentImageIndex}
-                className="!text-white !space-y-0"
-              />
-            ) : (
-              <PropertyCardInfo
-                price={listing.price || 0}
-                priceType={listing.rental_duration_type === 'monthly' ? 'month' : 'night'}
-                propertyType={listing.property_type ?? undefined}
-                beds={listing.beds ?? undefined}
-                baths={listing.baths ?? undefined}
-                location={listing.city ?? undefined}
-                isVerified={(listing as any).has_verified_documents ?? undefined}
-                photoIndex={currentImageIndex}
-                className="!text-white !space-y-0"
-              />
-            )}
+            {(() => {
+              const isProfile = (listing as any).profile_images || (listing as any).name;
+              if (isProfile) {
+                const profile = listing as MatchedClientProfile;
+                return (
+                  <ClientCardInfo
+                    name={profile.name}
+                    age={profile.age}
+                    budgetMin={profile.budget_min}
+                    budgetMax={profile.budget_max}
+                    location={profile.city}
+                    occupation={(profile as any).occupation || (profile as any).client_type}
+                    isVerified={profile.verified}
+                    photoIndex={currentImageIndex}
+                    workSchedule={profile.work_schedule}
+                    className="!text-white !space-y-0"
+                  />
+                );
+              }
+              if ((listing as any).category === 'vehicle' || (listing as any).vehicle_type) {
+                return (
+                  <VehicleCardInfo
+                    price={(listing as any).price || 0}
+                    priceType={(listing as any).rental_duration_type === 'monthly' ? 'month' : 'day'}
+                    make={(listing as any).vehicle_brand ?? undefined}
+                    model={(listing as any).vehicle_model ?? undefined}
+                    year={(listing as any).year ?? undefined}
+                    location={(listing as any).city ?? undefined}
+                    isVerified={(listing as any).has_verified_documents ?? undefined}
+                    photoIndex={currentImageIndex}
+                    className="!text-white !space-y-0"
+                  />
+                );
+              }
+              if ((listing as any).category === 'worker' || (listing as any).category === 'services' || (listing as any).service_category) {
+                return (
+                  <ServiceCardInfo
+                    hourlyRate={(listing as any).price || 0}
+                    pricingUnit={(listing as any).pricing_unit || 'hr'}
+                    serviceName={(listing as any).service_category || (listing as any).title || 'Service'}
+                    name={(listing as any).title}
+                    location={(listing as any).city ?? undefined}
+                    isVerified={(listing as any).has_verified_documents ?? undefined}
+                    photoIndex={currentImageIndex}
+                    className="!text-white !space-y-0"
+                  />
+                );
+              }
+              return (
+                <PropertyCardInfo
+                  price={(listing as any).price || 0}
+                  priceType={(listing as any).rental_duration_type === 'monthly' ? 'month' : 'night'}
+                  propertyType={(listing as any).property_type ?? undefined}
+                  beds={(listing as any).beds ?? undefined}
+                  baths={(listing as any).baths ?? undefined}
+                  location={(listing as any).city ?? undefined}
+                  isVerified={(listing as any).has_verified_documents ?? undefined}
+                  photoIndex={currentImageIndex}
+                  className="!text-white !space-y-0"
+                />
+              );
+            })()}
           </motion.div>
         </div>
 
-        {/* Global Dark Gradient for contrast */}
-        <div 
-          className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none z-10"
+        {/* Cinema Bottom Fade — theme-aware vignette behind nav + action buttons */}
+        <div
+          className="absolute inset-x-0 bottom-0 pointer-events-none z-10"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)'
+            height: '50%',
+            background: isLight
+              ? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 35%, rgba(255,255,255,0.05) 65%, transparent 100%)'
+              : 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0.05) 65%, transparent 100%)',
           }}
         />
 
-        {/* 🏎️ DISCOVERY REEL SIDEBAR — Social-Media Standard */}
-        {isTop && (
-          <DiscoverySidebar
-            onUndo={undoLastSwipe}
-            onMessage={onMessage}
-            onShare={onShare}
-            onInsights={onInsights}
-            onLike={onLike}
-            onDislike={onDislike}
-            onReport={onReport}
-            canUndo={canUndo}
-            matchPercentage={'matchPercentage' in listing ? (listing as MatchedListing).matchPercentage : undefined}
-          />
-        )}
-
         {/* Verified Badge - Left corner higher up */}
-        {listing.has_verified_documents && (
+        {(listing as any).has_verified_documents && (
           <div className="absolute top-16 left-6 z-40">
              <div className="relative px-3 py-1.5 rounded-full flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10">
                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]" />

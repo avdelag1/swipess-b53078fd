@@ -92,7 +92,7 @@ export function useSaveOwnerProfile() {
         .maybeSingle();
 
       // Normalize payload: strip undefined values to prevent PostgREST 400s
-      const cleanUpdates: Record<string, any> = {};
+      const cleanUpdates: any = {};
       for (const [key, value] of Object.entries(updates)) {
         if (value !== undefined) {
           cleanUpdates[key] = value;

@@ -7,73 +7,31 @@ import { triggerHaptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 
-type MiniMode = 'bubble' | 'expanded' | 'docked';
-
 function RadioMiniPlayerInner() {
   const { state, togglePlayPause, changeStation, pause, setMiniPlayerMode, setVolume } = useRadio();
   const { isLight } = useAppTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const [mode, setMode] = useState<MiniMode>('bubble');
-  const [isHovered, setIsHovered] = useState(false);
-  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // RESET IDLE TIMER on ANY interaction
-  const resetIdleTimer = useCallback(() => {
-    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    
-    // Only auto-dock if we are in bubble mode
-    if (mode === 'bubble') {
-      idleTimerRef.current = setTimeout(() => {
-        setMode('docked');
-      }, 5000);
-    }
-  }, [mode]);
-
-  useEffect(() => {
-    resetIdleTimer();
-    return () => {
-      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    };
-  }, [resetIdleTimer]);
-
-  // Global activity listener to wake it up from docked
-  useEffect(() => {
-    const handleGlobalActivity = () => {
-      if (mode === 'docked') {
-        setMode('bubble');
-        resetIdleTimer();
-      }
-    };
-    window.addEventListener('mousemove', handleGlobalActivity);
-    window.addEventListener('touchstart', handleGlobalActivity);
-    return () => {
-      window.removeEventListener('mousemove', handleGlobalActivity);
-      window.removeEventListener('touchstart', handleGlobalActivity);
-    };
-  }, [mode, resetIdleTimer]);
+  const [expanded, setExpanded] = useState(false);
 
   const handleTogglePlay = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     triggerHaptic('light');
     togglePlayPause();
-    resetIdleTimer();
-  }, [togglePlayPause, resetIdleTimer]);
+  }, [togglePlayPause]);
 
   const handlePrev = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     triggerHaptic('light');
     changeStation('prev');
-    resetIdleTimer();
-  }, [changeStation, resetIdleTimer]);
+  }, [changeStation]);
 
   const handleNext = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     triggerHaptic('light');
     changeStation('next');
-    resetIdleTimer();
-  }, [changeStation, resetIdleTimer]);
+  }, [changeStation]);
 
   const handleClose = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -81,13 +39,6 @@ function RadioMiniPlayerInner() {
     pause();
     setMiniPlayerMode('closed');
   }, [pause, setMiniPlayerMode]);
-
-  const handleMinimize = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    triggerHaptic('light');
-    setMode('bubble');
-    resetIdleTimer();
-  }, [resetIdleTimer]);
 
   const handleNavigate = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -99,8 +50,7 @@ function RadioMiniPlayerInner() {
     e.stopPropagation();
     triggerHaptic('light');
     setVolume(state.volume > 0 ? 0 : 0.8);
-    resetIdleTimer();
-  }, [state.volume, setVolume, resetIdleTimer]);
+  }, [state.volume, setVolume]);
 
   if (!state.isPoweredOn || !state.currentStation) return null;
   if (location.pathname.startsWith('/radio')) return null;
@@ -108,203 +58,142 @@ function RadioMiniPlayerInner() {
 
   const station = state.currentStation;
 
+  // Position above bottom nav using CSS variable
+  const bottomStyle = { bottom: 'calc(var(--bottom-nav-height, 72px) + var(--safe-bottom, 0px) + 12px)' };
+
   return (
     <AnimatePresence mode="popLayout">
-      {/* ─── DOCKED STATE (EDGE INDICATOR) ─── */}
-      {mode === 'docked' && (
-        <m.button
-          key="radio-docked"
-          initial={{ x: 60, opacity: 0 }}
-          animate={{ x: 16, opacity: 1 }}
-          exit={{ x: 60, opacity: 0 }}
-          whileHover={{ x: 8 }}
-          onClick={() => { setMode('bubble'); triggerHaptic('light'); }}
-          className={cn(
-            "fixed bottom-32 right-0 z-[100] w-14 h-14 rounded-l-full flex items-center justify-start pl-3 glass-nano-texture border shadow-2xl",
-            isLight ? "bg-white border-slate-200" : "bg-black/60 border-white/10"
-          )}
-        >
-          <div className="relative w-8 h-8 rounded-full overflow-hidden flex items-center justify-center">
-            {state.isPlaying ? (
-              <div className="flex gap-0.5 items-end h-3">
-                <m.div animate={{ height: [4, 12, 6, 12, 4] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-0.5 bg-blue-400 rounded-full" />
-                <m.div animate={{ height: [6, 4, 12, 4, 6] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-0.5 bg-blue-400 rounded-full" />
-                <m.div animate={{ height: [12, 6, 4, 6, 12] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} className="w-0.5 bg-blue-400 rounded-full" />
-              </div>
-            ) : (
-                <Radio className={cn("w-4 h-4", isLight ? "text-slate-400" : "text-white/40")} />
-            )}
-            <m.div 
-               animate={state.isPlaying ? { rotate: 360 } : {}} 
-               transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
-               className="absolute inset-0 border border-blue-500/30 rounded-full border-dashed"
-            />
-          </div>
-        </m.button>
-      )}
-
-      {/* ─── BUBBLE STATE ─── */}
-      {mode === 'bubble' && (
+      {!expanded ? (
+        /* ── BUBBLE ── */
         <m.div
           key="radio-bubble"
-          initial={{ scale: 0, opacity: 0, x: 20 }}
-          animate={{ scale: 1, opacity: 1, x: 0 }}
-          exit={{ scale: 0, opacity: 0, x: 20 }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="fixed bottom-32 right-4 z-[100]"
+          className="fixed right-4 z-[200] flex items-center gap-2"
+          style={bottomStyle}
         >
-          <div className="relative group">
-             {/* Glow effect */}
-             <div className="absolute -inset-1 rounded-full bg-blue-500/20 blur-lg transition-opacity opacity-0 group-hover:opacity-100" />
-             
-             <m.button
-                onClick={() => { setMode('expanded'); triggerHaptic('medium'); }}
-                className={cn(
-                  "w-14 h-14 rounded-full flex items-center justify-center relative shadow-2xl overflow-hidden glass-nano-texture border",
-                  isLight ? "bg-white border-slate-200" : "bg-black/45 border-white/10"
-                )}
-             >
-                {station.albumArt ? (
-                  <img src={station.albumArt} alt="" className={cn("w-full h-full object-cover rounded-full transition-transform duration-700", state.isPlaying && "animate-spin-slow")} />
-                ) : (
-                  <Radio className={cn("w-6 h-6", isLight ? "text-slate-600" : "text-white")} strokeWidth={1.8} />
-                )}
-                
-                {state.isPlaying && (
-                  <div className="absolute inset-0 rounded-full border-2 border-blue-400/30 animate-ping-slow" />
-                )}
-             </m.button>
-
-             {/* Mini quick controls on hover */}
-             <AnimatePresence>
-                {isHovered && (
-                  <m.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className={cn(
-                      "absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-1 backdrop-blur-xl border p-1 rounded-full shadow-2xl",
-                      isLight ? "bg-white/90 border-slate-200" : "bg-black/80 border-white/10"
-                    )}
-                  >
-                     <button onClick={handlePrev} className={cn("p-2 active:scale-90 transition-all", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/60 hover:text-white")}><SkipBack className="w-3.5 h-3.5 fill-current" /></button>
-                     <button onClick={handleTogglePlay} className={cn("p-2 active:scale-90 transition-all", isLight ? "text-slate-900 hover:text-primary" : "text-white hover:text-blue-400")}>
-                        {state.isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-                     </button>
-                     <button onClick={handleNext} className={cn("p-2 active:scale-90 transition-all", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/60 hover:text-white")}><SkipForward className="w-3.5 h-3.5 fill-current" /></button>
-                  </m.div>
-                )}
-             </AnimatePresence>
-          </div>
-        </m.div>
-      )}
-
-      {/* ─── EXPANDED STATE ─── */}
-      {mode === 'expanded' && (
-        <m.div
-          key="radio-expanded"
-          initial={{ scale: 0.8, opacity: 0, y: 20, filter: 'blur(10px)' }}
-          animate={{ scale: 1, opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ scale: 0.8, opacity: 0, y: 20, filter: 'blur(10px)' }}
-          transition={{ type: 'spring', stiffness: 400, damping: 26 }}
-          className="fixed bottom-32 right-4 z-[100] w-[300px]"
-        >
-          {/* Liquid Glass Container */}
-          <div
+          {/* Play/pause pill */}
+          <m.button
+            onClick={handleTogglePlay}
             className={cn(
-              "rounded-[28px] overflow-hidden shadow-[0_22px_70px_8px_rgba(0,0,0,0.56)] border backdrop-blur-3xl saturate-[1.8]",
-              isLight ? "bg-white/95 border-slate-200" : "bg-black/85 border-white/10"
+              "flex items-center gap-2 h-12 px-4 rounded-full shadow-2xl border backdrop-blur-xl transition-all active:scale-95",
+              isLight ? "bg-white border-slate-200 text-slate-900" : "bg-black/80 border-white/15 text-white"
             )}
           >
-            {/* Top rim catch-light */}
-            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+              {station.albumArt ? (
+                <img src={station.albumArt} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-primary/20">
+                  <Radio className="w-4 h-4 text-primary" />
+                </div>
+              )}
+            </div>
+            {state.isPlaying ? (
+              <Pause className="w-4 h-4 fill-current flex-shrink-0" />
+            ) : (
+              <Play className="w-4 h-4 fill-current ml-0.5 flex-shrink-0" />
+            )}
+            {state.isPlaying && (
+              <div className="flex items-end gap-[2px] h-3 flex-shrink-0">
+                {[1,2,3].map(i => (
+                  <m.div
+                    key={i}
+                    className="w-[2px] bg-primary rounded-full"
+                    animate={{ height: ['4px', '12px', '4px'] }}
+                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                  />
+                ))}
+              </div>
+            )}
+          </m.button>
 
+          {/* Expand button */}
+          <button
+            onClick={() => { setExpanded(true); triggerHaptic('light'); }}
+            className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center border shadow-xl backdrop-blur-xl active:scale-90 transition-all",
+              isLight ? "bg-white/90 border-slate-200 text-slate-500" : "bg-black/60 border-white/15 text-white/60"
+            )}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 5l5-3 5 3M2 9l5 3 5-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </m.div>
+      ) : (
+        /* ── EXPANDED CARD ── */
+        <m.div
+          key="radio-expanded"
+          initial={{ scale: 0.85, opacity: 0, y: 16 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.85, opacity: 0, y: 16 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 26 }}
+          className="fixed right-4 z-[200] w-[300px]"
+          style={bottomStyle}
+        >
+          <div className={cn(
+            "rounded-[28px] overflow-hidden shadow-[0_22px_70px_8px_rgba(0,0,0,0.56)] border backdrop-blur-3xl",
+            isLight ? "bg-white/95 border-slate-200" : "bg-black/85 border-white/10"
+          )}>
             {/* Top bar */}
             <div className="flex items-center justify-between px-4 pt-3.5 pb-2">
               <button
-                onClick={handleMinimize}
-                className={cn("text-[10px] font-black uppercase tracking-[0.2em] transition-colors", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/30 hover:text-white/60")}
+                onClick={() => { setExpanded(false); triggerHaptic('light'); }}
+                className={cn("text-[10px] font-black uppercase tracking-[0.2em]", isLight ? "text-slate-400" : "text-white/50")}
               >
                 Minimize
               </button>
               <button
                 onClick={handleClose}
-                className={cn("w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90", isLight ? "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900" : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white")}
+                className={cn("w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90", isLight ? "bg-slate-100 text-slate-500" : "bg-white/5 text-white/70")}
               >
                 <X className="w-4 h-4" strokeWidth={2.5} />
               </button>
             </div>
 
-            {/* Station info row */}
-            <button onClick={handleNavigate} className="flex items-center gap-4 px-4 pb-4 w-full text-left group">
-              <div className={cn("relative w-14 h-14 rounded-2xl overflow-hidden shadow-xl ring-1 transition-transform duration-300 group-active:scale-95", isLight ? "ring-slate-200" : "ring-white/10")}>
+            {/* Station info */}
+            <button onClick={handleNavigate} className="flex items-center gap-4 px-4 pb-4 w-full text-left active:opacity-80">
+              <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-xl flex-shrink-0">
                 {station.albumArt ? (
                   <img src={station.albumArt} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className={cn("w-full h-full flex items-center justify-center", isLight ? "bg-slate-100" : "bg-gradient-to-br from-blue-500/20 to-purple-600/20")}>
-                    <Radio className={cn("w-6 h-6", isLight ? "text-slate-300" : "text-white/40")} />
-                  </div>
-                )}
-                {state.isPlaying && (
-                  <div className="absolute top-1 right-1">
-                      <div className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)] animate-pulse" />
+                  <div className={cn("w-full h-full flex items-center justify-center", isLight ? "bg-slate-100" : "bg-primary/20")}>
+                    <Radio className="w-6 h-6 text-primary" />
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={cn("text-[15px] font-black truncate tracking-tight", isLight ? "text-slate-900" : "text-white")}>{station.name}</p>
+                <p className={cn("text-[15px] font-black truncate", isLight ? "text-slate-900" : "text-white")}>{station.name}</p>
                 <p className={cn("text-[11px] font-bold truncate uppercase tracking-widest mt-0.5", isLight ? "text-primary/60" : "text-blue-400/60")}>
                   {station.frequency} · {station.genre || 'LIVE'}
                 </p>
               </div>
+              {state.isPlaying && <div className="w-2 h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />}
             </button>
 
             {/* Controls */}
             <div className="flex items-center justify-between px-4 pb-5 pt-1">
-              <button
-                onClick={handleMute}
-                className={cn("w-10 h-10 rounded-full flex items-center justify-center transition-colors active:scale-90", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/30 hover:text-white")}
-              >
-                {state.volume > 0 ? (
-                  <Volume2 className="w-4.5 h-4.5" />
-                ) : (
-                  <VolumeX className="w-4.5 h-4.5" />
-                )}
+              <button onClick={handleMute} className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90", isLight ? "text-slate-400" : "text-white/60")}>
+                {state.volume > 0 ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
               </button>
-
               <div className="flex items-center gap-2">
-                <button
-                  onClick={handlePrev}
-                  className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/40 hover:text-white")}
-                >
+                <button onClick={handlePrev} className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90", isLight ? "text-slate-400" : "text-white/70")}>
                   <SkipBack className="w-5 h-5 fill-current" />
                 </button>
-
                 <button
                   onClick={handleTogglePlay}
-                  className={cn(
-                    "w-14 h-14 rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition-all",
-                    isLight ? "bg-slate-900 text-white" : "bg-white text-black"
-                  )}
+                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl active:scale-90 bg-white text-black border border-black/10"
                 >
-                  {state.isPlaying ? (
-                    <Pause className="w-7 h-7 fill-current" />
-                  ) : (
-                    <Play className="w-7 h-7 fill-current ml-1" />
-                  )}
+                  {state.isPlaying ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current ml-1" />}
                 </button>
-
-                <button
-                  onClick={handleNext}
-                  className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all", isLight ? "text-slate-400 hover:text-slate-900" : "text-white/40 hover:text-white")}
-                >
+                <button onClick={handleNext} className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90", isLight ? "text-slate-400" : "text-white/70")}>
                   <SkipForward className="w-5 h-5 fill-current" />
                 </button>
               </div>
-
-              <div className="w-10" /> {/* Spacer */}
+              <div className="w-10" />
             </div>
           </div>
         </m.div>
@@ -313,7 +202,6 @@ function RadioMiniPlayerInner() {
   );
 }
 
-// Error-safe wrapper
 import { Component, type ReactNode } from 'react';
 
 class RadioErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -330,5 +218,3 @@ export function RadioMiniPlayer() {
     </RadioErrorBoundary>
   );
 }
-
-

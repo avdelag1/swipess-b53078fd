@@ -52,10 +52,10 @@ export function useOwnerInsights() {
         .eq('owner_id', user.id);
 
       // 4. Get active conversations
-      const { count: convosCount } = await supabase
+      const { count: convosCount } = await (supabase
         .from('conversations')
         .select('*', { count: 'exact', head: true })
-        .eq('owner_id', user.id)
+        .eq('owner_id', user.id) as any)
         .eq('is_active', true);
 
       // Mocking some growth data for visuals

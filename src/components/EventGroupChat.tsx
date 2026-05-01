@@ -161,7 +161,7 @@ export function EventGroupChat({ eventId: _eventId, eventTitle, onClose }: Event
               onClick={handleSend}
               disabled={!input.trim() || sending}
               data-testid="button-send-message"
-              className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0 disabled:opacity-40 transition-opacity"
+              className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0 disabled:opacity-70 transition-opacity"
             >
               <Send className="w-4 h-4 text-primary-foreground" />
             </button>

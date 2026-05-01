@@ -23,7 +23,7 @@ function Badge({ children, className, variant = "secondary" }: { children: React
   return (
     <span className={cn(
       "px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest italic transition-colors",
-      variant === "secondary" ? (isLight ? "bg-black/5 text-black/40" : "bg-white/5 text-white/40") : "bg-primary/20 text-primary border border-primary/20",
+      variant === "secondary" ? (isLight ? "bg-black/5 text-black/70" : "bg-white/5 text-white/70") : "bg-primary/20 text-primary border border-primary/20",
       className
     )}>
       {children}
@@ -31,7 +31,7 @@ function Badge({ children, className, variant = "secondary" }: { children: React
   );
 }
 
-export function LegalHub() {
+export function ContractsVault() {
   const { user } = useAuth();
   const { theme, isLight } = useAppTheme();
   const [view, setView] = useState<HubView>('dashboard');
@@ -82,7 +82,7 @@ export function LegalHub() {
 
   return (
     <div className={cn(
-      "relative min-h-[80vh] w-full backdrop-blur-3xl rounded-[3rem] border overflow-hidden shadow-2xl transition-colors duration-500",
+      "relative w-full backdrop-blur-3xl rounded-[3rem] border shadow-2xl transition-colors duration-500",
       isLight ? "bg-white/80 border-black/5" : "bg-black/50 border-white/10"
     )}>
       {/* 🛸 BACKGROUND DECOR */}
@@ -96,19 +96,19 @@ export function LegalHub() {
             <ShieldCheck className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h2 className={cn("text-xl font-black tracking-tight uppercase italic", isLight ? "text-black" : "text-white")}>Legal Hub</h2>
+            <h2 className={cn("text-xl font-black tracking-tight uppercase italic", isLight ? "text-black" : "text-white")}>Contracts Vault</h2>
             <p className={cn("text-[10px] font-black uppercase tracking-[0.2em] opacity-20", isLight ? "text-black" : "text-white")}>Secured Digital Protocols v2.0</p>
           </div>
         </div>
         
         {view !== 'dashboard' && (
           <Button variant="ghost" onClick={handleClose} className={cn("rounded-full w-10 h-10 p-0 hover:bg-black/5", isLight ? "hover:bg-black/5" : "hover:bg-white/5")}>
-            <X className={cn("w-5 h-5", isLight ? "text-black/40" : "text-white/40")} />
+            <X className={cn("w-5 h-5", isLight ? "text-black/70" : "text-white/70")} />
           </Button>
         )}
       </div>
 
-      <div className="relative z-10 p-8 h-[calc(80vh-100px)] overflow-y-auto no-scrollbar">
+      <div className="relative z-10 p-8">
         <AnimatePresence mode="wait">
           {view === 'dashboard' && (
             <motion.div 
@@ -132,7 +132,7 @@ export function LegalHub() {
 
                 <div className={cn("p-10 rounded-[2.5rem] border flex flex-col justify-between", isLight ? "bg-black/[0.03] border-black/5" : "bg-white/5 border-white/10")}>
                   <div>
-                    <h4 className={cn("text-[10px] font-black uppercase tracking-widest opacity-30 mb-2", isLight ? "text-black" : "text-white")}>Awaiting Signature</h4>
+                    <h4 className={cn("text-[10px] font-black uppercase tracking-widest opacity-70 mb-2", isLight ? "text-black" : "text-white")}>Awaiting Signature</h4>
                     <p className={cn("text-5xl font-black italic tracking-tighter leading-none", isLight ? "text-black" : "text-white")}>
                       {contracts.filter(c => c.status === 'sent' && !c.client_signature).length}
                     </p>
@@ -147,7 +147,7 @@ export function LegalHub() {
               {/* 🛸 VAULT LIST */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between px-2">
-                  <h3 className={cn("text-[10px] font-black uppercase tracking-[0.4em] italic opacity-30", isLight ? "text-black" : "text-white")}>Active Vault</h3>
+                  <h3 className={cn("text-[10px] font-black uppercase tracking-[0.4em] italic opacity-70", isLight ? "text-black" : "text-white")}>Active Vault</h3>
                   <Download className={cn("w-4 h-4 opacity-20", isLight ? "text-black" : "text-white")} />
                 </div>
 
@@ -172,7 +172,7 @@ export function LegalHub() {
                     >
                       <div className="flex items-center gap-6">
                         <div className={cn("w-16 h-16 rounded-[1.2rem] border flex items-center justify-center transition-colors", isLight ? "bg-black/5 border-black/5 group-hover:bg-primary/10 group-hover:border-primary/20" : "bg-white/5 border-white/10 group-hover:bg-primary/10 group-hover:border-primary/20")}>
-                          <FileText className={cn("w-7 h-7 text-white/40 group-hover:text-primary transition-colors")} />
+                          <FileText className={cn("w-7 h-7 group-hover:text-primary transition-colors", isLight ? "text-black/40" : "text-white/70")} />
                         </div>
                         <div className="space-y-1.5">
                           <h4 className={cn("text-base font-black tracking-tighter uppercase italic transition-colors", isLight ? "text-black group-hover:text-primary" : "text-white group-hover:text-primary")}>{contract.title}</h4>
@@ -181,7 +181,7 @@ export function LegalHub() {
                               "text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border",
                               contract.status === 'signed' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" :
                               contract.status === 'sent' ? "bg-amber-500/10 border-amber-500/20 text-amber-500" :
-                              isLight ? "bg-black/5 border-black/10 text-black/40" : "bg-white/5 border-white/10 text-white/40"
+                              isLight ? "bg-black/5 border-black/10 text-black/70" : "bg-white/5 border-white/10 text-white/70"
                             )}>
                               {contract.status}
                             </span>
@@ -238,11 +238,11 @@ export function LegalHub() {
                     
                     <div className="relative flex items-center gap-6">
                       <div className={cn("w-14 h-14 rounded-2xl border flex items-center justify-center group-hover:scale-110 transition-transform", isLight ? "bg-black/5 border-black/5" : "bg-white/5 border-white/10")}>
-                        <PenTool className="w-7 h-7 text-white/20 group-hover:text-primary transition-colors" />
+                        <PenTool className={cn("w-7 h-7 group-hover:text-primary transition-colors", isLight ? "text-black/10" : "text-white/20")} />
                       </div>
                       <div className="flex-1 space-y-1">
                         <h4 className={cn("text-base font-black tracking-tighter uppercase italic", isLight ? "text-black" : "text-white")}>{template.name}</h4>
-                        <p className={cn("text-[11px] font-bold italic opacity-40 leading-relaxed", isLight ? "text-black" : "text-white")}>{template.description}</p>
+                        <p className={cn("text-[11px] font-bold italic opacity-70 leading-relaxed", isLight ? "text-black" : "text-white")}>{template.description}</p>
                       </div>
                       <ArrowRight className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all" />
                     </div>
@@ -262,12 +262,12 @@ export function LegalHub() {
                <div className={cn("p-10 rounded-[3rem] border space-y-10", isLight ? "bg-black/[0.02] border-black/5" : "bg-white/[0.03] border-white/5")}>
                   <div className="flex items-center gap-3">
                     <Sparkles className="w-5 h-5 text-primary" />
-                    <span className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-40 italic", isLight ? "text-black" : "text-white")}>AI Protocol Synthesis</span>
+                    <span className={cn("text-[10px] font-black uppercase tracking-[0.3em] opacity-70 italic", isLight ? "text-black" : "text-white")}>AI Protocol Synthesis</span>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-3 col-span-full">
-                       <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2 opacity-30", isLight ? "text-black" : "text-white")}>Document Title</label>
+                       <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2 opacity-70", isLight ? "text-black" : "text-white")}>Document Title</label>
                        <input 
                          type="text" 
                          defaultValue={selectedTemplate?.name}
@@ -276,19 +276,19 @@ export function LegalHub() {
                     </div>
 
                     <div className="space-y-3">
-                       <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2 opacity-30", isLight ? "text-black" : "text-white")}>Effective Date</label>
+                       <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2 opacity-70", isLight ? "text-black" : "text-white")}>Effective Date</label>
                        <input type="date" className={cn("w-full h-16 rounded-2xl border px-8 text-sm outline-none", isLight ? "bg-black/[0.04] border-black/5 text-black" : "bg-white/5 border-white/10 text-white")} />
                     </div>
 
                     {selectedTemplate?.category === 'lease' && (
                       <div className="space-y-3">
-                         <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2 opacity-30", isLight ? "text-black" : "text-white")}>Monthly Value</label>
+                         <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2 opacity-70", isLight ? "text-black" : "text-white")}>Monthly Value</label>
                          <input type="number" placeholder="$0.00" className={cn("w-full h-16 rounded-2xl border px-8 text-sm outline-none", isLight ? "bg-black/[0.04] border-black/5 text-black" : "bg-white/5 border-white/10 text-white")} />
                       </div>
                     )}
 
                     <div className="space-y-3 col-span-full">
-                       <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2 opacity-30", isLight ? "text-black" : "text-white")}>Counterparty ID</label>
+                       <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2 opacity-70", isLight ? "text-black" : "text-white")}>Counterparty ID</label>
                        <input type="text" placeholder="SCAN VERIFIED USERS..." className={cn("w-full h-16 rounded-2xl border px-8 text-[11px] font-black uppercase tracking-widest outline-none", isLight ? "bg-black/[0.04] border-black/5 text-black" : "bg-white/5 border-white/10 text-white")} />
                     </div>
                   </div>
@@ -332,7 +332,7 @@ export function LegalHub() {
 
               <div className="text-center space-y-4 px-6">
                  <h3 className={cn("text-3xl font-black tracking-tighter uppercase italic", isLight ? "text-black" : "text-white")}>Signature Protocol</h3>
-                 <p className={cn("text-[10px] font-black uppercase tracking-[0.4em] opacity-30 italic", isLight ? "text-black" : "text-white")}>Digital authenticity via biometric ink</p>
+                 <p className={cn("text-[10px] font-black uppercase tracking-[0.4em] opacity-70 italic", isLight ? "text-black" : "text-white")}>Digital authenticity via biometric ink</p>
               </div>
 
               <DigitalSignaturePad 

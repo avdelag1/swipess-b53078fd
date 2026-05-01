@@ -7,7 +7,7 @@
 
 import { memo, CSSProperties, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User } from 'lucide-react';
+import { User, Radio, SlidersHorizontal, LayoutGrid, ChevronLeft } from 'lucide-react';
 
 interface RadarSearchEffectProps {
   size?: number;
@@ -84,7 +84,7 @@ export const RadarSearchEffect = memo(function RadarSearchEffect({
                 animate={{ rotate: 360 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-                className="absolute rounded-full opacity-30 z-0"
+                className="absolute rounded-full opacity-70 z-0"
                 style={{
                   width: size * 1.0,
                   height: size * 1.0,

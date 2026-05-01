@@ -14,7 +14,7 @@
 
 import { memo, useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Share2, RotateCcw, MessageCircle, Flame, ThumbsDown, Sparkles } from 'lucide-react';
+import { Share2, RotateCcw, MessageCircle, Flame, ThumbsDown, Info, Smartphone } from 'lucide-react';
 import { triggerHaptic } from '@/utils/haptics';
 import { AnimatedLottieIcon } from './ui/AnimatedLottieIcon';
 
@@ -22,9 +22,11 @@ interface SwipeActionButtonBarProps {
   onLike: () => void;
   onDislike: () => void;
   onShare?: () => void;
+  onInsights?: () => void;
   onUndo?: () => void;
   onMessage?: () => void;
   onSpeedMeet?: () => void;
+  onCycleCategory?: () => void;
   canUndo?: boolean;
   disabled?: boolean;
   className?: string;
@@ -36,12 +38,12 @@ const _ICON_SPRING = { type: 'spring' as const, stiffness: 520, damping: 28 } as
 const ENTRY_SPRING = { type: 'spring' as const, stiffness: 340, damping: 26, mass: 0.7 } as const;
 
 // ── DIMENSIONS ────────────────────────────────────────────────────────────────
-const LARGE_CSS = 'clamp(56px, 15vw, 68px)';
-const SMALL_CSS = 'clamp(44px, 12vw, 52px)';
-const LARGE_ICON = 32;
-const SMALL_ICON = 24;
-const GAP_CSS = 'clamp(8px, 3.5vw, 16px)';
-const TAP_SCALE = 0.94;
+const LARGE_CSS = 'clamp(44px, 11vw, 54px)';
+const SMALL_CSS = 'clamp(38px, 9vw, 44px)';
+const LARGE_ICON = 26;
+const SMALL_ICON = 18;
+const GAP_CSS = 'clamp(6px, 1.5vw, 12px)';
+const TAP_SCALE = 0.92;
 
 // ── VARIANT CONFIGS ───────────────────────────────────────────────────────────
 type Variant = 'default' | 'like' | 'dislike' | 'amber' | 'cyan' | 'purple' | 'gold';
@@ -61,47 +63,47 @@ const VARIANTS: Record<Variant, VariantCfg> = {
     glow: '0 0 20px rgba(255, 107, 53, 0.4)',
     glowIntense: '0 0 40px rgba(255, 107, 53, 0.5)',
     dropShadow: 'var(--shadow-cinematic-primary)',
-    circleBg: 'rgba(255, 107, 53, 0.15)',
-    circleBorder: 'none',
+    circleBg: 'rgba(255, 107, 53, 0.35)', // Increased opacity
+    circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
   dislike: {
     iconColor: '#ef4444',
     glow: '0 0 20px rgba(239, 68, 68, 0.4)',
     glowIntense: '0 0 40px rgba(239, 68, 68, 0.5)',
     dropShadow: '0 12px 24px -6px rgba(239, 68, 68, 0.45)',
-    circleBg: 'rgba(239, 68, 68, 0.15)',
-    circleBorder: 'none',
+    circleBg: 'rgba(239, 68, 68, 0.35)', // Increased opacity
+    circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
   amber: {
     iconColor: '#f59e0b',
     glow: '0 0 16px rgba(245, 158, 11, 0.35)',
     glowIntense: '0 0 32px rgba(245, 158, 11, 0.45)',
     dropShadow: '0 8px 16px -4px rgba(245, 158, 11, 0.4)',
-    circleBg: 'rgba(245, 158, 11, 0.15)',
-    circleBorder: 'none',
+    circleBg: 'rgba(245, 158, 11, 0.35)', // Increased opacity
+    circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
   cyan: {
     iconColor: '#06b6d4',
     glow: '0 0 16px rgba(6, 182, 212, 0.35)',
     glowIntense: '0 0 32px rgba(6, 182, 212, 0.45)',
     dropShadow: '0 8px 16px -4px rgba(6, 182, 212, 0.4)',
-    circleBg: 'rgba(6, 182, 212, 0.15)',
-    circleBorder: 'none',
+    circleBg: 'rgba(6, 182, 212, 0.35)', // Increased opacity
+    circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
   purple: {
     iconColor: '#a855f7',
     glow: '0 0 16px rgba(168, 85, 247, 0.35)',
     glowIntense: '0 0 32px rgba(168, 85, 247, 0.45)',
     dropShadow: '0 8px 16px -4px rgba(168, 85, 247, 0.4)',
-    circleBg: 'rgba(168, 85, 247, 0.15)',
-    circleBorder: 'none',
+    circleBg: 'rgba(168, 85, 247, 0.35)', // Increased opacity
+    circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
   gold: {
     iconColor: '#FFD700',
     glow: '0 0 20px rgba(255, 215, 0, 0.4)',
     glowIntense: '0 0 40px rgba(255, 215, 0, 0.6)',
     dropShadow: '0 12px 24px -6px rgba(255, 215, 0, 0.45)',
-    circleBg: 'rgba(255, 215, 0, 0.15)',
+    circleBg: 'rgba(255, 215, 0, 0.25)', // Increased opacity
     circleBorder: 'none',
   },
   default: {
@@ -235,9 +237,11 @@ function SwipeActionButtonBarComponent({
   onLike,
   onDislike,
   onShare,
+  onInsights,
   onUndo,
   onMessage,
   onSpeedMeet,
+  onCycleCategory,
   canUndo = false,
   disabled = false,
   className = '',
@@ -275,34 +279,10 @@ function SwipeActionButtonBarComponent({
           disabled={disabled}
           size="large"
           variant="dislike"
-          ariaLabel="Pass on this listing"
+          ariaLabel="Pass"
           index={1}
         >
           <ThumbsDown className="w-full h-full" strokeWidth={1.8} />
-        </ActionButton>
-
-        {onShare && (
-          <ActionButton
-            onClick={onShare}
-            disabled={disabled}
-            size="small"
-            variant="purple"
-            ariaLabel="Share this listing"
-            index={2}
-          >
-            <Share2 className="w-full h-full" strokeWidth={1.5} />
-          </ActionButton>
-        )}
-
-        <ActionButton
-          onClick={onLike}
-          disabled={disabled}
-          size="large"
-          variant="like"
-          ariaLabel="Like this listing"
-          index={3}
-        >
-          <Flame className="w-full h-full" strokeWidth={1.8} />
         </ActionButton>
 
         {onMessage && (
@@ -311,23 +291,34 @@ function SwipeActionButtonBarComponent({
             disabled={disabled}
             size="small"
             variant="cyan"
-            ariaLabel="Message the owner"
-            index={4}
+            ariaLabel="Message"
+            index={2}
           >
             <MessageCircle className="w-full h-full" strokeWidth={1.5} />
           </ActionButton>
         )}
 
-        {onSpeedMeet && (
+        <ActionButton
+          onClick={onLike}
+          disabled={disabled}
+          size="large"
+          variant="like"
+          ariaLabel="Like"
+          index={3}
+        >
+          <Flame className="w-full h-full" strokeWidth={1.8} />
+        </ActionButton>
+
+        {onInsights && (
           <ActionButton
-            onClick={onSpeedMeet}
+            onClick={onInsights}
             disabled={disabled}
-            size="large"
-            variant="gold"
-            ariaLabel="AI Speed Meet"
-            index={5}
+            size="small"
+            variant="cyan"
+            ariaLabel="Insights"
+            index={4}
           >
-            <Sparkles className="w-full h-full" strokeWidth={1.8} />
+            <Smartphone className="w-full h-full" strokeWidth={1.5} />
           </ActionButton>
         )}
       </div>

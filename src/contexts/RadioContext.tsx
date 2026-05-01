@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { RadioStation, CityLocation, RadioPlayerState } from '@/types/radio';
 import { getStationsByCity, getStationById, radioStations } from '@/data/radioStations';
 import { logger } from '@/utils/prodLogger';
+import { appToast } from '@/utils/appNotification';
 
 /** Fisher-Yates shuffle — returns a new shuffled array, never starting with excludeId */
 function shuffleArray<T extends { id: string }>(arr: T[], excludeId?: string): T[] {
@@ -157,6 +158,7 @@ export function RadioProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      appToast.warning('Station unavailable', 'Tuning to next frequency...');
       setError('Station unavailable - skipping...');
 
       if (audio) {
@@ -170,7 +172,19 @@ export function RadioProvider({ children }: { children: React.ReactNode }) {
       const currentId = currentStationRef.current?.id;
       if (currentId) {
         failedStationsRef.current.add(currentId);
-        setTimeout(() => failedStationsRef.current.delete(currentId), 30000);
+        // Also update state so UI can show offline indicator
+        setState(prev => ({
+          ...prev,
+          deadStationIds: [...prev.deadStationIds, currentId]
+        }));
+        
+        setTimeout(() => {
+          failedStationsRef.current.delete(currentId);
+          setState(prev => ({
+            ...prev,
+            deadStationIds: prev.deadStationIds.filter(id => id !== currentId)
+          }));
+        }, 30000);
       }
 
       if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
@@ -337,13 +351,14 @@ export function RadioProvider({ children }: { children: React.ReactNode }) {
           currentStation: targetStation,
           currentCity: targetStation.city,
           // 🚀 SENTIENT VISIBILITY: Automatically expand when music starts
-          miniPlayerMode: prev.miniPlayerMode === 'closed' ? 'closed' : 'expanded'
+          miniPlayerMode: prev.miniPlayerMode === 'closed' ? 'expanded' : prev.miniPlayerMode
         }));
         savePreferences({ currentStation: targetStation, currentCity: targetStation.city });
       }
 
-      // 📡 TURBO TIMEOUT: 7s is plenty for modern streams
+      // 📡 TURBO TIMEOUT: 10s for slower connections
       loadTimeoutRef.current = setTimeout(() => {
+        console.warn(`[RadioPlayer] Station ${targetStation.id} (${targetStation.name}) timeout after 10s, skipping...`);
         logger.warn(`[RadioPlayer] Station ${targetStation.id} timeout, skipping`);
         failedStationsRef.current.add(targetStation.id);
         setTimeout(() => failedStationsRef.current.delete(targetStation.id), 20000);
@@ -352,7 +367,7 @@ export function RadioProvider({ children }: { children: React.ReactNode }) {
           setError(null);
           changeStationRef.current('next');
         }, 300);
-      }, 7000);
+      }, 10000);
 
       try {
         // ⚡ TURBO ENGINE: Immediate AudioContext creation on first play

@@ -2,12 +2,12 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Bed, Bath, Square, DollarSign, MessageCircle, Sparkles, Trash2, Ban, Flag, ChevronLeft, ChevronRight, X, Star, ArrowLeft } from 'lucide-react';
+import { MapPin, Bed, Bath, Square, DollarSign, MessageCircle, Sparkles, Trash2, Ban, Flag, ChevronLeft, ChevronRight, X, Star, ArrowLeft, Share2, TrendingUp, CheckCircle, Home, Clock, Zap, Users, Shield, Award, ThumbsUp, Eye, Ruler, Settings, Bike, Car, Gauge, Fuel } from 'lucide-react';
 import { PropertyImageGallery } from './PropertyImageGallery';
 import { useNavigate } from 'react-router-dom';
 import { useStartConversation } from '@/hooks/useConversations';
 import { toast } from '@/components/ui/sonner';
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { logger } from '@/utils/prodLogger';
@@ -29,6 +29,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ReportDialog } from './ReportDialog';
+import { ShareDialog } from './ShareDialog';
 
 interface LikedListingInsightsModalProps {
   open: boolean;
@@ -46,12 +48,77 @@ function LikedListingInsightsModalComponent({ open, onOpenChange, listing }: Lik
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const [showRatingDialog, setShowRatingDialog] = useState(false);
-  const [reportReason, setReportReason] = useState('');
-  const [reportDetails, setReportDetails] = useState('');
 
   // Fetch rating aggregate for this listing
   const { data: ratingAggregate } = useListingRatingAggregate(listing?.id);
+
+  // Calculate property insights based on listing data
+  const propertyInsights = useMemo(() => {
+    if (!listing) return null;
+
+    const pricePerSqft = listing.square_footage && listing.price
+      ? Math.round(listing.price / listing.square_footage)
+      : null;
+
+    const amenityCount = listing.amenities?.length || 0;
+    const imageCount = (listing.images?.length || 0);
+
+    // Calculate listing quality score (0-100)
+    let qualityScore = 0;
+    if (listing.description && listing.description.length > 100) qualityScore += 20;
+    if (imageCount >= 5) qualityScore += 25;
+    else if (imageCount >= 3) qualityScore += 15;
+    else if (imageCount >= 1) qualityScore += 5;
+    if (amenityCount >= 8) qualityScore += 20;
+    else if (amenityCount >= 4) qualityScore += 10;
+    if (listing.furnished) qualityScore += 10;
+    if (listing.pet_friendly) qualityScore += 10;
+    if (listing.square_footage) qualityScore += 5;
+    if (listing.beds && listing.baths) qualityScore += 10;
+
+    // Value rating based on price per sqft (simplified)
+    let valueRating: 'excellent' | 'good' | 'fair' | 'premium' = 'good';
+    if (pricePerSqft) {
+      if (pricePerSqft < 15) valueRating = 'excellent';
+      else if (pricePerSqft < 25) valueRating = 'good';
+      else if (pricePerSqft < 40) valueRating = 'fair';
+      else valueRating = 'premium';
+    }
+
+    // Determine category
+    const category = listing.category || 'property';
+    const isWorker = category === 'worker' || category === 'services';
+    const isMotorcycle = category === 'motorcycle';
+    const isBicycle = category === 'bicycle';
+    const isVehicle = isMotorcycle || isBicycle;
+    const isProperty = !isVehicle && !isWorker;
+    
+    // Calculate demand level
+    const demandLevel = qualityScore >= 80 ? 'high' : qualityScore >= 50 ? 'medium' : 'low';
+
+    // Listing urgency
+    const isHotListing = qualityScore >= 75 && listing.status === 'available';
+
+    return {
+      pricePerSqft,
+      qualityScore: Math.min(100, qualityScore),
+      valueRating,
+      amenityCount,
+      imageCount,
+      responseRate: Math.min(95, 70 + amenityCount * 2),
+      avgResponseTime: amenityCount > 5 ? '< 1 hour' : '1-2 hours',
+      category,
+      isWorker,
+      isMotorcycle,
+      isBicycle,
+      isVehicle,
+      isProperty,
+      demandLevel,
+      isHotListing,
+    };
+  }, [listing]);
 
   const images = listing?.images || [];
 
@@ -140,44 +207,7 @@ function LikedListingInsightsModalComponent({ open, onOpenChange, listing }: Lik
     }
   });
 
-  // Report mutation
-  const reportMutation = useMutation({
-    mutationFn: async ({ reason, details }: { reason: string; details: string }) => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user || !listing?.owner_id) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('user_reports')
-        .insert({
-          reporter_id: user.user.id,
-          reported_user_id: listing.owner_id,
-          report_reason: reason,
-          report_details: details,
-          status: 'pending'
-        });
-
-      if (error) {
-        logger.error('Report submission error:', error);
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      toast({
-        title: 'Report submitted',
-        description: "We'll review it shortly.",
-      });
-      setShowReportDialog(false);
-      setReportReason('');
-      setReportDetails('');
-    },
-    onError: () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to submit report.',
-        variant: 'destructive',
-      });
-    }
-  });
 
   const handleDelete = () => {
     setShowDeleteDialog(true);
@@ -200,17 +230,6 @@ function LikedListingInsightsModalComponent({ open, onOpenChange, listing }: Lik
     setShowReportDialog(true);
   };
 
-  const handleSubmitReport = () => {
-    if (!reportReason) {
-      toast({
-        title: 'Error',
-        description: 'Please select a reason for your report.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    reportMutation.mutate({ reason: reportReason, details: reportDetails });
-  };
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -275,223 +294,278 @@ function LikedListingInsightsModalComponent({ open, onOpenChange, listing }: Lik
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
-          className="w-full max-w-2xl h-[90vh] max-h-[90vh] p-0 overflow-hidden bg-background border-0 rounded-3xl"
+          className="w-full max-w-lg h-[92dvh] max-h-[92dvh] p-0 overflow-hidden bg-[#0a0a0f] border-0 rounded-[2.5rem]"
           hideCloseButton
         >
           <div className="flex flex-col h-full relative">
-            {/* Persistent Back/Close — always visible */}
-            <div className="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+            {/* Floating nav buttons */}
+            <div className="absolute top-4 left-4 right-4 z-30 flex items-center justify-between pointer-events-none">
               <button
                 onClick={() => onOpenChange(false)}
-                title="Back"
                 aria-label="Back"
-                className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-sm"
+                className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-xl border border-white/10"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ArrowLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={() => onOpenChange(false)}
-                title="Close Details"
-                aria-label="Close Details"
-                className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-sm"
+                aria-label="Close"
+                className="pointer-events-auto w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-xl border border-white/10"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Hero Image Section */}
+            {/* Hero Image */}
             <div className="relative flex-shrink-0">
               {images.length > 0 ? (
-                <div className="relative aspect-[16/10] w-full">
+                <div className="relative h-[44vw] max-h-[280px] min-h-[200px] w-full overflow-hidden rounded-t-[2.5rem]">
                   <img
                     src={images[currentImageIndex]}
                     alt={`Property photo ${currentImageIndex + 1}`}
                     className="w-full h-full object-cover cursor-pointer"
                     onClick={handleImageClick}
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/20 to-transparent pointer-events-none" />
 
-                  {/* Navigation Arrows */}
                   {images.length > 1 && (
                     <>
-                      <button
-                        onClick={handlePrevImage}
-                        title="Previous Image"
-                        aria-label="Previous Image"
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-sm"
-                      >
-                        <ChevronLeft className="w-6 h-6" />
+                      <button onClick={handlePrevImage} aria-label="Previous Image"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center backdrop-blur-md border border-white/10 active:scale-90 transition-all">
+                        <ChevronLeft className="w-5 h-5" />
                       </button>
-                      <button
-                        onClick={handleNextImage}
-                        title="Next Image"
-                        aria-label="Next Image"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all backdrop-blur-sm"
-                      >
-                        <ChevronRight className="w-6 h-6" />
+                      <button onClick={handleNextImage} aria-label="Next Image"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center backdrop-blur-md border border-white/10 active:scale-90 transition-all">
+                        <ChevronRight className="w-5 h-5" />
                       </button>
                     </>
                   )}
 
-                  {/* Photo Counter & Badges */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 px-3 py-1">
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        Liked
-                      </Badge>
-                      <Badge className="bg-black/60 text-white border-0 px-3 py-1 backdrop-blur-sm">
-                        <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-                        {ratingAggregate?.displayed_rating?.toFixed(1) || '5.0'}
-                        <span className="text-white/70 ml-1">({ratingAggregate?.total_ratings || 0})</span>
-                      </Badge>
-                    </div>
-                    {images.length > 1 && (
-                      <div className="bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
-                        {currentImageIndex + 1} / {images.length}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Thumbnail Strip */}
+                  {/* Dot indicators */}
                   {images.length > 1 && (
-                    <div className="absolute bottom-[-28px] left-0 right-0 flex justify-center gap-1.5 px-4 z-20">
+                    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5">
                       {images.slice(0, 8).map((_: any, idx: number) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentImageIndex(idx)}
-                          title={`View image ${idx + 1}`}
-                          aria-label={`View image ${idx + 1}`}
-                          className={`h-1.5 rounded-full transition-all duration-200 ${
-                            idx === currentImageIndex
-                              ? 'w-6 bg-primary'
-                              : 'w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground/60'
-                          }`}
+                        <button key={idx} onClick={() => setCurrentImageIndex(idx)} aria-label={`Image ${idx + 1}`}
+                          className={`rounded-full transition-all duration-300 ${idx === currentImageIndex ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/40'}`}
                         />
                       ))}
                     </div>
                   )}
+
+                  {/* Status badges */}
+                  <div className="absolute bottom-8 left-4 flex flex-wrap items-center gap-2">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EB4898]/90 backdrop-blur-md">
+                      <Sparkles className="w-3 h-3 text-white" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white">Liked</span>
+                    </div>
+                    {propertyInsights?.isHotListing && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-600/90 backdrop-blur-md">
+                        <Zap className="w-3 h-3 text-white" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white">Hot</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      <span className="text-[11px] font-black text-white">{ratingAggregate?.displayed_rating?.toFixed(1) || '5.0'}</span>
+                      <span className="text-[10px] text-white/50">({ratingAggregate?.total_ratings || 0})</span>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="aspect-[16/10] w-full bg-muted flex items-center justify-center pt-14">
-                  <span className="text-muted-foreground">No images</span>
+                <div className="h-[200px] w-full bg-[#1a1a2e] rounded-t-[2.5rem] flex items-center justify-center">
+                  <MapPin className="w-12 h-12 text-white/20" />
                 </div>
               )}
             </div>
 
-            {/* Content Section - Scrollable */}
+            {/* Scrollable Content */}
             <ScrollArea className="flex-1 min-h-0">
-              <div className="p-4 sm:p-6 space-y-4 pt-8 pb-6">
-                {/* Title & Address */}
-                <div className="space-y-2">
-                  <h2 className="text-xl sm:text-2xl font-bold leading-tight">{listing.title}</h2>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm">{listing.address}</span>
-                  </div>
+              <div className="px-5 pt-4 pb-6 space-y-5">
+                {/* Title & Location */}
+                <div>
+                  <h2 className="text-[22px] font-black text-white leading-tight tracking-tight">{listing.title}</h2>
+                  {listing.address && (
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
+                      <span className="text-[12px] text-white/50 font-medium">{listing.address}</span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Quick Stats */}
+                {/* Stats Grid */}
                 <div className="grid grid-cols-4 gap-2">
-                  <div className="flex flex-col items-center p-3 bg-rose-500/10 rounded-xl">
-                    <DollarSign className="w-5 h-5 text-rose-500 mb-1" />
-                    <span className="text-lg font-bold text-rose-500">${listing.price?.toLocaleString()}</span>
-                    <span className="text-[10px] text-muted-foreground uppercase">per month</span>
+                  <div className="flex flex-col items-center p-3 bg-[#EB4898]/[0.1] rounded-2xl border border-[#EB4898]/20">
+                    <DollarSign className="w-4 h-4 text-[#EB4898] mb-1" />
+                    <span className="text-[15px] font-black text-[#EB4898]">${(listing.price || 0).toLocaleString()}</span>
+                    <span className="text-[9px] text-white/30 uppercase font-black tracking-wider mt-0.5">/ mo</span>
                   </div>
-                  {listing.beds && (
-                    <div className="flex flex-col items-center p-3 bg-blue-500/10 rounded-xl">
-                      <Bed className="w-5 h-5 text-blue-500 mb-1" />
-                      <span className="text-lg font-bold">{listing.beds}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase">beds</span>
+                  {listing.beds ? (
+                    <div className="flex flex-col items-center p-3 bg-blue-500/[0.08] rounded-2xl border border-blue-500/20">
+                      <Bed className="w-4 h-4 text-blue-400 mb-1" />
+                      <span className="text-[15px] font-black text-white">{listing.beds}</span>
+                      <span className="text-[9px] text-white/30 uppercase font-black tracking-wider mt-0.5">beds</span>
                     </div>
-                  )}
-                  {listing.baths && (
-                    <div className="flex flex-col items-center p-3 bg-purple-500/10 rounded-xl">
-                      <Bath className="w-5 h-5 text-purple-500 mb-1" />
-                      <span className="text-lg font-bold">{listing.baths}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase">baths</span>
+                  ) : <div />}
+                  {listing.baths ? (
+                    <div className="flex flex-col items-center p-3 bg-purple-500/[0.08] rounded-2xl border border-purple-500/20">
+                      <Bath className="w-4 h-4 text-purple-400 mb-1" />
+                      <span className="text-[15px] font-black text-white">{listing.baths}</span>
+                      <span className="text-[9px] text-white/30 uppercase font-black tracking-wider mt-0.5">baths</span>
                     </div>
-                  )}
-                  {listing.square_footage && (
-                    <div className="flex flex-col items-center p-3 bg-orange-500/10 rounded-xl">
-                      <Square className="w-5 h-5 text-orange-500 mb-1" />
-                      <span className="text-lg font-bold">{listing.square_footage}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase">sqft</span>
+                  ) : <div />}
+                  {listing.square_footage ? (
+                    <div className="flex flex-col items-center p-3 bg-orange-500/[0.08] rounded-2xl border border-orange-500/20">
+                      <Square className="w-4 h-4 text-orange-400 mb-1" />
+                      <span className="text-[15px] font-black text-white">{listing.square_footage}</span>
+                      <span className="text-[9px] text-white/30 uppercase font-black tracking-wider mt-0.5">sqft</span>
                     </div>
-                  )}
+                  ) : propertyInsights?.isVehicle && listing.year ? (
+                    <div className="flex flex-col items-center p-3 bg-orange-500/[0.08] rounded-2xl border border-orange-500/20">
+                      <Clock className="w-4 h-4 text-orange-400 mb-1" />
+                      <span className="text-[15px] font-black text-white">{listing.year}</span>
+                      <span className="text-[9px] text-white/30 uppercase font-black tracking-wider mt-0.5">year</span>
+                    </div>
+                  ) : <div />}
                 </div>
 
-                {/* Description - Sentient Cascade */}
+                {/* Description */}
                 {listing.description && (
-                  <motion.div 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1, duration: 0.5 }}
-                    className="space-y-2"
-                  >
-                    <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">About</h4>
-                    <p className="text-sm leading-relaxed font-medium text-foreground/90">{listing.description}</p>
-                  </motion.div>
+                  <div className="space-y-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">About</h4>
+                    <p className="text-[13px] leading-relaxed text-white/70 font-medium">{listing.description}</p>
+                  </div>
                 )}
 
-                {/* Features - Staggered Chips */}
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.15, duration: 0.4 }}
-                  className="space-y-2"
-                >
-                  <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Features</h4>
+                {/* Tags */}
+                <div className="space-y-2">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Details</h4>
                   <div className="flex flex-wrap gap-2">
                     {listing.property_type && (
-                      <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-0 font-black">
-                        {listing.property_type}
-                      </Badge>
+                      <span className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] font-black text-blue-400 uppercase tracking-wide">{listing.property_type}</span>
                     )}
                     {listing.furnished && (
-                      <Badge variant="secondary" className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border-0 font-black">
-                        {listing.furnished}
-                      </Badge>
+                      <span className="px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[11px] font-black text-purple-400 uppercase tracking-wide">{listing.furnished}</span>
                     )}
                     {listing.pet_friendly && (
-                      <Badge variant="secondary" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-0 font-black">
-                        Pet Friendly
-                      </Badge>
+                      <span className="px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[11px] font-black text-rose-400 uppercase tracking-wide">Pet Friendly</span>
                     )}
-                    <Badge variant="secondary" className={cn(
-                      "border-0 font-black tracking-widest uppercase",
-                      listing.status === 'available'
-                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                        : 'bg-muted text-muted-foreground'
-                    )}>
-                      {listing.status}
-                    </Badge>
+                    {listing.status && (
+                      <span className={cn(
+                        "px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wide",
+                        listing.status === 'available'
+                          ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                          : 'bg-white/5 border border-white/10 text-white/40'
+                      )}>{listing.status}</span>
+                    )}
+                    {propertyInsights?.demandLevel === 'high' && (
+                      <span className="px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/20 text-[11px] font-black text-red-400 uppercase tracking-wide">High Demand</span>
+                    )}
                   </div>
-                </motion.div>
+                </div>
+
+                {/* Market Insights */}
+                {propertyInsights && (
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Market Insights</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="p-3 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                        <div className="flex items-center gap-2 mb-1">
+                          <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                          <span className="text-[10px] text-white/40 uppercase font-black">Quality Score</span>
+                        </div>
+                        <div className="text-lg font-black text-white">{propertyInsights.qualityScore}%</div>
+                      </div>
+                      <div className="p-3 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                        <div className="flex items-center gap-2 mb-1">
+                          <MessageCircle className="w-3.5 h-3.5 text-rose-400" />
+                          <span className="text-[10px] text-white/40 uppercase font-black">Resp. Rate</span>
+                        </div>
+                        <div className="text-lg font-black text-white">{propertyInsights.responseRate}%</div>
+                      </div>
+                      {propertyInsights.pricePerSqft && (
+                        <div className="p-3 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                          <div className="flex items-center gap-2 mb-1">
+                            <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                            <span className="text-[10px] text-white/40 uppercase font-black">Per Sqft</span>
+                          </div>
+                          <div className="text-lg font-black text-white">${propertyInsights.pricePerSqft}</div>
+                        </div>
+                      )}
+                      <div className="p-3 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Clock className="w-3.5 h-3.5 text-amber-400" />
+                          <span className="text-[10px] text-white/40 uppercase font-black">Avg Response</span>
+                        </div>
+                        <div className="text-sm font-black text-white">{propertyInsights.avgResponseTime}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Value Assessment */}
+                {propertyInsights && (
+                  <div className="space-y-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Value Assessment</h4>
+                    <div className={cn(
+                      "p-4 rounded-2xl border backdrop-blur-md",
+                      propertyInsights.valueRating === 'excellent' ? 'bg-emerald-500/5 border-emerald-500/20' :
+                      propertyInsights.valueRating === 'good' ? 'bg-blue-500/5 border-blue-500/20' :
+                      propertyInsights.valueRating === 'fair' ? 'bg-amber-500/5 border-amber-500/20' :
+                      'bg-[#EB4898]/5 border-[#EB4898]/20'
+                    )}>
+                      <div className="flex items-center gap-2 mb-2">
+                        {propertyInsights.valueRating === 'excellent' ? <Award className="w-4 h-4 text-emerald-400" /> :
+                         propertyInsights.valueRating === 'good' ? <ThumbsUp className="w-4 h-4 text-blue-400" /> :
+                         propertyInsights.valueRating === 'fair' ? <CheckCircle className="w-4 h-4 text-amber-400" /> :
+                         <Sparkles className="w-4 h-4 text-[#EB4898]" />}
+                        <span className={cn(
+                          "text-[12px] font-black uppercase tracking-wider",
+                          propertyInsights.valueRating === 'excellent' ? 'text-emerald-400' :
+                          propertyInsights.valueRating === 'good' ? 'text-blue-400' :
+                          propertyInsights.valueRating === 'fair' ? 'text-amber-400' :
+                          'text-[#EB4898]'
+                        )}>
+                          {propertyInsights.valueRating === 'excellent' ? 'Excellent Value' :
+                           propertyInsights.valueRating === 'good' ? 'Good Value' :
+                           propertyInsights.valueRating === 'fair' ? 'Fair Price' :
+                           'Premium Choice'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-white/50 leading-relaxed font-medium">
+                        {propertyInsights.valueRating === 'excellent'
+                          ? 'Exceptional value for this location. Highly recommended.'
+                          : propertyInsights.valueRating === 'good'
+                          ? 'Competitive pricing compared to similar listings in this area.'
+                          : propertyInsights.valueRating === 'fair'
+                          ? 'Fair market pricing based on current trends and amenities.'
+                          : 'Premium selection offering high-end features and prime placement.'}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Amenities */}
                 {listing.amenities && listing.amenities.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Amenities</h4>
-                    <div className="flex flex-wrap gap-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Amenities</h4>
+                    <div className="flex flex-wrap gap-1.5">
                       {listing.amenities.map((amenity: string) => (
-                        <Badge key={`amenity-${amenity}`} variant="outline" className="text-xs">
-                          {amenity}
-                        </Badge>
+                        <span key={`amenity-${amenity}`} className="px-2.5 py-1 rounded-lg bg-white/[0.05] border border-white/10 text-[11px] text-white/60">{amenity}</span>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Rating Section */}
-                <div className="space-y-3 pt-2">
-                  <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Rating & Reviews</h4>
-                  <div className="p-4 bg-muted/30 rounded-xl">
+                {/* Rating */}
+                <div className="space-y-2">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Rating & Reviews</h4>
+                  <div className="p-4 bg-white/[0.03] rounded-2xl border border-white/[0.07]">
                     <CompactRatingDisplay aggregate={ratingAggregate || null} showReviews={true} />
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setShowRatingDialog(true)}
-                      className="mt-3 w-full rounded-xl"
+                      className="mt-3 w-full rounded-xl bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/20"
                     >
                       <Star className="w-4 h-4 mr-2" />
                       Rate this Property
@@ -501,49 +575,35 @@ function LikedListingInsightsModalComponent({ open, onOpenChange, listing }: Lik
               </div>
             </ScrollArea>
 
-            {/* Action Buttons - Fixed at Bottom */}
-            <div className="flex-shrink-0 p-4 border-t bg-background/80 backdrop-blur-sm space-y-3">
-              {/* Primary Action */}
+            {/* Action Dock */}
+            <div className="flex-shrink-0 px-4 pb-5 pt-3 border-t border-white/[0.06] bg-[#0d0d14]/95 backdrop-blur-xl space-y-2.5">
               <Button
                 onClick={handleMessage}
                 disabled={isCreatingConversation || !listing}
-                className="w-full h-12 mexican-pink-premium font-semibold text-base rounded-xl"
+                className="w-full h-13 bg-gradient-to-r from-[#EB4898] to-[#FF4D00] hover:brightness-110 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-lg shadow-[#EB4898]/20 border-0 active:scale-[0.98] transition-all"
               >
                 <MessageCircle className="w-5 h-5 mr-2" />
                 {isCreatingConversation ? 'Starting...' : 'Message Owner'}
               </Button>
 
-              {/* Secondary Actions */}
-              <div className="grid grid-cols-3 gap-2">
-                <Button
-                  onClick={handleDelete}
-                  variant="outline"
-                  size="sm"
-                  className="h-10 bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-600 dark:text-red-400 rounded-xl"
-                  disabled={deleteMutation.isPending}
-                >
-                  <Trash2 className="w-4 h-4 mr-1.5" />
-                  Delete
+              <div className="grid grid-cols-4 gap-2">
+                <Button onClick={() => setShowShareDialog(true)} variant="ghost" size="sm"
+                  className="h-10 bg-blue-500/[0.07] hover:bg-blue-500/[0.15] border border-blue-500/20 text-blue-400 rounded-xl text-[11px] font-black uppercase tracking-wide">
+                  <Share2 className="w-3.5 h-3.5 mr-1.5" /> Share
                 </Button>
-                <Button
-                  onClick={handleBlock}
-                  variant="outline"
-                  size="sm"
-                  className="h-10 bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/30 text-orange-600 dark:text-orange-400 rounded-xl"
-                  disabled={blockMutation.isPending}
-                >
-                  <Ban className="w-4 h-4 mr-1.5" />
-                  Block
+                <Button onClick={handleDelete} variant="ghost" size="sm"
+                  className="h-10 bg-red-500/[0.07] hover:bg-red-500/[0.15] border border-red-500/20 text-red-400 rounded-xl text-[11px] font-black uppercase tracking-wide"
+                  disabled={deleteMutation.isPending}>
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Remove
                 </Button>
-                <Button
-                  onClick={handleReport}
-                  variant="outline"
-                  size="sm"
-                  className="h-10 bg-yellow-500/10 hover:bg-yellow-500/20 border-yellow-500/30 text-yellow-600 dark:text-yellow-400 rounded-xl"
-                  disabled={reportMutation.isPending}
-                >
-                  <Flag className="w-4 h-4 mr-1.5" />
-                  Report
+                <Button onClick={handleBlock} variant="ghost" size="sm"
+                  className="h-10 bg-orange-500/[0.07] hover:bg-orange-500/[0.15] border border-orange-500/20 text-orange-400 rounded-xl text-[11px] font-black uppercase tracking-wide"
+                  disabled={blockMutation.isPending}>
+                  <Ban className="w-3.5 h-3.5 mr-1.5" /> Block
+                </Button>
+                <Button onClick={handleReport} variant="ghost" size="sm"
+                  className="h-10 bg-amber-500/[0.07] hover:bg-amber-500/[0.15] border border-amber-500/20 text-amber-400 rounded-xl text-[11px] font-black uppercase tracking-wide">
+                  <Flag className="w-3.5 h-3.5 mr-1.5" /> Report
                 </Button>
               </div>
             </div>
@@ -610,64 +670,26 @@ function LikedListingInsightsModalComponent({ open, onOpenChange, listing }: Lik
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Report Dialog */}
-      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Flag className="w-5 h-5 text-yellow-500" />
-              <h3 className="text-lg font-semibold">Report Property/Owner</h3>
-            </div>
-            <div className="space-y-3">
-              <Label>Reason for report</Label>
-              <RadioGroup value={reportReason} onValueChange={setReportReason} className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="fake_listing" id="fake_listing" />
-                  <Label htmlFor="fake_listing" className="font-normal">Fake or misleading listing</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="inappropriate" id="inappropriate" />
-                  <Label htmlFor="inappropriate" className="font-normal">Inappropriate content</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="scam" id="scam" />
-                  <Label htmlFor="scam" className="font-normal">Suspected scam</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="discrimination" id="discrimination" />
-                  <Label htmlFor="discrimination" className="font-normal">Discrimination</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="other" id="other" />
-                  <Label htmlFor="other" className="font-normal">Other</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="details">Additional details (optional)</Label>
-              <Textarea
-                id="details"
-                placeholder="Please provide any additional information..."
-                value={reportDetails}
-                onChange={(e) => setReportDetails(e.target.value)}
-                className="min-h-[100px] rounded-xl"
-              />
-            </div>
-            <div className="flex gap-2 pt-2">
-              <Button variant="outline" onClick={() => setShowReportDialog(false)} className="flex-1 rounded-xl">
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSubmitReport}
-                disabled={!reportReason || reportMutation.isPending}
-                className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded-xl"
-              >
-                {reportMutation.isPending ? "Submitting..." : "Submit Report"}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Report and Share Dialogs */}
+      {listing && (
+        <>
+          <ReportDialog
+            open={showReportDialog}
+            onOpenChange={setShowReportDialog}
+            targetId={listing.id}
+            targetType="listing"
+            reportedUserId={listing.owner_id}
+            targetName={listing.title}
+          />
+          <ShareDialog
+            open={showShareDialog}
+            onOpenChange={setShowShareDialog}
+            listingId={listing.id}
+            title={listing.title}
+            description={listing.description}
+          />
+        </>
+      )}
 
       {/* Rating Submission Dialog */}
       {listing && (

@@ -21,6 +21,7 @@ import { GlobalDialogs } from './GlobalDialogs'
 import { useModalStore } from '@/state/modalStore'
 import { useFocusMode } from '@/hooks/useFocusMode'
 import { useScrollDirection } from '@/hooks/useScrollDirection'
+import { RadioMiniPlayer } from './RadioMiniPlayer'
 
 // =============================================================================
 // PERFORMANCE FIX: SessionStorage caching for dashboard checks
@@ -91,26 +92,8 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
     return () => clearTimeout(safetyCheck);
   }, [location.pathname]);
 
-  // NEXT-GEN DESIGN: Mouse tracking for liquid glass effects
-  useEffect(() => {
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    if (isTouchDevice) return;
-
-    let rafId = 0;
-    const handleMouseMove = (e: MouseEvent) => {
-      if (rafId) return; 
-      rafId = requestAnimationFrame(() => {
-        document.documentElement.style.setProperty('--mouse-x', `${(e.clientX / window.innerWidth) * 100}%`);
-        document.documentElement.style.setProperty('--mouse-y', `${(e.clientY / window.innerHeight) * 100}%`);
-        rafId = 0;
-      });
-    };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
+  // NEXT-GEN DESIGN: Mouse tracking for liquid glass effects has been moved
+  // to AtmosphericLayer.tsx natively to prevent global CSS reflows/layout thrashing.
 
   const { shouldShowWelcome: _shouldShowWelcome, dismissWelcome: _dismissWelcome } = useWelcomeState(userId)
   const queryClient = useQueryClient();
@@ -221,14 +204,12 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
   const clientSwipePaths = ['/client/dashboard', '/client/profile', '/client/liked-properties', '/messages', '/explore/roommates'];
   const ownerSwipePaths = ['/owner/dashboard', '/owner/profile', '/owner/liked-clients', '/owner/properties', '/messages'];
 
-  const isImmersiveDashboard = useMemo(() => {
+  // SINGLE SOURCE OF TRUTH: only the two swipe deck routes are locked.
+  // Every other route scrolls inside this container.
+  const isSwipeDeck = useMemo(() => {
     const path = location.pathname;
-    const immersiveRoutes = [
-      '/client/dashboard', '/owner/dashboard',
-      '/owner/properties', '/client/advertise'
-    ];
-    return immersiveRoutes.some(route => path === route || path === route + '/' || path.startsWith(route + '/')) ||
-      path.includes('discovery') || path.includes('view-client') || path.includes('/listing/');
+    return path === '/client/dashboard' || path === '/client/dashboard/' ||
+           path === '/owner/dashboard'  || path === '/owner/dashboard/';
   }, [location.pathname]);
 
   const { resetFocus } = useFocusMode(6000);
@@ -248,63 +229,51 @@ export function DashboardLayout({ children, userRole }: DashboardLayoutProps) {
   const isCameraRoute = useMemo(() => location.pathname.includes('/camera'), [location.pathname]);
 
   const isFullScreenRoute = useMemo(() => {
-    const scrollExclusions = ['likes', 'interested', 'liked'];
+    const scrollExclusions = ['likes', 'interested', 'liked', 'profile', 'legal', 'settings'];
     if (scrollExclusions.some(path => location.pathname.includes(path))) return false;
+    
     const isRoommatesPageLocal = location.pathname.startsWith('/explore/roommates');
     const isSpecialSubPage = [
-      '/client/advertise', '/explore/prices', '/explore/intel', '/explore/tours',
-      '/documents', '/escrow', '/admin/eventos', '/about', '/contact',
-      '/privacy-policy', '/terms-of-service', '/legal', '/agl',
-      '/subscription/packages', '/notifications', '/explore/eventos'
+      // Full screen camera/roommate pages stay edge-to-edge
     ].some(path => location.pathname === path || location.pathname === path + '/');
-    return isCameraRoute || isRadioRoute || isRoommatesPageLocal || isSpecialSubPage || modalStore.showMapFullscreen;
-  }, [location.pathname, isCameraRoute, isRadioRoute, modalStore.showMapFullscreen]);
+    
+    return isCameraRoute || isRadioRoute || isRoommatesPageLocal || isSpecialSubPage;
+  }, [location.pathname, isCameraRoute, isRadioRoute]);
 
   const isZeroScrollDashboard = useMemo(() => {
     const path = location.pathname;
     return path === '/client/dashboard' || path === '/owner/dashboard' || path === '/client/dashboard/' || path === '/owner/dashboard/';
   }, [location.pathname]);
 
-  useSwipeNavigation({
-    paths: userRole === 'client' ? clientSwipePaths : userRole === 'owner' ? ownerSwipePaths : [],
-    containerSelector: '#dashboard-scroll-container',
-    enabled: userRole !== 'admin' && !isImmersiveDashboard && location.pathname !== '/client/liked-properties' && location.pathname !== '/owner/liked-clients',
-  });
+  // useSwipeNavigation removed to prevent horizontal scrolling interference with listing details
 
   return (
     <div className={cn(
-      "dashboard-root w-full h-full min-h-0 relative flex flex-col overflow-hidden",
-      (isImmersiveDashboard || location.pathname.includes('dashboard')) ? (isDark ? "bg-black" : "bg-white") : "bg-background",
+      "dashboard-root w-full h-full flex flex-col relative overflow-hidden",
       isDark ? "dark dark-matte" : "light white-matte"
     )}>
       <main
         ref={scrollContainerRef}
         id="dashboard-scroll-container"
-        onPointerDown={() => {
-          window.dispatchEvent(new CustomEvent('sentient-ui-recovery'));
-        }}
         className={cn(
-          "flex-1 w-full h-full min-h-0 relative z-0 touch-pan-y overscroll-y-contain",
-          isRadioRoute ? "overflow-visible" 
-            : (isZeroScrollDashboard || isImmersiveDashboard) ? "overflow-hidden"
-            : "overflow-y-auto overflow-x-hidden",
-          "shadow-none",
-          (location.pathname === '/explore/eventos' || location.pathname === '/explore/eventos/' || isImmersiveDashboard || location.pathname.includes('dashboard')) ? (isDark ? "bg-black" : "bg-white") : "bg-background"
+          "flex-1 flex flex-col relative w-full",
+          isSwipeDeck ? "overflow-hidden touch-none" : "overflow-y-auto scroll-area-momentum pb-[var(--bottom-nav-height)]"
         )}
         style={{
-          paddingTop: (isFullScreenRoute || isImmersiveDashboard) ? '0px' : 'calc(var(--top-bar-height) + var(--safe-top))',
-          paddingBottom: (isFullScreenRoute || isZeroScrollDashboard) ? '0px' : 'calc(80px + env(safe-area-inset-bottom, 20px))',
-          paddingLeft: 'max(var(--safe-left), 0px)',
-          paddingRight: 'max(var(--safe-right), 0px)',
+          WebkitOverflowScrolling: 'touch',
+          scrollPaddingTop: 'var(--top-bar-height, 60px)',
+          scrollPaddingBottom: 'var(--bottom-nav-height, 72px)',
         }}
       >
-        <div className="h-full w-full flex flex-1 min-w-0 flex-col">
+        {/* INNER WRAPPER: Ensures flex-grow works correctly for child pages */}
+        <div className="flex-grow w-full flex flex-col min-h-full">
           {children}
         </div>
       </main>
 
       {/* ZENITH GLOBAL DIALOGS */}
       <GlobalDialogs userRole={userRole} />
+
     </div>
   )
 }

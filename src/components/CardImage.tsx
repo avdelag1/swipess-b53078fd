@@ -154,7 +154,7 @@ const CardImage = memo(({
 
           {/* Branded Pulse */}
           <div className="relative z-10 flex flex-col items-center gap-4 opacity-20 scale-75 lg:scale-100">
-            <SwipessLogo variant="icon" className="w-12 h-12 grayscale" />
+            <SwipessLogo variant="white" size="sm" className="opacity-60" />
             <div className="flex gap-1">
               {[0, 1, 2].map(i => (
                 <motion.div 
@@ -174,7 +174,7 @@ const CardImage = memo(({
               aria-hidden="true"
               loading="eager"
               decoding="async"
-              className="absolute inset-0 w-full h-full object-cover filter blur-[20px] scale-110 opacity-40 mix-blend-overlay transition-opacity duration-300"
+              className="absolute inset-0 w-full h-full object-cover filter blur-[20px] scale-110 opacity-70 mix-blend-overlay transition-opacity duration-300"
             />
           )}
         </div>

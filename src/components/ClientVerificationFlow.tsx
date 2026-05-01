@@ -141,14 +141,14 @@ export function ClientVerificationFlow({ onComplete }: ClientVerificationFlowPro
                   "w-14 h-14 rounded-2xl flex items-center justify-center border-2 transition-all duration-500",
                   isDone ? "bg-primary border-primary shadow-lg shadow-primary/20" :
                   isActive ? "border-primary bg-primary/10" :
-                  "border-white/5 bg-white/5 opacity-40"
+                  "border-white/5 bg-white/5 opacity-70"
                 )}
                 style={isActive ? { borderColor: s.color, backgroundColor: `${s.color}20` } : (isDone ? { backgroundColor: '#10b981', borderColor: '#10b981' } : {})}
               >
                 {isDone ? (
                   <Check className="w-6 h-6 text-primary-foreground" />
                 ) : (
-                  <StepIcon className={cn("w-6 h-6", isActive ? "text-primary" : "text-white/40")} style={isActive ? { color: s.color } : {}} />
+                  <StepIcon className={cn("w-6 h-6", isActive ? "text-primary" : "text-white/70")} style={isActive ? { color: s.color } : {}} />
                 )}
               </motion.div>
               <span className={cn("text-[8px] font-black uppercase tracking-[0.2em]", isActive ? "text-white" : "text-white/20")}>
@@ -193,7 +193,7 @@ export function ClientVerificationFlow({ onComplete }: ClientVerificationFlowPro
 
             <div className="space-y-3">
               <h3 className="text-2xl font-black text-white tracking-tight">{steps[step].title}</h3>
-              <p className="text-sm text-white/40 font-medium max-w-xs mx-auto">{steps[step].description}</p>
+              <p className="text-sm text-white/70 font-medium max-w-xs mx-auto">{steps[step].description}</p>
             </div>
 
             {step === 0 && (
@@ -227,7 +227,7 @@ export function ClientVerificationFlow({ onComplete }: ClientVerificationFlowPro
 
                 <div className="flex flex-col items-center gap-4">
                   <label className="relative group cursor-pointer">
-                    <div className="absolute -inset-1 bg-primary blur opacity-20 group-hover:opacity-40 transition" />
+                    <div className="absolute -inset-1 bg-primary blur opacity-20 group-hover:opacity-70 transition" />
                     <div className="relative px-10 py-5 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-[0.2em] text-[10px] flex items-center gap-3 transition active:scale-95">
                       <input type="file" accept="image/*" capture="user" onChange={(e) => handleFileSelect(e, 'selfie')} className="hidden" />
                       {uploading ? <Activity className="w-5 h-5 animate-pulse" /> : <Camera className="w-5 h-5" />}
@@ -265,7 +265,7 @@ export function ClientVerificationFlow({ onComplete }: ClientVerificationFlowPro
 
                 <div className="flex flex-col items-center gap-4">
                   <label className="relative group cursor-pointer">
-                    <div className="absolute -inset-1 bg-primary blur opacity-20 group-hover:opacity-40 transition" />
+                    <div className="absolute -inset-1 bg-primary blur opacity-20 group-hover:opacity-70 transition" />
                     <div className="relative px-10 py-5 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-[0.2em] text-[10px] flex items-center gap-3 transition active:scale-95">
                       <input type="file" accept="image/*" onChange={(e) => handleFileSelect(e, 'id_document')} className="hidden" />
                       {uploading ? <Activity className="w-5 h-5 animate-pulse" /> : <FileCheck className="w-5 h-5" />}
@@ -299,7 +299,7 @@ export function ClientVerificationFlow({ onComplete }: ClientVerificationFlowPro
                    <AlertCircle className="w-6 h-6 text-amber-500 shrink-0 mt-1" />
                    <div className="space-y-2">
                        <h4 className="text-[12px] font-black uppercase italic tracking-tighter leading-none">Identity Compliance Review</h4>
-                       <p className="text-[10px] font-bold italic opacity-30 leading-relaxed uppercase tracking-widest">Manual review initialized. 24h expected processing time. Data is AES-256 encrypted.</p>
+                       <p className="text-[10px] font-bold italic opacity-70 leading-relaxed uppercase tracking-widest">Manual review initialized. 24h expected processing time. Data is AES-256 encrypted.</p>
                    </div>
                 </div>
 

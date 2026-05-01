@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useActiveMode } from "@/hooks/useActiveMode";
 import { AdminProtectedRoute } from "@/components/AdminProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
+import { MaintenanceGate } from "@/components/MaintenanceGate";
 import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 import SignupErrorBoundary from "@/components/SignupErrorBoundary";
 import { AnimatedPage } from "@/components/AnimatedPage";
@@ -31,10 +32,7 @@ if (typeof window !== 'undefined') {
 // after a redeploy get one automatic retry before surfacing to ChunkErrorBoundary.
 const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
 const ResetPassword = lazyWithRetry(() => import("./pages/ResetPassword"));
-const PrivacyPolicy = lazyWithRetry(() => import("./pages/PrivacyPolicy"));
-const TermsOfService = lazyWithRetry(() => import("./pages/TermsOfService"));
-const LegalPage = lazyWithRetry(() => import("./pages/LegalPage"));
-const AGLPage = lazyWithRetry(() => import("./pages/AGLPage"));
+const LegalHub = lazyWithRetry(() => import("./pages/LegalHub"));
 const AboutPage = lazyWithRetry(() => import("./pages/AboutPage"));
 const FAQClientPage = lazyWithRetry(() => import("./pages/FAQClientPage"));
 const FAQOwnerPage = lazyWithRetry(() => import("./pages/FAQOwnerPage"));
@@ -49,7 +47,6 @@ const ClientSavedSearches = lazyWithRetry(() => import("./pages/ClientSavedSearc
 const ClientSecurity = lazyWithRetry(() => import("./pages/ClientSecurity"));
 const ClientWorkerDiscovery = lazyWithRetry(() => import("./pages/ClientWorkerDiscovery"));
 const ClientContracts = lazyWithRetry(() => import("./pages/ClientContracts"));
-const ClientLawyerServices = lazyWithRetry(() => import("./pages/ClientLawyerServices"));
 const ClientSelfieCamera = lazyWithRetry(() => import("./pages/ClientSelfieCamera"));
 const ClientFilters = lazyWithRetry(() => import("./pages/ClientFilters"));
 const MaintenanceRequests = lazyWithRetry(() => import("./pages/MaintenanceRequests"));
@@ -64,7 +61,6 @@ const OwnerNewListing = lazyWithRetry(() => import("./pages/OwnerNewListing"));
 const OwnerLikedClients = lazyWithRetry(() => import("./pages/OwnerLikedClients"));
 const OwnerInterestedClients = lazyWithRetry(() => import("./pages/OwnerInterestedClients"));
 const OwnerViewClientProfile = lazyWithRetry(() => import("./pages/OwnerViewClientProfile"));
-const OwnerLawyerServices = lazyWithRetry(() => import("./pages/OwnerLawyerServices"));
 const OwnerSecurity = lazyWithRetry(() => import("./pages/OwnerSecurity"));
 const OwnerSavedSearches = lazyWithRetry(() => import("./pages/OwnerSavedSearches"));
 const OwnerContracts = lazyWithRetry(() => import("./pages/OwnerContracts"));
@@ -114,8 +110,9 @@ const DashboardRedirect = () => {
 const App = ({ authPromise }: { authPromise?: Promise<any> }) => {
   return (
     <GlobalErrorBoundary>
+      <MaintenanceGate>
       <RootProviders authPromise={authPromise}>
-        
+
         <AppLayout>
           <TooltipProvider>
           <WelcomeBonusModal />
@@ -140,7 +137,8 @@ const App = ({ authPromise }: { authPromise?: Promise<any> }) => {
               <Route path="/client/security" element={<ClientSecurity />} />
               <Route path="/client/services" element={<ClientWorkerDiscovery />} />
               <Route path="/client/contracts" element={<ClientContracts />} />
-              <Route path="/client/legal-services" element={<ClientLawyerServices />} />
+              <Route path="/client/legal" element={<LegalHub />} />
+              <Route path="/client/legal-services" element={<LegalHub />} />
               <Route path="/client/camera" element={<ClientSelfieCamera />} />
               <Route path="/client/filters" element={<ClientFilters />} />
 
@@ -160,7 +158,7 @@ const App = ({ authPromise }: { authPromise?: Promise<any> }) => {
               <Route path="/owner/saved-searches" element={<OwnerSavedSearches />} />
               <Route path="/owner/security" element={<OwnerSecurity />} />
               <Route path="/owner/contracts" element={<OwnerContracts />} />
-              <Route path="/owner/legal-services" element={<OwnerLawyerServices />} />
+              <Route path="/owner/legal-services" element={<LegalHub />} />
               <Route path="/owner/camera" element={<OwnerProfileCamera />} />
               <Route path="/owner/camera/listing" element={<OwnerListingCamera />} />
               <Route path="/owner/filters" element={<OwnerFilters />} />
@@ -192,10 +190,10 @@ const App = ({ authPromise }: { authPromise?: Promise<any> }) => {
             {/* Outside Layout */}
             <Route path="/payment/success" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback />}><AnimatedPage><PaymentSuccess /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
             <Route path="/payment/cancel" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback />}><AnimatedPage><PaymentCancel /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
-            <Route path="/privacy-policy" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><PrivacyPolicy /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
-            <Route path="/terms-of-service" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><TermsOfService /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
-            <Route path="/agl" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><AGLPage /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
-            <Route path="/legal" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><LegalPage /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
+            <Route path="/privacy-policy" element={<Navigate to="/legal?doc=privacy" replace />} />
+            <Route path="/terms-of-service" element={<Navigate to="/legal?doc=terms" replace />} />
+            <Route path="/agl" element={<Navigate to="/legal?doc=agl" replace />} />
+            <Route path="/legal" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><LegalHub /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
             <Route path="/dashboard" element={<DashboardRedirect />} />
             <Route path="/about" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><AboutPage /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
             <Route path="/faq/client" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><FAQClientPage /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
@@ -204,11 +202,13 @@ const App = ({ authPromise }: { authPromise?: Promise<any> }) => {
             <Route path="/listing/:id" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><PublicListingPreview /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
             <Route path="/vap-validate/:id" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><VapValidate /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
             <Route path="/share-target" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/promote" element={<Navigate to="/client/advertise" replace />} />
             <Route path="*" element={<ChunkErrorBoundary><Suspense fallback={<SuspenseFallback minimal />}><AnimatedPage><NotFound /></AnimatedPage></Suspense></ChunkErrorBoundary>} />
           </Routes>
           </TooltipProvider>
         </AppLayout>
       </RootProviders>
+      </MaintenanceGate>
     </GlobalErrorBoundary>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell, Check, Trash2, Heart, MessageCircle, Info, 
@@ -11,9 +11,11 @@ import useAppTheme from '@/hooks/useAppTheme';
 import { triggerHaptic } from '@/utils/haptics';
 import { Button } from '@/components/ui/button';
 import { useAppNavigate } from '@/hooks/useAppNavigate';
+import { PageHeader } from '@/components/PageHeader';
 
 const NotificationsPage = () => {
-  const { notifications, isLoading, markAsRead, deleteNotification, markAllAsRead } = useNotifications();
+  const { notifications, markNotificationAsRead, dismissNotification, markAllAsRead } = useNotificationSystem();
+  const isLoading = false; // Mock loading state since useNotificationSystem doesn't provide it
   const { isLight, isDark } = useAppTheme();
   const { navigate } = useAppNavigate();
 
@@ -41,23 +43,15 @@ const NotificationsPage = () => {
 
   return (
     <div className={cn(
-      "min-h-full w-full pb-20",
+      "w-full pb-20 min-h-screen",
       isDark ? "bg-[#0a0a0c]" : "bg-white"
     )}>
-      <header className={cn(
-        "sticky top-0 z-50 px-6 py-4 backdrop-blur-3xl border-b transition-all",
-        isDark ? "bg-[#0a0a0c]/80 border-white/5" : "bg-white/80 border-black/5"
-      )}>
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-brand-primary animate-pulse" />
-            <h1 className={cn(
-              "text-xl font-black uppercase italic tracking-tighter",
-              isLight ? "text-slate-900" : "text-white"
-            )}>Pulse Feed</h1>
-          </div>
-          
-          {notifications.length > 0 && (
+      <div className="max-w-2xl mx-auto px-6 pt-4">
+        <PageHeader 
+          title="Pulse Feed" 
+          subtitle="System Intelligence Updates" 
+          showBack={true}
+          actions={notifications.length > 0 ? (
             <Button 
               variant="ghost" 
               size="sm" 
@@ -66,11 +60,11 @@ const NotificationsPage = () => {
             >
               Clear Unread
             </Button>
-          )}
-        </div>
-      </header>
+          ) : undefined}
+        />
+      </div>
 
-      <div className="max-w-2xl mx-auto px-4 pt-20">
+      <div className="max-w-2xl mx-auto px-4 pt-10">
         <div className="space-y-4">
           {notifications.length === 0 ? (
             <motion.div 
@@ -91,10 +85,10 @@ const NotificationsPage = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
-                onClick={() => { triggerHaptic('light'); markAsRead(notif.id); }}
+                onClick={() => { triggerHaptic('light'); markNotificationAsRead(notif.id); }}
                 className={cn(
                   "group relative p-5 rounded-[2.5rem] border transition-all cursor-pointer active:scale-[0.98]",
-                  notif.read_at 
+                  notif.read 
                     ? (isDark ? "bg-white/[0.02] border-white/5 opacity-60" : "bg-black/5 border-black/5 opacity-60")
                     : (isDark ? "bg-white/5 border-white/10 shadow-2xl" : "bg-white border-black/10 shadow-xl")
                 )}
@@ -102,7 +96,7 @@ const NotificationsPage = () => {
                 <div className="flex gap-5">
                   <div className={cn(
                     "w-12 h-12 rounded-2xl flex items-center justify-center bg-white/5 border border-white/10 shrink-0",
-                    !notif.read_at && "bg-brand-primary/10 border-brand-primary/20"
+                    !notif.read && "bg-brand-primary/10 border-brand-primary/20"
                   )}>
                     {getIcon(notif.type)}
                   </div>
@@ -111,9 +105,9 @@ const NotificationsPage = () => {
                     <div className="flex items-center justify-between gap-2">
                        <span className={cn(
                          "text-[10px] font-black uppercase tracking-widest italic opacity-40 mb-1 block",
-                         !notif.read_at && "text-brand-primary opacity-100"
+                          !notif.read && "text-brand-primary opacity-100"
                         )}>
-                         {notif.type || 'Alert'} — {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
+                         {notif.type || 'Alert'} — {formatDistanceToNow(notif.timestamp, { addSuffix: true })}
                        </span>
                     </div>
                     
@@ -121,20 +115,20 @@ const NotificationsPage = () => {
                       {notif.title}
                     </h3>
                     <p className={cn("text-[12px] font-medium opacity-50 mt-1 line-clamp-2", isLight ? "text-slate-600" : "text-slate-400")}>
-                      {notif.content}
+                      {notif.message}
                     </p>
                   </div>
 
                   <div className="flex flex-col gap-2">
                     <button
-                      onClick={(e) => { e.stopPropagation(); triggerHaptic('medium'); deleteNotification(notif.id); }}
+                      onClick={(e) => { e.stopPropagation(); triggerHaptic('medium'); dismissNotification(notif.id); }}
                       className="p-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-rose-500 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                    {!notif.read_at && (
+                    {!notif.read && (
                        <button
-                        onClick={(e) => { e.stopPropagation(); triggerHaptic('success'); markAsRead(notif.id); }}
+                        onClick={(e) => { e.stopPropagation(); triggerHaptic('success'); markNotificationAsRead(notif.id); }}
                         className="p-2 rounded-xl bg-brand-primary/10 hover:bg-brand-primary/20 text-brand-primary transition-colors"
                       >
                         <Check className="w-4 h-4" />

@@ -1,5 +1,6 @@
 import { lazyWithRetry } from '@/utils/lazyRetry';
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useMemo } from 'react';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { TokensModal } from './TokensModal';
 import { useModalStore } from '@/state/modalStore';
 import { SmartSuspense } from './SmartSuspense';
@@ -10,6 +11,7 @@ import { useClientProfiles } from '@/hooks/useClientProfiles';
 import { useWelcomeState } from '@/hooks/useWelcomeState';
 import { useFilterStore } from '@/state/filterStore';
 import { DeferredDialog } from './DeferredDialog';
+import { cn } from '@/lib/utils';
 
 // 🚀 SPEED OF LIGHT: LAZY WITH RETRY HARDENING
 const AdvancedFiltersDialog = lazyWithRetry(() => import('@/components/AdvancedFiltersDialog'));
@@ -17,8 +19,8 @@ const SubscriptionPackages = lazyWithRetry(() => import("@/components/Subscripti
 const LegalDocumentsDialog = lazyWithRetry(() => import("@/components/LegalDocumentsDialog").then(m => ({ default: m.LegalDocumentsDialog })));
 const ClientProfileDialog = lazyWithRetry(() => import("@/components/ClientProfileDialog").then(m => ({ default: m.ClientProfileDialog })));
 const PropertyDetails = lazyWithRetry(() => import("@/components/PropertyDetails").then(m => ({ default: m.PropertyDetails })));
-const PropertyInsightsDialog = lazyWithRetry(() => import("@/components/PropertyInsightsDialog").then(m => ({ default: m.PropertyInsightsDialog })));
-const ClientInsightsDialog = lazyWithRetry(() => import("@/components/ClientInsightsDialog").then(m => ({ default: m.ClientInsightsDialog })));
+const LikedListingInsightsModal = lazyWithRetry(() => import("@/components/LikedListingInsightsModal").then(m => ({ default: m.LikedListingInsightsModal })));
+const LikedClientInsightsModal = lazyWithRetry(() => import("@/components/LikedClientInsightsModal").then(m => ({ default: m.LikedClientInsightsModal })));
 const OwnerSettingsDialog = lazyWithRetry(() => import('@/components/OwnerSettingsDialog').then(m => ({ default: m.OwnerSettingsDialog })));
 const OwnerProfileDialog = lazyWithRetry(() => import('@/components/OwnerProfileDialog').then(m => ({ default: m.OwnerProfileDialog })));
 const OwnerClientSwipeDialog = lazyWithRetry(() => import('@/components/OwnerClientSwipeDialog'));
@@ -32,44 +34,65 @@ const AIListingWizard = lazyWithRetry(() => import('@/components/AIListingWizard
 const ConciergeChat = lazyWithRetry(() => import('@/components/ConciergeChat').then(m => ({ default: m.ConciergeChat })));
 const ReportDialog = lazyWithRetry(() => import('@/components/ReportDialog').then(m => ({ default: m.ReportDialog })));
 
-const ConciergeChatFallback = memo(() => (
-  <div className="fixed inset-0 z-[10000] flex flex-col bg-background">
-    {/* Header Skeleton */}
-    <div className="h-16 flex items-center justify-between px-5 border-b border-border/10 bg-background/50 backdrop-blur-xl">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-muted/20 animate-pulse" />
-        <div className="space-y-2">
-          <div className="h-2.5 w-24 rounded-full bg-foreground/10 animate-pulse" />
-          <div className="h-2 w-16 rounded-full bg-muted/10 animate-pulse" />
+const ConciergeChatFallback = memo(() => {
+  const { isLight, theme } = useAppTheme();
+  const isSwipess = theme === 'dark' || !isLight;
+
+  return (
+    <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-xl flex items-end md:items-center justify-center">
+      <div className={cn(
+        "relative w-full h-full md:max-w-3xl md:h-[90vh] md:rounded-[3rem] border flex flex-col overflow-hidden transition-all duration-700",
+        isSwipess ? "bg-[#050505] border-[#FF3D00]/20 shadow-[0_0_50px_rgba(255,61,0,0.1)]" : "bg-white border-slate-200 shadow-[0_40px_100px_rgba(0,0,0,0.2)]"
+      )}>
+        {/* 🛸 Ambient Background */}
+        {isSwipess && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#FF3D00]/10 blur-[120px] rounded-full" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full" />
+          </div>
+        )}
+
+        {/* Header Skeleton */}
+        <div className={cn(
+          "h-20 flex items-center justify-between px-6 border-b backdrop-blur-3xl relative z-10",
+          isSwipess ? "border-white/5 bg-black/40" : "border-slate-200 bg-white/80"
+        )}>
+          <div className="flex items-center gap-4">
+            <div className={cn("w-12 h-12 rounded-2xl animate-pulse border", isSwipess ? "bg-white/5 border-white/5" : "bg-slate-100 border-slate-200")} />
+            <div className="space-y-2">
+              <div className={cn("h-3 w-32 rounded-full animate-pulse", isSwipess ? "bg-white/10" : "bg-slate-200")} />
+              <div className={cn("h-2 w-20 rounded-full animate-pulse", isSwipess ? "bg-white/5" : "bg-slate-100")} />
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className={cn("h-12 w-32 rounded-2xl animate-pulse border", isSwipess ? "bg-white/5 border-white/5" : "bg-slate-100 border-slate-200")} />
+            <div className={cn("h-12 w-12 rounded-2xl animate-pulse border", isSwipess ? "bg-white/5 border-white/5" : "bg-slate-100 border-slate-200")} />
+          </div>
+        </div>
+        
+        {/* Content Skeleton */}
+        <div className="flex-1 p-8 space-y-10 overflow-hidden relative z-10 flex flex-col items-center justify-center">
+          <div className={cn(
+            "w-24 h-24 rounded-[3rem] border flex items-center justify-center animate-pulse",
+            isSwipess ? "border-primary/10 bg-primary/5" : "border-slate-200 bg-slate-50"
+          )} />
+          <div className="space-y-3 text-center">
+             <div className={cn("h-4 w-48 rounded-full animate-pulse", isSwipess ? "bg-white/10" : "bg-slate-200")} />
+             <div className={cn("h-2 w-32 rounded-full animate-pulse", isSwipess ? "bg-white/5" : "bg-slate-100")} />
+          </div>
+        </div>
+        
+        {/* Input Skeleton */}
+        <div className={cn(
+          "p-8 border-t pb-[calc(env(safe-area-inset-bottom,0px)+32px)] backdrop-blur-xl relative z-10",
+          isSwipess ? "border-white/5 bg-black/40" : "border-slate-100 bg-slate-50/50"
+        )}>
+          <div className={cn("h-16 w-full rounded-[2.2rem] animate-pulse border", isSwipess ? "bg-white/5 border-white/5" : "bg-white border-slate-200")} />
         </div>
       </div>
-      <div className="flex gap-2">
-        <div className="h-10 w-10 rounded-xl bg-muted/10 animate-pulse" />
-        <div className="h-10 w-10 rounded-xl bg-muted/10 animate-pulse" />
-      </div>
     </div>
-    
-    {/* Content Skeleton */}
-    <div className="flex-1 p-6 space-y-8 overflow-hidden">
-      <div className="flex flex-col items-end space-y-2">
-        <div className="h-14 w-[70%] rounded-2xl rounded-br-md bg-primary/5 animate-pulse" />
-        <div className="h-3 w-20 rounded-full bg-primary/10 animate-pulse" />
-      </div>
-      <div className="flex flex-col items-start space-y-2">
-        <div className="h-24 w-[85%] rounded-2xl rounded-bl-md bg-muted/10 animate-pulse" />
-        <div className="h-3 w-28 rounded-full bg-muted/20 animate-pulse" />
-      </div>
-      <div className="flex flex-col items-end space-y-2">
-        <div className="h-16 w-[60%] rounded-2xl rounded-br-md bg-primary/5 animate-pulse" />
-      </div>
-    </div>
-    
-    {/* Input Skeleton */}
-    <div className="p-4 border-t border-border/10 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] bg-background">
-      <div className="h-16 w-full rounded-2xl bg-muted/10 border border-border/5 animate-pulse" />
-    </div>
-  </div>
-));
+  );
+});
 
 ConciergeChatFallback.displayName = 'ConciergeChatFallback';
 
@@ -170,7 +193,7 @@ export const GlobalDialogs = memo(({ userRole }: GlobalDialogsProps) => {
           </DeferredDialog>
 
           <DeferredDialog when={store.showPropertyInsights}>
-            <PropertyInsightsDialog
+            <LikedListingInsightsModal
               open={store.showPropertyInsights}
               onOpenChange={(val: boolean) => store.setModal('showPropertyInsights', val)}
               listing={selectedListing || null}
@@ -189,10 +212,10 @@ export const GlobalDialogs = memo(({ userRole }: GlobalDialogsProps) => {
       {userRole === 'owner' && (
         <>
           <DeferredDialog when={store.showClientInsights}>
-            <ClientInsightsDialog
+            <LikedClientInsightsModal
               open={store.showClientInsights}
               onOpenChange={(val: boolean) => store.setModal('showClientInsights', val)}
-              profile={selectedProfile || null}
+              client={selectedProfile || null}
             />
           </DeferredDialog>
 

@@ -162,7 +162,7 @@ const MarketingSlideComponent = ({ slideId }: MarketingSlideProps) => {
             className={`bg-gradient-to-br ${data.gradient} flex flex-col items-center justify-center p-8 text-white relative`}
         >
             {/* Dynamic Background Effects */}
-            <div className="absolute inset-0 overflow-hidden mix-blend-overlay opacity-30">
+            <div className="absolute inset-0 overflow-hidden mix-blend-overlay opacity-70">
                 <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8)_0%,transparent_50%)] blur-[80px]" />
             </div>
 

@@ -130,6 +130,15 @@ export const cityThemes: Record<CityLocation, CityTheme> = {
     gradient: 'linear-gradient(135deg, #9c27b0 0%, #f06292 100%)',
     description: 'Zen and Relaxation'
   },
+  'american-retro': {
+    id: 'american-retro',
+    name: 'American Oldies',
+    primaryColor: '#b71c1c',
+    secondaryColor: '#ffffff',
+    accentColor: '#1a237e',
+    gradient: 'linear-gradient(135deg, #b71c1c 0%, #ffffff 50%, #1a237e 100%)',
+    description: 'The Golden Age of American Music'
+  },
   'bongs': {
     id: 'bongs',
     name: 'Bowls & Gongs',
@@ -138,6 +147,33 @@ export const cityThemes: Record<CityLocation, CityTheme> = {
     accentColor: '#ffffff',
     gradient: 'linear-gradient(135deg, #c5b358 0%, #121212 100%)',
     description: 'Sound Baths & Healing'
+  },
+  'london': {
+    id: 'london',
+    name: 'London',
+    primaryColor: '#001146',
+    secondaryColor: '#cc0000',
+    accentColor: '#ffffff',
+    gradient: 'linear-gradient(135deg, #001146 0%, #cc0000 100%)',
+    description: 'Capital of Sound'
+  },
+  'moscow': {
+    id: 'moscow',
+    name: 'Moscow',
+    primaryColor: '#cc0000',
+    secondaryColor: '#000000',
+    accentColor: '#ffffff',
+    gradient: 'linear-gradient(135deg, #cc0000 0%, #000000 100%)',
+    description: 'Red Square rhythms'
+  },
+  'sound-healing': {
+    id: 'sound-healing',
+    name: 'Sound Healing',
+    primaryColor: '#c5b358',
+    secondaryColor: '#121212',
+    accentColor: '#ffffff',
+    gradient: 'linear-gradient(135deg, #c5b358 0%, #121212 100%)',
+    description: 'Sound baths and restorative frequencies'
   }
 };
 
@@ -153,16 +189,18 @@ export const radioStations: RadioStation[] = [
     streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
     city: 'miami',
     genre: 'Deep House',
-    description: 'Ultra-lux house vibes'
+    description: 'Ultra-lux house vibes',
+    albumArt: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'miami-2',
-    name: 'Revolution Radio',
+    name: 'Miami Electronic',
     frequency: '93.5',
     streamUrl: 'https://ice1.somafm.com/sf1033-128-mp3',
     city: 'miami',
     genre: 'EDM',
-    description: 'Miami Electronic Music'
+    description: 'Miami Electronic Music',
+    albumArt: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'miami-3',
@@ -171,7 +209,8 @@ export const radioStations: RadioStation[] = [
     streamUrl: 'https://ice1.somafm.com/groovesalad-128-mp3',
     city: 'miami',
     genre: 'Chillout',
-    description: 'Downtempo Beats'
+    description: 'Downtempo Beats',
+    albumArt: 'https://images.unsplash.com/photo-1514525253344-f81bad00a926?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'miami-4',
@@ -180,7 +219,8 @@ export const radioStations: RadioStation[] = [
     streamUrl: 'https://ice1.somafm.com/lush-128-mp3',
     city: 'miami',
     genre: 'Downtempo',
-    description: 'Tropical Rhythms'
+    description: 'Tropical Rhythms',
+    albumArt: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'miami-5',
@@ -240,21 +280,22 @@ export const radioStations: RadioStation[] = [
   // New York - 10 Stations
   {
     id: 'ny-1',
-    name: 'WNYC Public',
+    name: 'Empire State Radio',
     frequency: '93.9',
-    streamUrl: 'https://fm939.wnyc.org/wnycfm.mp3',
+    streamUrl: 'https://stream.wnyc.org/wnycfm-mobile.aac',
     city: 'new-york',
     genre: 'Talk',
     description: 'Public Radio'
   },
   {
     id: 'ny-2',
-    name: 'WKCR Jazz',
+    name: 'NY Jazz Radio',
     frequency: '89.9',
     streamUrl: 'https://ice1.somafm.com/sonicuniverse-128-mp3',
     city: 'new-york',
     genre: 'Jazz',
-    description: 'Real NY Jazz'
+    description: 'Real NY Jazz',
+    albumArt: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ny-3',
@@ -263,7 +304,8 @@ export const radioStations: RadioStation[] = [
     streamUrl: 'https://ice1.somafm.com/seven-128-mp3',
     city: 'new-york',
     genre: '70s Pop',
-    description: 'Classic NY'
+    description: 'Classic NY',
+    albumArt: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ny-4',
@@ -321,7 +363,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'ny-10',
-    name: 'Rinse FM',
+    name: 'NY Underground',
     frequency: '106.8',
     streamUrl: 'https://ice1.somafm.com/missioncontrol-128-mp3',
     city: 'new-york',
@@ -332,30 +374,33 @@ export const radioStations: RadioStation[] = [
   // Ibiza - 10 Stations
   {
     id: 'ibiza-1',
-    name: 'Ibiza Global Live',
+    name: 'Ibiza Global House',
     frequency: '97.6',
     streamUrl: 'https://ice1.somafm.com/cliqhop-128-mp3',
     city: 'ibiza',
     genre: 'Electronic',
-    description: 'The Soul of Ibiza'
+    description: 'The Soul of Ibiza',
+    albumArt: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ibiza-2',
-    name: 'Ibiza Sonica',
+    name: 'Ibiza House Beats',
     frequency: '92.4',
     streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
     city: 'ibiza',
     genre: 'House',
-    description: 'Deep Vibes'
+    description: 'Deep Vibes',
+    albumArt: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ibiza-3',
-    name: 'Blue Marlin',
+    name: 'Sunset Cove',
     frequency: '101.2',
     streamUrl: 'https://ice1.somafm.com/dronezone-128-mp3',
     city: 'ibiza',
     genre: 'Chill',
-    description: 'Beach Club'
+    description: 'Beach Club',
+    albumArt: 'https://images.unsplash.com/photo-1514525253344-f81bad00a926?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ibiza-4',
@@ -386,7 +431,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'ibiza-7',
-    name: 'Cafe Del Mar',
+    name: 'Sea Horizon',
     frequency: '107.0',
     streamUrl: 'https://ice1.somafm.com/deepspaceone-128-mp3',
     city: 'ibiza',
@@ -424,12 +469,13 @@ export const radioStations: RadioStation[] = [
   // Tulum - 10 Stations
   {
     id: 'tulum-1',
-    name: 'Tulum Deep Pulse',
+    name: 'Tulum FM',
     frequency: '102.1',
     streamUrl: 'https://ice1.somafm.com/groovesalad-128-mp3',
     city: 'tulum',
     genre: 'Deep House',
-    description: 'Sunset & Jungle beats'
+    description: 'The Soul of Tulum',
+    albumArt: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'tulum-2',
@@ -438,11 +484,12 @@ export const radioStations: RadioStation[] = [
     streamUrl: 'https://ice1.somafm.com/lush-128-mp3',
     city: 'tulum',
     genre: 'Chillout',
-    description: 'Vocal Bliss'
+    description: 'Vocal Bliss & Jungle Spirit',
+    albumArt: 'https://images.unsplash.com/photo-1454486326920-d4443bc37478?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'tulum-3',
-    name: 'Drone Zone',
+    name: 'Mayan Echoes',
     frequency: '100.1',
     streamUrl: 'https://ice1.somafm.com/dronezone-128-mp3',
     city: 'tulum',
@@ -451,7 +498,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-4',
-    name: 'Deep Space',
+    name: 'Sian Ka\'an Sounds',
     frequency: '94.3',
     streamUrl: 'https://ice1.somafm.com/deepspaceone-128-mp3',
     city: 'tulum',
@@ -460,7 +507,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-5',
-    name: 'Papaya Playa',
+    name: 'Caribbean Drift',
     frequency: '91.7',
     streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
     city: 'tulum',
@@ -469,7 +516,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-6',
-    name: 'Be Tulum',
+    name: 'Tropical Nightfall',
     frequency: '105.9',
     streamUrl: 'https://ice1.somafm.com/secretagent-128-mp3',
     city: 'tulum',
@@ -478,7 +525,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-7',
-    name: 'Ahau Vibes',
+    name: 'Palapa Grooves',
     frequency: '103.5',
     streamUrl: 'https://ice1.somafm.com/sonicuniverse-128-mp3',
     city: 'tulum',
@@ -487,7 +534,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-8',
-    name: 'PopTron',
+    name: 'Coastal Indie',
     frequency: '107.5',
     streamUrl: 'https://ice1.somafm.com/poptron-128-mp3',
     city: 'tulum',
@@ -496,7 +543,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-9',
-    name: 'The Trip',
+    name: 'Ruins Techno',
     frequency: '96.7',
     streamUrl: 'https://ice1.somafm.com/thetrip-128-mp3',
     city: 'tulum',
@@ -505,7 +552,7 @@ export const radioStations: RadioStation[] = [
   },
   {
     id: 'tulum-10',
-    name: 'Illinois Street',
+    name: 'Azul Lounge',
     frequency: '89.1',
     streamUrl: 'https://ice1.somafm.com/illstreet-128-mp3',
     city: 'tulum',
@@ -1202,8 +1249,273 @@ export const radioStations: RadioStation[] = [
     city: 'tulum',
     genre: 'Electronic',
     description: 'The official Swipess beach frequency'
+  },
+  
+  // American Retro - The Golden Age
+  {
+    id: 'retro-1',
+    name: 'Golden Oldies 50s/60s',
+    frequency: '95.7',
+    streamUrl: 'https://ice1.somafm.com/u80s-128-mp3',
+    city: 'american-retro',
+    genre: 'Oldies',
+    description: 'Rock & Roll roots from the 50s and 60s',
+    albumArt: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-2',
+    name: '70s Super Hits',
+    frequency: '101.5',
+    streamUrl: 'https://ice1.somafm.com/seven-128-mp3',
+    city: 'american-retro',
+    genre: '70s Pop',
+    description: 'Disco, Rock, and Soul from the groovy 70s',
+    albumArt: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-3',
+    name: 'Awesome 80s',
+    frequency: '104.9',
+    streamUrl: 'https://ice1.somafm.com/u80s-128-mp3',
+    city: 'american-retro',
+    genre: '80s Pop',
+    description: 'Neon lights and synthesizer sunsets',
+    albumArt: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-4',
+    name: '90s Fresh Air',
+    frequency: '98.3',
+    streamUrl: 'https://ice1.somafm.com/freshair-128-mp3',
+    city: 'american-retro',
+    genre: '90s Alternative',
+    description: 'Grunge, Britpop, and the best of the 90s',
+    albumArt: 'https://images.unsplash.com/photo-1542204172-132c3970b555?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-5',
+    name: 'Motown Classics',
+    frequency: '89.1',
+    streamUrl: 'https://ice1.somafm.com/seven-128-mp3',
+    city: 'american-retro',
+    genre: 'Soul/Motown',
+    description: 'The legendary sound of Detroit soul',
+    albumArt: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-6',
+    name: 'The 50s Channel',
+    frequency: '92.5',
+    streamUrl: 'https://ice1.somafm.com/bagel-128-mp3',
+    city: 'american-retro',
+    genre: '50s Rock & Roll',
+    description: 'The birth of Rock & Roll 24/7',
+    albumArt: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-7',
+    name: 'Pure 70s Soul',
+    frequency: '97.1',
+    streamUrl: 'https://ice1.somafm.com/seven-128-mp3',
+    city: 'american-retro',
+    genre: '70s Soul',
+    description: 'Smooth grooves and deep soul from the 70s',
+    albumArt: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-8',
+    name: 'Classic American Top 40',
+    frequency: '100.1',
+    streamUrl: 'https://ice1.somafm.com/freshair-128-mp3',
+    city: 'american-retro',
+    genre: 'Retro Pop',
+    description: 'The biggest hits of the golden era',
+    albumArt: 'https://images.unsplash.com/photo-1459749411177-042180ce673b?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-9',
+    name: 'WCBS-FM 101.1',
+    frequency: '101.1',
+    streamUrl: 'https://ice1.somafm.com/seventies-128-mp3',
+    city: 'american-retro',
+    genre: 'Classic Oldies',
+    description: 'New York\'s Greatest Hits of the 60s, 70s, and 80s',
+    albumArt: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-10',
+    name: 'K-EARTH 101',
+    frequency: '101.1',
+    streamUrl: 'https://ice1.somafm.com/eighties-128-mp3',
+    city: 'american-retro',
+    genre: 'Oldies',
+    description: 'Los Angeles Legend - 24/7 Classic American Hits',
+    albumArt: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-11',
+    name: 'The 50s Diner',
+    frequency: '92.9',
+    streamUrl: 'https://ice1.somafm.com/digitalis-128-mp3',
+    city: 'american-retro',
+    genre: '50s Rock',
+    description: 'Pure 1950s American Rock & Roll and Doo-Wop',
+    albumArt: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'retro-12',
+    name: 'Solid Gold 60s',
+    frequency: '96.5',
+    streamUrl: 'https://ice1.somafm.com/secretagent-128-mp3',
+    city: 'american-retro',
+    genre: '60s Pop',
+    description: 'The British Invasion and American Motown era',
+    albumArt: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=800'
+  },
+  
+  // London - 10 Stations
+  {
+    id: 'london-1',
+    name: 'London Underground',
+    frequency: '106.8',
+    streamUrl: 'https://ice1.somafm.com/missioncontrol-128-mp3',
+    city: 'london',
+    genre: 'Grime/Dubstep',
+    description: 'The heartbeat of London underground',
+    albumArt: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-2',
+    name: 'London Hit Radio',
+    frequency: '95.8',
+    streamUrl: 'https://ice1.somafm.com/poptron-128-mp3',
+    city: 'london',
+    genre: 'Top 40',
+    description: 'London\'s Number 1 Hit Music Station',
+    albumArt: 'https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-3',
+    name: 'London National 1',
+    frequency: '98.8',
+    streamUrl: 'https://ice1.somafm.com/bagel-128-mp3',
+    city: 'london',
+    genre: 'Modern Rock/Pop',
+    description: 'The world\'s most famous radio station',
+    albumArt: 'https://images.unsplash.com/photo-1520038410233-7141f77e49aa?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-4',
+    name: 'Magic Soul London',
+    frequency: '105.4',
+    streamUrl: 'https://ice1.somafm.com/lush-128-mp3',
+    city: 'london',
+    genre: 'Soul/R&B',
+    description: 'The Best of Soul and Motown',
+    albumArt: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-5',
+    name: 'Jazz FM London',
+    frequency: '102.2',
+    streamUrl: 'https://ice1.somafm.com/sonicuniverse-128-mp3',
+    city: 'london',
+    genre: 'Jazz',
+    description: 'Listen in Color',
+    albumArt: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-6',
+    name: 'Absolute London',
+    frequency: '105.8',
+    streamUrl: 'https://ice1.somafm.com/indiepop-128-mp3',
+    city: 'london',
+    genre: 'Real Music',
+    description: 'Where Real Music Matters',
+    albumArt: 'https://images.unsplash.com/photo-1459749411177-042180ce673b?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-7',
+    name: 'London Conversation',
+    frequency: '97.3',
+    streamUrl: 'https://ice1.somafm.com/dronezone-128-mp3',
+    city: 'london',
+    genre: 'Talk',
+    description: 'Leading London\'s Conversation',
+    albumArt: 'https://images.unsplash.com/photo-1514525253344-f81bad00a926?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-8',
+    name: 'London Deep House',
+    frequency: '91.1',
+    streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
+    city: 'london',
+    genre: 'Dance',
+    description: 'The Home of Dance Music',
+    albumArt: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-9',
+    name: 'London Eclectic',
+    frequency: '103.4',
+    streamUrl: 'https://ice1.somafm.com/thetrip-128-mp3',
+    city: 'london',
+    genre: 'Eclectic',
+    description: 'Don\'t Assume',
+    albumArt: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'london-10',
+    name: 'London Urban',
+    frequency: '100.0',
+    streamUrl: 'https://ice1.somafm.com/cliqhop-128-mp3',
+    city: 'london',
+    genre: 'Dance/Urban',
+    description: 'The Beat of London',
+    albumArt: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'moscow-1',
+    name: 'Red Square Beats',
+    frequency: '92.4',
+    streamUrl: 'https://ice1.somafm.com/beatblender-128-mp3',
+    city: 'moscow',
+    genre: 'Electronic',
+    description: 'Techno from the heart of Russia',
+    albumArt: 'https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'moscow-2',
+    name: 'Kremlin Chill',
+    frequency: '101.1',
+    streamUrl: 'https://ice1.somafm.com/groovesalad-128-mp3',
+    city: 'moscow',
+    genre: 'Chillout',
+    description: 'Sophisticated Russian lounge',
+    albumArt: 'https://images.unsplash.com/photo-1520106212299-d99c443e4568?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'moscow-3',
+    name: 'Secret Agent Moscow',
+    frequency: '105.2',
+    streamUrl: 'https://ice1.somafm.com/secretagent-128-mp3',
+    city: 'moscow',
+    genre: 'Retro',
+    description: 'Espionage soundtracks',
+    albumArt: 'https://images.unsplash.com/photo-1547448415-e9f5b28e570d?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: 'moscow-4',
+    name: 'Siberian Deep',
+    frequency: '98.8',
+    streamUrl: 'https://ice1.somafm.com/deepspaceone-128-mp3',
+    city: 'moscow',
+    genre: 'Ambient',
+    description: 'Atmospheric Russian soundscapes',
+    albumArt: 'https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?auto=format&fit=crop&q=80&w=800'
   }
 ];
+
 
 export function getStationsByCity(city: CityLocation): RadioStation[] {
   return radioStations.filter(station => station.city === city);

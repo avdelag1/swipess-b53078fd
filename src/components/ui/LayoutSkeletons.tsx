@@ -28,7 +28,7 @@ export function DashboardSkeleton() {
       </Card>
 
       {/* Subtle indicator of more content below (Swipe Stack feel) */}
-      <div className="h-4 w-full flex justify-center gap-2 opacity-30">
+      <div className="h-4 w-full flex justify-center gap-2 opacity-70">
         <div className="w-2 h-2 rounded-full bg-white/20" />
         <div className="w-2 h-2 rounded-full bg-white/40" />
         <div className="w-2 h-2 rounded-full bg-white/20" />

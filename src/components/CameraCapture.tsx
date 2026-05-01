@@ -758,7 +758,7 @@ export function CameraCapture({
         </div>
 
         {/* Tips */}
-        <p className="text-center text-white/40 text-xs mt-4 px-6">
+        <p className="text-center text-white/70 text-xs mt-4 px-6">
           {photoMode === 'PORTRAIT'
             ? 'Portrait mode adds a professional background blur effect'
             : photoMode === 'NIGHT'

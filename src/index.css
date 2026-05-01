@@ -15,11 +15,42 @@ html, body, #root {
   -ms-overflow-style: none;
   overflow-x: hidden;
   -webkit-touch-callout: none;
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizeSpeed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff;
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* 🏎️ GPU ACCELERATION INJECTION */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000;
+  overscroll-behavior-y: none;
+  /* 📱 MOBILE OPTIMIZATION: Prevent text selection and highlight */
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 🚀 FLAGSHIP LAYOUT CONTAINMENT */
+.glass-nano-texture {
+  contain: paint layout style;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.zenith-interaction-isolation {
+  isolation: isolate;
+  contain: content;
+}
+
+.gpu-ultra {
+  transform: translate3d(0,0,0);
+  will-change: transform;
+}
+
+/* 🏎️ OFF-SCREEN OPTIMIZATION */
+.offscreen-hidden {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
 }
 
 /* 🎨 ARTISTIC FONT UTILITY */
@@ -29,7 +60,7 @@ html, body, #root {
 
 /* 🚀 PERFORMANCE FONT UTILITY */
 .font-structural {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Force background color in dark/matte themes — eliminates white frame bleed */
@@ -76,13 +107,25 @@ body::-webkit-scrollbar {
   100% { clip-path: circle(150% at var(--theme-reveal-x, 50%) var(--theme-reveal-y, 50%)); }
 }
 
+@keyframes photo-slide-in {
+  0% { opacity: 0; transform: scale(1.05) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes photo-swim {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
 :root {
   --glass-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 .glass-nano-texture {
   position: relative;
-  contain: layout style;
+  contain: paint layout style;
+  /* Reduce layout thrashing */
+  will-change: transform;
 }
 .glass-nano-texture::before {
   content: "";
@@ -128,6 +171,23 @@ body::-webkit-scrollbar {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
+/* ─── GPU & Layout Optimizations ─── */
+.perf-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+.perf-heavy-scroll {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1000px;
+}
+
+.perf-static {
+  contain: content;
+}
+
 *::-webkit-scrollbar {
   display: none !important;
 }
@@ -142,7 +202,8 @@ html {
   -webkit-overflow-scrolling: touch;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --top-bar-height: 60px;
+  --top-bar-height: 72px;
+  --bottom-nav-height: 80px;
 }
 
 body {
@@ -152,15 +213,13 @@ body {
   min-height: 100dvh;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  /* CRITICAL: Allow body to scroll */
-  overflow-y: visible !important; 
-  overflow-x: hidden;
+  overflow: hidden;
   position: relative;
 }
 
 main, .scrollable-content, .overflow-y-auto {
   overscroll-behavior-y: auto;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 #root {
@@ -188,7 +247,7 @@ button:active, [role="button"]:active {
     --background: 0 0% 100%;
     --foreground: 0 0% 7%;
     --primary: 343 99% 62%;
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
     --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 10%;
     --accent: 343 99% 62%;
@@ -230,8 +289,8 @@ button:active, [role="button"]:active {
     /* 🧘 HUD TOKEN SYSTEM (DARK) */
     --hud-bg: rgba(15, 15, 20, 0.95);
     --hud-text: #ffffff;
-    --hud-border: rgba(255, 255, 255, 0.1);
-    --hud-active-bg: rgba(255, 255, 255, 0.08);
+    --hud-border: rgba(255, 255, 255, 0.25);
+    --hud-active-bg: rgba(255, 255, 255, 0.12);
   }
 
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -293,8 +352,8 @@ button:active, [role="button"]:active {
     /* 🧘 HUD TOKEN SYSTEM (GREY) */
     --hud-bg: rgba(35, 35, 40, 0.85);
     --hud-text: #ffffff;
-    --hud-border: rgba(255, 255, 255, 0.1);
-    --hud-active-bg: rgba(255, 255, 255, 0.1);
+    --hud-border: rgba(255, 255, 255, 0.25);
+    --hud-active-bg: rgba(255, 255, 255, 0.15);
   }
 
   /* THEME 2: BLACK MATTE (Deep dark mode - like ChatGPT) */
@@ -351,8 +410,8 @@ button:active, [role="button"]:active {
     /* 🧘 HUD TOKEN SYSTEM (BLACK) */
     --hud-bg: rgba(5, 5, 5, 0.96);
     --hud-text: #ffffff;
-    --hud-border: rgba(255, 255, 255, 0.12);
-    --hud-active-bg: rgba(255, 255, 255, 0.1);
+    --hud-border: rgba(255, 255, 255, 0.3);
+    --hud-active-bg: rgba(255, 255, 255, 0.15);
   }
 
   /* THEME 3: WHITE MATTE (Clean minimalist - like Apple/Linear) */
@@ -363,7 +422,7 @@ button:active, [role="button"]:active {
     --card: 0 0% 100%;
     --card-foreground: 0 0% 10%;
     --primary: 0 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
     --secondary: 0 0% 94%;
     --secondary-foreground: 0 0% 10%;
     --muted: 0 0% 94%;
@@ -540,9 +599,9 @@ button:active, [role="button"]:active {
     }
   }
 
-  /* MOBILE PERFORMANCE MODE - Disable blur effects on phones */
+  /* MOBILE PERFORMANCE MODE - Refined for 2026 devices */
   @media (max-width: 768px) {
-    /* Remove backdrop-blur - GPU intensive on mobile */
+    /* Allow backdrop-blur on modern mobile devices for premium feel */
     .backdrop-blur-sm,
     .backdrop-blur-md,
     .backdrop-blur-lg,
@@ -550,13 +609,13 @@ button:active, [role="button"]:active {
     .backdrop-blur-2xl,
     .backdrop-blur-3xl,
     [class*="backdrop-blur"] {
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
+      /* Remove the hard disable. Modern iPhones handle this easily. */
     }
 
     /* Faster transitions on mobile - no !important to avoid janky framer-motion */
     * {
-      transition-duration: 150ms;
+      transition-duration: 200ms;
+      transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
     }
 
     /* Disable box-shadow animations (expensive repaints) */
@@ -733,6 +792,17 @@ button:active, [role="button"]:active {
   @keyframes blur-in {
     from { filter: blur(20px); opacity: 0; }
     to { filter: blur(0); opacity: 1; }
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 40px) scale(0.9); }
+  }
+
+  .animate-float-slow {
+    animation: float-slow 20s ease-in-out infinite;
+    will-change: transform;
   }
 
   .gradient-text {
@@ -2061,3 +2131,61 @@ html[data-navigation-direction="back"] {
 
 .leaflet-container { width: 100%; height: 100%; background: #f1f5f9; outline: none; }
 .leaflet-control-attribution { display: none !important; }
+
+/* ============================================================
+   APPLE A11Y SAFETY NET — Button/Chip contrast guarantees
+   ------------------------------------------------------------
+   Apple App Review flags any control whose pressed / selected
+   state is not visually distinct, or where text fails minimum
+   contrast. These rules act as a global guard so a control can
+   never silently render white-on-white or white-on-light.
+   ============================================================ */
+
+/* 1. Any element whose Tailwind class forces a white background
+      AND also a white text class must be corrected to black —
+      this is the white-on-white case Apple reviewers flag. */
+button.bg-white.text-white,
+a.bg-white.text-white,
+[role="button"].bg-white.text-white {
+  color: #0a0a0a !important;
+}
+
+/* 2. Tactile pressed state for every interactive control.
+      Even when a component forgets to define an :active style,
+      users get clear feedback that their tap was registered. */
+button:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active,
+a[href]:active {
+  filter: brightness(0.92);
+  transition: filter 80ms ease-out;
+}
+
+/* 3. Apple HIG requires a visible focus indicator for keyboard
+      and switch-control users. Many components rely on default
+      browser outlines that we strip via Tailwind reset. */
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid hsl(var(--ring, var(--primary)));
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* 4. Selected / aria-pressed safety: if a toggle is "on" but
+      the author forgot to style it, give it a brand outline so
+      reviewers can see the selection. */
+[aria-pressed="true"]:not([data-styled="true"]),
+[aria-selected="true"]:not([data-styled="true"]),
+[data-state="on"]:not([data-styled="true"]),
+[data-state="active"]:not([data-styled="true"]) {
+  box-shadow: inset 0 0 0 2px hsl(var(--primary));
+}
+
+/* 5. Disabled controls must stay legible — never invisible. */
+button:disabled,
+[aria-disabled="true"] {
+  opacity: 0.55;
+}

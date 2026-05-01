@@ -127,7 +127,7 @@ export function PWAInstallPrompt() {
               <p className={cn("font-black text-base tracking-tight leading-tight", isDark ? "text-white" : "text-black")}>Swipess</p>
               <div className="flex items-center gap-1.5">
                 <Sparkles className="w-3 h-3 text-orange-500" />
-                <p className={cn("text-[10px] font-bold uppercase tracking-widest", isDark ? "text-white/40" : "text-black/40")}>Elite Discovery</p>
+                <p className={cn("text-[10px] font-bold uppercase tracking-widest", isDark ? "text-white/70" : "text-black/70")}>Elite Discovery</p>
               </div>
             </div>
           </div>
