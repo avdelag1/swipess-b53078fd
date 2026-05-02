@@ -13,7 +13,7 @@
 
 import { memo, useRef, useState, useCallback, useMemo, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo, animate, useDragControls } from 'framer-motion';
-import { MapPin, DollarSign, Briefcase, Flag, Share2 } from 'lucide-react';
+import { MapPin, DollarSign, Briefcase, Flag, Share2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { triggerHaptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 
@@ -165,7 +165,7 @@ const CardImage = memo(({
 
   return (
     <div
-      className={cn("absolute inset-0 w-full h-full", !fullScreen && "rounded-[24px]")}
+      className={cn("absolute inset-0 w-full h-full", !fullScreen && "rounded-[2.5rem]")}
       style={{
         transform: 'translateZ(0)',
         touchAction: 'none',
@@ -189,7 +189,7 @@ const CardImage = memo(({
       <img
         src={src}
         alt={alt}
-        className={cn("absolute inset-0 w-full h-full", !fullScreen && "rounded-[24px]", loaded ? "" : "")}
+        className={cn("absolute inset-0 w-full h-full", !fullScreen && "rounded-[2.5rem]", loaded ? "" : "")}
         style={{
           objectFit: 'cover',
           objectPosition: 'center',
@@ -759,25 +759,84 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
           </div>
         </div>
 
+        {/* LIKE stamp — shown top-right when swiping right */}
         <motion.div
-          className="absolute top-28 left-8 z-30 pointer-events-none"
-          style={{ opacity: likeOpacity }}
+          className="absolute top-10 right-6 z-30 pointer-events-none"
+          style={{ opacity: likeOpacity, willChange: 'opacity' }}
         >
-          <div className="px-6 py-3 rounded-xl border-4 border-emerald-500 text-emerald-500 font-black text-3xl tracking-wider" style={{ transform: 'rotate(-12deg)' }}>
-            YES!
+          <div className="flex flex-col items-center gap-1.5" style={{ transform: 'rotate(15deg) translateZ(0)' }}>
+            <div
+              className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
+              style={{
+                background: 'rgba(16,185,129,0.15)',
+                backdropFilter: 'blur(8px)',
+                border: '3px solid #10b981',
+                boxShadow: '0 0 28px rgba(16,185,129,0.55), inset 0 0 12px rgba(16,185,129,0.15)',
+              }}
+            >
+              <ThumbsUp className="w-9 h-9 text-emerald-400" fill="currentColor" strokeWidth={0} />
+            </div>
+            <div
+              className="px-4 py-1 rounded-lg"
+              style={{
+                border: '2.5px solid #10b981',
+                background: 'rgba(16,185,129,0.12)',
+                backdropFilter: 'blur(6px)',
+                boxShadow: '0 0 18px rgba(16,185,129,0.4)',
+              }}
+            >
+              <span className="font-black text-xl tracking-[0.18em] uppercase text-emerald-400" style={{ textShadow: '0 0 14px rgba(16,185,129,0.9)' }}>
+                LIKE
+              </span>
+            </div>
           </div>
         </motion.div>
 
+        {/* NOPE stamp — shown top-left when swiping left */}
         <motion.div
-          className="absolute top-28 right-8 z-30 pointer-events-none"
-          style={{ opacity: passOpacity }}
+          className="absolute top-10 left-6 z-30 pointer-events-none"
+          style={{ opacity: passOpacity, willChange: 'opacity' }}
         >
-          <div className="px-6 py-3 rounded-xl border-4 border-red-600 text-red-600 font-black text-3xl tracking-wider" style={{ transform: 'rotate(12deg)' }}>
-            NOPE
+          <div className="flex flex-col items-center gap-1.5" style={{ transform: 'rotate(-15deg) translateZ(0)' }}>
+            <div
+              className="px-5 py-2.5 rounded-xl"
+              style={{
+                border: '3px solid #f43f5e',
+                background: 'rgba(244,63,94,0.12)',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 0 28px rgba(244,63,94,0.5), inset 0 0 12px rgba(244,63,94,0.1)',
+              }}
+            >
+              <span className="font-black text-4xl tracking-[0.15em] uppercase text-rose-400" style={{ textShadow: '0 0 16px rgba(244,63,94,0.9)' }}>
+                NOPE
+              </span>
+            </div>
+            <div
+              className="w-[52px] h-[52px] rounded-full flex items-center justify-center"
+              style={{
+                background: 'rgba(244,63,94,0.15)',
+                backdropFilter: 'blur(6px)',
+                border: '2.5px solid #f43f5e',
+                boxShadow: '0 0 18px rgba(244,63,94,0.45)',
+              }}
+            >
+              <ThumbsDown className="w-6 h-6 text-rose-400" fill="currentColor" strokeWidth={0} />
+            </div>
           </div>
         </motion.div>
 
 
+
+        {/* Edge vignette — perimeter inset shadow that outlines the rounded corners
+            so the card always reads as a physical object */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[25] rounded-[2.5rem]"
+          style={{
+            boxShadow: _isDark
+              ? 'inset 0 0 0 1.5px rgba(255,255,255,0.08), inset 0 0 50px rgba(0,0,0,0.45)'
+              : 'inset 0 0 0 1.5px rgba(0,0,0,0.10), inset 0 0 40px rgba(0,0,0,0.18)',
+          }}
+        />
 
         {/* Cinema Bottom Fade — theme-aware vignette behind nav + action buttons */}
         <div
@@ -785,8 +844,8 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
           style={{
             height: '60%',
             background: _isDark
-              ? 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0) 100%)'
-              : 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 35%, rgba(255,255,255,0) 100%)',
+              ? 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0) 100%)'
+              : 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.65) 35%, rgba(255,255,255,0) 100%)',
           }}
         />
 

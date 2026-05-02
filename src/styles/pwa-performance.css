@@ -472,6 +472,9 @@ body.hw-mid .animate-pulse {
 .app-bottom-bar {
     transform: translateZ(0);
     contain: layout style paint;
+    border: none !important;
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Faster Framer Motion spring/tween for all motion elements on mobile */

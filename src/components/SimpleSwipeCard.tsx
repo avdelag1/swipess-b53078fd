@@ -26,7 +26,7 @@ import { imageCache } from '@/lib/swipe/cardImageCache';
 import { useDeviceParallax } from '@/hooks/useDeviceParallax';
 import useAppTheme from '@/hooks/useAppTheme';
 import { cn } from '@/lib/utils';
-import { Flag, Share2 } from 'lucide-react';
+import { Flag, Share2, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 // Exposed interface for parent to trigger swipe animations
 export interface SimpleSwipeCardRef {
@@ -596,45 +596,87 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
           </div>
         </div>
 
+        {/* LIKE stamp — shown top-right when swiping right */}
         <motion.div
-          className="absolute top-8 left-8 z-30 pointer-events-none"
+          className="absolute top-10 right-6 z-30 pointer-events-none"
           style={{
             opacity: likeOpacity,
-            backfaceVisibility: 'hidden',
-            transform: 'translateZ(0)',
+            willChange: 'opacity',
           }}
         >
           <div
-            className="px-6 py-3 rounded-xl border-4 border-emerald-500 text-emerald-500 font-black text-3xl tracking-wider"
-            style={{
-              transform: 'rotate(-12deg) translateZ(0)', // GPU Composite
-              backfaceVisibility: 'hidden',
-              textShadow: '0 0 10px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.4)',
-              willChange: 'opacity, transform',
-            }}
+            className="flex flex-col items-center gap-1.5"
+            style={{ transform: 'rotate(15deg) translateZ(0)' }}
           >
-            YES!
+            <div
+              className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
+              style={{
+                background: 'rgba(16,185,129,0.15)',
+                backdropFilter: 'blur(8px)',
+                border: '3px solid #10b981',
+                boxShadow: '0 0 28px rgba(16,185,129,0.55), inset 0 0 12px rgba(16,185,129,0.15)',
+              }}
+            >
+              <ThumbsUp className="w-9 h-9 text-emerald-400" fill="currentColor" strokeWidth={0} />
+            </div>
+            <div
+              className="px-4 py-1 rounded-lg"
+              style={{
+                border: '2.5px solid #10b981',
+                background: 'rgba(16,185,129,0.12)',
+                backdropFilter: 'blur(6px)',
+                boxShadow: '0 0 18px rgba(16,185,129,0.4)',
+              }}
+            >
+              <span
+                className="font-black text-xl tracking-[0.18em] uppercase text-emerald-400"
+                style={{ textShadow: '0 0 14px rgba(16,185,129,0.9)' }}
+              >
+                LIKE
+              </span>
+            </div>
           </div>
         </motion.div>
 
+        {/* NOPE stamp — shown top-left when swiping left */}
         <motion.div
-          className="absolute top-8 right-8 z-30 pointer-events-none"
+          className="absolute top-10 left-6 z-30 pointer-events-none"
           style={{
             opacity: passOpacity,
-            backfaceVisibility: 'hidden',
-            transform: 'translateZ(0)',
+            willChange: 'opacity',
           }}
         >
           <div
-            className="px-6 py-3 rounded-xl border-4 border-red-500 text-red-500 font-black text-3xl tracking-wider"
-            style={{
-              transform: 'rotate(12deg) translateZ(0)', // GPU Composite
-              backfaceVisibility: 'hidden',
-              textShadow: '0 0 10px rgba(239, 68, 68, 0.6), 0 0 20px rgba(239, 68, 68, 0.4)',
-              willChange: 'opacity, transform',
-            }}
+            className="flex flex-col items-center gap-1.5"
+            style={{ transform: 'rotate(-15deg) translateZ(0)' }}
           >
-            NOPE
+            <div
+              className="px-5 py-2.5 rounded-xl"
+              style={{
+                border: '3px solid #f43f5e',
+                background: 'rgba(244,63,94,0.12)',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 0 28px rgba(244,63,94,0.5), inset 0 0 12px rgba(244,63,94,0.1)',
+              }}
+            >
+              <span
+                className="font-black text-4xl tracking-[0.15em] uppercase text-rose-400"
+                style={{ textShadow: '0 0 16px rgba(244,63,94,0.9)' }}
+              >
+                NOPE
+              </span>
+            </div>
+            <div
+              className="w-[52px] h-[52px] rounded-full flex items-center justify-center"
+              style={{
+                background: 'rgba(244,63,94,0.15)',
+                backdropFilter: 'blur(6px)',
+                border: '2.5px solid #f43f5e',
+                boxShadow: '0 0 18px rgba(244,63,94,0.45)',
+              }}
+            >
+              <ThumbsDown className="w-6 h-6 text-rose-400" fill="currentColor" strokeWidth={0} />
+            </div>
           </div>
         </motion.div>
 
@@ -740,10 +782,21 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
         <div
           className="absolute inset-x-0 bottom-0 pointer-events-none z-10"
           style={{
-            height: '50%',
+            height: '55%',
             background: isLight
-              ? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 35%, rgba(255,255,255,0.05) 65%, transparent 100%)'
-              : 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0.05) 65%, transparent 100%)',
+              ? 'linear-gradient(to top, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.5) 35%, rgba(255,255,255,0.06) 65%, transparent 100%)'
+              : 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.06) 65%, transparent 100%)',
+          }}
+        />
+
+        {/* Edge vignette — perimeter inset shadow that outlines the rounded corners
+            so the card always reads as a physical object */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[25] rounded-[2.5rem]"
+          style={{
+            boxShadow: isLight
+              ? 'inset 0 0 0 1.5px rgba(0,0,0,0.10), inset 0 0 40px rgba(0,0,0,0.18)'
+              : 'inset 0 0 0 1.5px rgba(255,255,255,0.08), inset 0 0 50px rgba(0,0,0,0.45)',
           }}
         />
 
