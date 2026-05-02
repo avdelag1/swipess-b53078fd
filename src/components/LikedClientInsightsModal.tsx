@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CompactRatingDisplay } from './RatingDisplay';
 import { RatingSubmissionDialog } from './RatingSubmissionDialog';
+import { cn } from '@/lib/utils';
 import { useUserRatingAggregate } from '@/hooks/useRatingSystem';
 import {
   AlertDialog,
@@ -653,10 +654,9 @@ function LikedClientInsightsModalComponent({ open, onOpenChange, client }: Liked
           <ReportDialog
             open={showReportDialog}
             onOpenChange={setShowReportDialog}
-            targetId={client.user_id}
-            targetType="user_profile"
             reportedUserId={client.user_id}
-            targetName={client.name}
+            reportedUserName={client.name}
+            category="user_profile"
           />
           <ShareDialog
             open={showShareDialog}

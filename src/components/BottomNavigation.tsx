@@ -37,11 +37,11 @@ import { useFilterStore } from '@/state/filterStore';
 import { useModalStore } from '@/state/modalStore';
 import { useActiveMode } from '@/hooks/useActiveMode';
 
-const ICON_SIZE = 20;
-const ICON_SIZE_COMPACT = 18;
-const ICON_SIZE_TABLET = 26;
-const TOUCH_TARGET = 40;
-const TOUCH_TARGET_TABLET = 54;
+const ICON_SIZE = 18;
+const ICON_SIZE_COMPACT = 16;
+const ICON_SIZE_TABLET = 24;
+const TOUCH_TARGET = 32;
+const TOUCH_TARGET_TABLET = 46;
 
 interface BottomNavigationProps {
   userRole: 'client' | 'owner' | 'admin';
@@ -116,37 +116,37 @@ export const BottomNavigation = memo(({
 
   // Client nav items — Legal lives inside Profile, not in the bar
   const clientNavItems: NavItem[] = [
-    { id: 'dashboard', icon: Zap, label: 'Dashboard', path: '/client/dashboard' },
-    { id: 'profile', icon: CircleUser, label: 'Profile', path: '/client/profile' },
-    { id: 'likes', icon: Flame, label: 'Likes', path: '/client/liked-properties', onClick: onListingsClick },
-    { id: 'ai', icon: Sparkles, label: 'AI Bot', onClick: openAIChat, isSpecial: true },
-    { id: 'messages', icon: MessageCircle, label: 'Messages', path: '/messages' },
-    { id: 'vapid', icon: IdCard, label: 'ID Card', onClick: () => setModal('showVapId', true) },
-    { id: 'events', icon: PartyPopper, label: 'Events', path: '/explore/eventos' },
-    { id: 'roommates', icon: Users2, label: 'Roommates', path: '/explore/roommates' },
-    { id: 'tokens', icon: Ticket, label: 'Tokens', onClick: () => setModal('showTokensModal', true) },
-    { id: 'search', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
-    { id: 'perks', icon: BadgePercent, label: 'Perks', path: '/client/perks' },
-    { id: 'radio', icon: Radio, label: 'Radio', path: '/radio' },
+    { id: 'dashboard', icon: Zap, label: t('nav.dashboard'), path: '/client/dashboard' },
+    { id: 'profile', icon: CircleUser, label: t('nav.profile'), path: '/client/profile' },
+    { id: 'likes', icon: Flame, label: t('nav.likes'), path: '/client/liked-properties', onClick: onListingsClick },
+    { id: 'ai', icon: Sparkles, label: t('nav.aiBot'), onClick: openAIChat, isSpecial: true },
+    { id: 'messages', icon: MessageCircle, label: t('nav.messages'), path: '/messages' },
+    { id: 'vapid', icon: IdCard, label: t('nav.idCard'), onClick: () => setModal('showVapId', true) },
+    { id: 'events', icon: PartyPopper, label: t('nav.events'), path: '/explore/eventos' },
+    { id: 'roommates', icon: Users2, label: t('nav.roommates'), path: '/explore/roommates' },
+    { id: 'tokens', icon: Ticket, label: t('nav.tokens'), onClick: () => setModal('showTokensModal', true) },
+    { id: 'search', icon: SlidersHorizontal, label: t('nav.filter'), onClick: onFilterClick },
+    { id: 'perks', icon: BadgePercent, label: t('nav.perks'), path: '/client/perks' },
+    { id: 'radio', icon: Radio, label: t('nav.radio'), path: '/radio' },
   ];
 
   // Owner nav items
   const ownerNavItems: NavItem[] = [
-    { id: 'dashboard', icon: Zap, label: 'Dashboard', path: '/owner/dashboard' },
-    { id: 'profile', icon: CircleUser, label: 'Profile', path: '/owner/profile' },
-    { id: 'likes', icon: Flame, label: 'Likes', path: '/owner/liked-clients' },
-    { id: 'ai', icon: Sparkles, label: 'AI Bot', onClick: openAIChat, isSpecial: true },
-    { id: 'listings', icon: Building2, label: 'Listings', path: '/owner/properties', onClick: onListingsClick },
-    { id: 'messages', icon: MessageCircle, label: 'Messages', path: '/messages' },
-    { id: 'ai-listing', icon: Sparkles, label: 'AI Listing', onClick: () => setModal('showAIListing', true), isSpecial: true },
-    { id: 'legal', icon: Scale, label: 'Legal', path: '/owner/legal-services' },
-    { id: 'promote', icon: Megaphone, label: 'Promote', path: '/client/advertise' },
-    { id: 'filters', icon: SlidersHorizontal, label: 'Filter', onClick: onFilterClick },
+    { id: 'dashboard', icon: Zap, label: t('nav.dashboard'), path: '/owner/dashboard' },
+    { id: 'profile', icon: CircleUser, label: t('nav.profile'), path: '/owner/profile' },
+    { id: 'likes', icon: Flame, label: t('nav.likes'), path: '/owner/liked-clients' },
+    { id: 'ai', icon: Sparkles, label: t('nav.aiBot'), onClick: openAIChat, isSpecial: true },
+    { id: 'listings', icon: Building2, label: t('nav.listings'), path: '/owner/properties', onClick: onListingsClick },
+    { id: 'messages', icon: MessageCircle, label: t('nav.messages'), path: '/messages' },
+    { id: 'ai-listing', icon: Sparkles, label: t('nav.aiListing'), onClick: () => setModal('showAIListing', true), isSpecial: true },
+    { id: 'legal', icon: Scale, label: t('nav.legal'), path: '/owner/legal-services' },
+    { id: 'promote', icon: Megaphone, label: t('nav.promote'), path: '/client/advertise' },
+    { id: 'filters', icon: SlidersHorizontal, label: t('nav.filter'), onClick: onFilterClick },
   ];
 
   // Admin nav items — admin panel + messaging
   const adminNavItems: NavItem[] = [
-    { id: 'admin-panel', icon: ShieldCheck, label: 'Admin', path: '/admin/eventos' },
+    { id: 'admin-panel', icon: ShieldCheck, label: t('nav.admin'), path: '/admin/eventos' },
     { id: 'admin-messages', icon: MessageCircle, label: t('nav.messages'), path: '/messages' },
   ];
 
@@ -252,27 +252,22 @@ export const BottomNavigation = memo(({
 
 
   return (
-    <nav role="navigation" aria-label="Main navigation" className={cn('app-bottom-bar px-2 pb-2 pt-1', className, isTablet ? 'px-3' : '')} style={{ paddingBottom: 'calc(8px + max(0px, env(safe-area-inset-bottom)))' }}>
+    <nav role="navigation" aria-label="Main navigation" className={cn('app-bottom-bar px-3 pb-2 pt-1', className, isTablet ? 'px-4' : '')} style={{ paddingBottom: 'calc(8px + max(0px, env(safe-area-inset-bottom)))' }}>
       {/* ── Liquid Glass bar surface ────────────────────────────────────────
           The bar itself is a glass layer so the swipe card content shows
           through, reinforcing the "floating above" feeling. */}
       <div
         className={cn(
-          "pointer-events-auto glass-pill-nav px-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]",
+          "pointer-events-auto glass-pill-nav px-1.5",
           isTablet ? "mx-auto w-fit max-w-full" : "w-full"
         )}
         style={{
-          background: isLight ? 'rgba(255, 255, 255, 0.92)' : 'rgba(10, 15, 30, 0.55)',
-          // Reduced from blur(40) — visually equivalent against a busy
-          // background, but ~3x cheaper per frame on the always-on bar.
-          backdropFilter: 'blur(22px) saturate(220%)',
-          WebkitBackdropFilter: 'blur(22px) saturate(220%)',
-          // Always a fully rounded pill — feels premium on every viewport.
+          background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(10, 15, 30, 0.55)',
+          backdropFilter: 'blur(32px) saturate(220%)',
+          WebkitBackdropFilter: 'blur(32px) saturate(220%)',
           borderRadius: '3rem',
           padding: '4px',
-          boxShadow: isLight
-            ? '0 15px 40px rgba(0,0,0,0.14), inset 0 0 0 1px rgba(0,0,0,0.06)'
-            : '0 25px 60px -10px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.08)',
+          boxShadow: 'none',
           border: 'none',
         }}
 
@@ -284,7 +279,7 @@ export const BottomNavigation = memo(({
           data-scroll-axis="x"
           onPointerMove={handlePointerMove}
           className={cn(
-            'relative flex items-center w-full gap-1 px-4 py-1.5 nav-scroll-hide transform-gpu select-none',
+            'relative flex items-center w-full gap-1 px-3 py-0.5 nav-scroll-hide transform-gpu select-none',
           )}
           style={{
             zIndex: 2,
@@ -387,7 +382,7 @@ export const BottomNavigation = memo(({
                       height: isTablet ? ICON_SIZE_TABLET : (isNarrow ? 16 : ICON_SIZE),
                       color: active
                         ? '#FF4D00'
-                        : (isLight ? 'rgba(0,0,0,0.62)' : 'rgba(255,255,255,0.7)'),
+                        : (isLight ? '#000000' : 'rgba(255,255,255,0.7)'),
                       fill: 'none',
                       strokeWidth: active ? 2.4 : 1.9,
                       transition: 'color 160ms ease-out, stroke-width 160ms ease-out',
@@ -405,7 +400,7 @@ export const BottomNavigation = memo(({
                       style={{
                         color: active
                           ? '#FF4D00'
-                          : (isLight ? 'rgba(0,0,0,0.62)' : 'rgba(255,255,255,0.7)'),
+                          : (isLight ? '#000000' : 'rgba(255,255,255,0.7)'),
                         transition: 'color 160ms ease-out',
                         zIndex: 1,
                       }}

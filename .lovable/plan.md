@@ -1,70 +1,49 @@
-## Goal
+## Why nothing is rendering
 
-Three things, no scope creep:
+The preview is currently blank for header buttons / nav buttons because the project has **8 TypeScript build errors** (reported by the build system). When the build fails, the dashboard chunks don't mount and the `TopBar` / `BottomNavigation` controls disappear with them. Both bars are mounted unconditionally in `AppLayout.tsx`, so the only reason they aren't visible is the broken build.
 
-1. Owner side must load again (currently white-screens / boundary error).
-2. The owner poker-card deck and the quick-filter row must sit centered within the safe area between the TopBar and BottomNav on a 393×779 viewport.
-3. No extra background frames around cards or filter rails. The TopBar pill, mode-switcher pill, bottom-nav pill, and notification circle stay exactly as they are.
+Once the build is green, the bars come back. Then the only remaining visual ask is: **no frame/background on the header itself** — just the round pill buttons floating over the swipe deck.
 
-## Findings
-
-- Console shows React **error #426** (a Suspense boundary received an update before it finished hydrating). On the Owner route this fires through `EnhancedOwnerDashboard → OwnerAllDashboard`, which lazy-resolves modal/route state inside its render path and reads `useModalStore.getState()` from inside a click handler created during the same Suspense pass.
-- `OwnerAllDashboard` sizes the deck with `height: min(75svh, 600px)`. With `--top-bar-height` + `--safe-top` + `--bottom-nav-height` + `--safe-bottom` already eating ~150–170px on a 779-tall device, 75svh = ~584px overflows the parent flex container, so the deck visually pushes under the bottom nav and the quick-filter row gets clipped.
-- `EnhancedOwnerDashboard` wraps the deck in two stacked centering layers (`flex flex-col items-center` + `flex flex-col justify-center`) which together with the loader/skeleton block create an extra translucent panel behind the cards.
-- `OwnerKilometerView` adds a `rounded-[3.5rem] border ... backdrop-blur-xl` panel — that is the extra "frame background" the user is calling out on the owner side.
-- `OwnerClientSwipeDialog` still passes `onClientTap` correctly; no schema mismatch there.
+---
 
 ## Plan
 
-### 1. Fix owner-side crash (React #426)
+### 1. Fix the 8 build errors (unblocks the preview)
 
-Edit `src/pages/EnhancedOwnerDashboard.tsx`:
-- Wrap the `<AnimatePresence>` body in a single `<Suspense fallback={null}>` so Framer Motion's deferred children cannot bubble a suspending update past the route boundary.
-- Remove the `typeof document !== 'undefined' && document.body && (...)` guard around `<SwipeInsightsModal>` — it forces the modal to mount/unmount on every render and is part of what triggers the boundary update; render the modal unconditionally with its own `open` prop.
+| # | File | Fix |
+|---|------|-----|
+| 1 | `src/components/DigitalSignaturePad.tsx:108` | `uiSounds.playSwoosh()` doesn't exist. Replace with `uiSounds.playTap()` (which does exist in `src/utils/uiSounds.ts`). |
+| 2 | `src/components/LikedClientInsightsModal.tsx:507, 517` | Missing `cn` import. Add `import { cn } from '@/lib/utils';`. |
+| 3 | `src/components/LikedClientInsightsModal.tsx:656` | `ReportDialog` has no `targetId` / `targetType` / `targetName` props. Real props are `reportedUserId`, `reportedListingId`, `reportedUserName`, `category`. Replace usage with the correct props (`reportedUserId={client.user_id}`, `reportedUserName={client.name}`, `category="user_profile"`). |
+| 4 | `src/components/LikedListingInsightsModal.tsx:679` | Same `ReportDialog` prop mismatch. Replace with `reportedListingId={listing.id}`, `reportedUserId={listing.owner_id}`, `reportedListingTitle={listing.title}`, `category="listing"`. |
+| 5 | `src/components/GlobalDialogs.tsx:218` | `LikedClientInsightsModal` expects a `LikedClient` (full_name, bio, images, liked_at) but receives a `ClientProfile`. Map the profile to the `LikedClient` shape inline (fill `full_name`, `bio`, `images`, `liked_at` from the profile, defaulting empty strings/arrays/`new Date().toISOString()` when missing). |
+| 6 | `src/components/OwnerClientSwipeDialog.tsx:60` | Same mapping problem. Apply the same `ClientProfile → LikedClient` adapter before passing to the modal. |
+| 7 | `src/components/PropertyManagement.tsx:439` | `ChevronRight` used but not imported. Add `ChevronRight` to the existing `lucide-react` import on line 14. |
 
-Edit `src/components/swipe/OwnerAllDashboard.tsx`:
-- Move the `useModalStore.getState()` lookup out of the inline `handleSelect` closure into a top-level `const openAIListing = useModalStore(s => s.openAIListing)` so the click path is pure and stable.
-- Keep the existing image preload effect (already safe).
+### 2. Remove the header frame (visual fix the user asked for)
 
-### 2. Center the owner deck in the safe viewport
+In `src/components/TopBar.tsx`:
 
-Edit `src/pages/EnhancedOwnerDashboard.tsx` (cards phase only):
-- Replace the deck wrapper sizing with a true safe-area calculation:
-  - parent: `flex-1 min-h-0` (already there) and remove the inner duplicate `flex flex-col justify-center` wrapper.
-  - the motion container keeps `paddingTop: calc(var(--top-bar-height) + var(--safe-top))` and `paddingBottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 16px)`.
+- The `<header>` already has `background: 'transparent'` and `border: 'none'` — that's correct. Confirm and keep.
+- Audit `AppLayout.tsx` and `SentientHud.tsx` wrappers around `<TopBar>` — neither should add a background or border. Both currently look clean (`pointer-events-none` only). No changes expected here, but verify in pass.
+- The user complained about a frame appearing on the header. Likely culprit: a stray container/outline inherited from the surrounding HUD or a leftover background on the `<header>` element from a previous edit. The current code in `TopBar.tsx` is clean, but we will explicitly **remove any backdrop / shadow / border on the `<header>` and its inner row**, leaving only the individual button pills (`glassPillStyle`) and the `ModeSwitcher` pill — those are the "buttons with their own frames" the user said they want to keep.
 
-Edit `src/components/swipe/OwnerAllDashboard.tsx`:
-- Replace the hard `height: min(75svh, 600px)` with a container-relative size:
-  - `height: min(100%, 600px)` on the deck stage,
-  - `width: calc(min(100%, 600px) * ${PK_ASPECT})`,
-  - keep `aspect-ratio` as fallback for older WebKit.
-- Remove `min-height: auto` inline style (redundant).
+### 3. Verification
 
-This makes the deck consume only the height actually available between TopBar and BottomNav, so it's mathematically centered on every device including 393×779.
+- After the edits, the harness rebuilds; confirm 0 TypeScript errors.
+- Reload `/owner/dashboard` and `/client/dashboard`:
+  - Header pills (profile, mode switcher, tokens, radio, dashboard, filter, AI, theme, notifications) are visible and tappable.
+  - Bottom navigation bar pill is visible and tappable.
+  - No outer frame/background behind the header — only the individual round buttons float over the swipe deck.
 
-### 3. Strip extra frames, preserve existing button pills
+### Files touched
 
-Edit `src/pages/EnhancedOwnerDashboard.tsx`:
-- Drop the loader's `bg-white/5 rounded-3xl` skeleton blocks; keep the spinner only (no panel chrome behind it).
-- Remove the `OwnerKilometerView` outer `rounded-[3.5rem] border bg-white/80|bg-black/60 backdrop-blur-*` panel. Keep the slider, the radius readout, and the buttons exactly as they are — they already carry their own surfaces.
-- Remove the absolute `Swipess FLAGSHIP v1.0.97` watermark (visual noise the user did not ask for).
+- `src/components/DigitalSignaturePad.tsx`
+- `src/components/LikedClientInsightsModal.tsx`
+- `src/components/LikedListingInsightsModal.tsx`
+- `src/components/GlobalDialogs.tsx`
+- `src/components/OwnerClientSwipeDialog.tsx`
+- `src/components/PropertyManagement.tsx`
+- `src/components/TopBar.tsx` (only if any residual frame styling is found)
 
-Edit `src/components/swipe/SwipeExhaustedState.tsx`:
-- Confirm the quick-filter row has no wrapper card; if a `bg-*/border-*/backdrop-blur-*` parent is present around the category grid + filter button, remove it. Buttons retain their per-button glass pill (already implemented in the previous turn).
-
-Do **not** touch:
-- `TopBar.tsx`, `ModeSwitcher.tsx`, `BottomNavigation.tsx`, `NotificationPopover.tsx` — user explicitly likes the current pill/circle treatment.
-- Swipe physics, `SimpleOwnerSwipeCard`, or any routing.
-
-## Files to edit
-
-```
-src/pages/EnhancedOwnerDashboard.tsx
-src/components/swipe/OwnerAllDashboard.tsx
-src/components/swipe/SwipeExhaustedState.tsx
-```
-
-## Verification
-
-- `npx tsc --noEmit` → 0 errors.
-- Manual: `/owner/dashboard` renders the fanned poker deck centered with no console error #426; quick-filter row sits within the safe area; no halo panel behind the slider on the kilometer step; TopBar / BottomNav pills unchanged.
+No database, no schema, no logic changes — purely build fixes + the header-frame cleanup you asked for.

@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useAppNavigate } from "@/hooks/useAppNavigate";
 import { motion } from 'framer-motion';
-import { ChevronLeft, UserCircle, Ticket, Radio, Ghost, Zap, SlidersHorizontal, MessageCircle } from 'lucide-react';
+import { ChevronLeft, UserCircle, Ticket } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -59,17 +59,19 @@ function TopBarComponent({
 
   const glassPillStyle: React.CSSProperties = {
     background: isLight
-      ? 'rgba(255, 255, 255, 0.92)'
-      : 'rgba(15, 25, 55, 0.55)',
-    backdropFilter: 'blur(32px) saturate(210%)',
-    WebkitBackdropFilter: 'blur(32px) saturate(210%)',
-    borderRadius: '3rem',
-    border: 'none',
-    boxShadow: isLight
-      ? '0 10px 30px -5px rgba(0,0,0,0.1)'
-      : '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
+      ? 'rgba(255, 255, 255, 0.85)'
+      : 'rgba(10, 15, 35, 0.45)',
+    backdropFilter: 'blur(24px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+    borderRadius: '1.25rem',
+    border: isLight ? '1px solid rgba(0,0,0,0.04)' : '1px solid rgba(255,255,255,0.06)',
+    boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.03)' : '0 4px 16px rgba(0,0,0,0.2)',
     pointerEvents: 'auto',
     color: isLight ? '#000000' : 'var(--hud-text)',
+    height: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 
   const { data: profile } = useQuery({
@@ -106,27 +108,27 @@ function TopBarComponent({
           {onBack ? (
             <motion.button
               transition={TAP_SPRING}
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => { haptics.tap(); onBack(); }}
-              className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full"
+              className="px-2.5 flex shrink-0 items-center justify-center rounded-[1rem]"
               style={glassPillStyle}
             >
-              <ChevronLeft className="w-5 h-5" style={{ color: isLight ? '#000000' : 'var(--hud-text)' }} />
+              <ChevronLeft className="w-4 h-4" style={{ color: isLight ? '#000000' : 'var(--hud-text)' }} />
             </motion.button>
           ) : (
             user && (
               <div className="flex items-center gap-2">
                 <motion.button
                   transition={TAP_SPRING}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={() => {
                     haptics.tap();
                     navigate(isOwner ? '/owner/profile' : '/client/profile');
                   }}
-                  className="flex shrink-0 items-center gap-2.5 px-2 py-1.5 pr-3.5 rounded-2xl"
+                  className="flex shrink-0 items-center gap-2 px-2.5 rounded-[1rem]"
                   style={glassPillStyle}
                 >
-                  <div className="w-7 h-7 rounded-[0.6rem] overflow-hidden shrink-0 flex items-center justify-center relative"
+                  <div className="w-6 h-6 rounded-[0.5rem] overflow-hidden shrink-0 flex items-center justify-center relative"
                     style={{
                       background: profile?.avatar_url ? 'transparent' : (isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)'),
                       border: 'none',
@@ -149,23 +151,17 @@ function TopBarComponent({
                       className="absolute inset-0 flex items-center justify-center"
                       style={{ display: profile?.avatar_url ? 'none' : 'flex' }}
                     >
-                      <UserCircle className="w-5 h-5" style={{ color: 'var(--hud-text)', opacity: 0.35 }} strokeWidth={1.5} />
+                      <UserCircle className="w-4 h-4" style={{ color: 'var(--hud-text)', opacity: 0.35 }} strokeWidth={1.5} />
                     </div>
                   </div>
                   {profile?.full_name && (
-                    <span className="text-[11px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: 'var(--hud-text)' }}>
+                    <span className="text-[10px] font-black uppercase tracking-[0.1em] opacity-80" style={{ color: 'var(--hud-text)' }}>
                       {profile.full_name.split(' ')[0]}
                     </span>
                   )}
                 </motion.button>
                 
-                {/* Brand Logo - The "Heather Bottle" / Glass Pill Logo */}
-                <div 
-                  className="hidden md:flex h-11 items-center px-5 rounded-full"
-                  style={glassPillStyle}
-                >
-                  <span className="swipess-logo-sm text-lg">Swipess</span>
-                </div>
+
               </div>
             )
           )}
@@ -193,109 +189,33 @@ function TopBarComponent({
             <>
               <motion.button
                 transition={TAP_SPRING}
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => { haptics.tap(); setModal('showTokensModal', true); }}
-                className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full relative overflow-hidden"
+                className="w-8 flex shrink-0 items-center justify-center rounded-[1rem] relative overflow-hidden"
                 style={{
                   ...glassPillStyle,
                   background: isLight
-                    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(79, 70, 229, 0.18))'
-                    : 'linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(79, 70, 229, 0.28))',
-                  boxShadow: isLight
-                    ? '0 8px 24px -6px rgba(124, 58, 237, 0.4)'
-                    : '0 12px 32px -8px rgba(124, 58, 237, 0.5)',
+                    ? 'rgba(0, 0, 0, 0.05)'
+                    : 'linear-gradient(135deg, rgba(124, 58, 237, 0.42), rgba(79, 70, 229, 0.38))',
+                  border: isLight ? '1px solid rgba(0,0,0,0.04)' : '1px solid rgba(255,255,255,0.08)',
                 }}
                 aria-label="Tokens"
               >
                 <Ticket
-                  className="w-4 h-4"
+                  className="w-3.5 h-3.5"
                   style={{
-                    color: '#8b5cf6',
-                    filter: 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))',
+                    color: isLight ? '#000000' : '#8b5cf6',
+                    filter: isLight ? 'none' : 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))',
                   }}
                   strokeWidth={2.4}
                 />
               </motion.button>
 
-              <motion.button
-                transition={TAP_SPRING}
-                whileTap={{ scale: 0.9 }}
-                onPointerDown={(e) => {
-                  e.preventDefault(); e.stopPropagation();
-                  haptics.tap();
-                  navigate('/radio');
-                }}
-                className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
-                style={glassPillStyle}
-                title="Radio"
-              >
-                <Radio 
-                  className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-orange-500" 
-                  strokeWidth={2.5} 
-                />
-              </motion.button>
-
-              <motion.button
-                transition={TAP_SPRING}
-                whileTap={{ scale: 0.9 }}
-                onPointerDown={(e) => {
-                  e.preventDefault(); e.stopPropagation();
-                  haptics.tap();
-                  navigate(isOwner ? '/owner/dashboard' : '/client/dashboard');
-                }}
-                className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
-                style={glassPillStyle}
-                title="Dashboard"
-              >
-                <Zap 
-                  className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-yellow-500" 
-                  strokeWidth={2.5} 
-                />
-              </motion.button>
-
-              {onFilterClick && (
-                <motion.button
-                  transition={TAP_SPRING}
-                  whileTap={{ scale: 0.9 }}
-                  onPointerDown={(e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    haptics.tap();
-                    onFilterClick(e);
-                  }}
-                  className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
-                  style={glassPillStyle}
-                  title="Filters"
-                >
-                  <SlidersHorizontal 
-                    className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-blue-500" 
-                    strokeWidth={2.5} 
-                  />
-                </motion.button>
-              )}
-
-              {onMessageActivationsClick && (
-                <motion.button
-                  transition={TAP_SPRING}
-                  whileTap={{ scale: 0.9 }}
-                  onPointerDown={(e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    haptics.tap();
-                    onMessageActivationsClick();
-                  }}
-                  className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
-                  style={glassPillStyle}
-                  title="Messages & Activations"
-                >
-                  <MessageCircle 
-                    className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-indigo-500" 
-                    strokeWidth={2.5} 
-                  />
-                </motion.button>
-              )}
-
-              <AIListingTrigger glassPillStyle={glassPillStyle} />
-
               <ThemeToggle glassPillStyle={glassPillStyle} />
+
+              {isOwner && (
+                <AIListingTrigger glassPillStyle={glassPillStyle} />
+              )}
 
               <NotificationPopover glassPillStyle={glassPillStyle} />
             </>
