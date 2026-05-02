@@ -47,7 +47,12 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { activeMode } = useActiveMode();
   const { isRefreshing, pullDistance, triggered } = usePullToRefresh();
 
-  const userRole = user?.user_metadata?.role === 'admin' ? 'admin' : activeMode;
+  const userRole = useMemo<'client' | 'owner' | 'admin'>(() => {
+    if (user?.user_metadata?.role === 'admin') return 'admin';
+    if (location.pathname.startsWith('/owner/')) return 'owner';
+    if (location.pathname.startsWith('/client/')) return 'client';
+    return activeMode;
+  }, [activeMode, location.pathname, user?.user_metadata?.role]);
 
   useKeyboardShortcuts();
   useFocusManagement();
