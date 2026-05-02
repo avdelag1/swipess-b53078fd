@@ -159,13 +159,7 @@ function TopBarComponent({
                   )}
                 </motion.button>
                 
-                {/* Brand Logo - The "Heather Bottle" / Glass Pill Logo */}
-                <div 
-                  className="hidden md:flex h-11 items-center px-5 rounded-full"
-                  style={glassPillStyle}
-                >
-                  <span className="swipess-logo-sm text-lg">Swipess</span>
-                </div>
+
               </div>
             )
           )}
@@ -191,25 +185,31 @@ function TopBarComponent({
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 pointer-events-auto">
           {!minimal && (
             <>
-              {onFilterClick && (
-                <motion.button
-                  transition={TAP_SPRING}
-                  whileTap={{ scale: 0.9 }}
-                  onPointerDown={(e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    haptics.tap();
-                    onFilterClick(e);
+              <motion.button
+                transition={TAP_SPRING}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => { haptics.tap(); setModal('showTokensModal', true); }}
+                className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full relative overflow-hidden"
+                style={{
+                  ...glassPillStyle,
+                  background: isLight
+                    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(79, 70, 229, 0.18))'
+                    : 'linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(79, 70, 229, 0.28))',
+                  boxShadow: isLight
+                    ? '0 8px 24px -6px rgba(124, 58, 237, 0.4)'
+                    : '0 12px 32px -8px rgba(124, 58, 237, 0.5)',
+                }}
+                aria-label="Tokens"
+              >
+                <Ticket
+                  className="w-4 h-4"
+                  style={{
+                    color: '#8b5cf6',
+                    filter: 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))',
                   }}
-                  className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
-                  style={glassPillStyle}
-                  title="Filters"
-                >
-                  <SlidersHorizontal 
-                    className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-blue-500" 
-                    strokeWidth={2.5} 
-                  />
-                </motion.button>
-              )}
+                  strokeWidth={2.4}
+                />
+              </motion.button>
 
               <ThemeToggle glassPillStyle={glassPillStyle} />
 
