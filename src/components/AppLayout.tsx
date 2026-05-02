@@ -113,15 +113,20 @@ export function AppLayout({ children }: AppLayoutProps) {
     return !isPublic;
   }, [location.pathname]);
 
+  const isSwipeDashboard = useMemo(() => {
+    const path = location.pathname;
+    return path === '/client/dashboard' || path === '/owner/dashboard' ||
+      path === '/client/dashboard/' || path === '/owner/dashboard/';
+  }, [location.pathname]);
+
   const isFullScreen = useMemo(() => {
     const path = location.pathname;
     const isRadio = path.startsWith('/radio');
     const isCamera = path.startsWith('/camera');
-    // Dashboard swipe pages are full-bleed — top bar floats transparently over them
-    const isSwipeDashboard = path === '/client/dashboard' || path === '/owner/dashboard' ||
-      path === '/client/dashboard/' || path === '/owner/dashboard/';
     return isCamera || isRadio || showAIChat || isSwipeDashboard;
-  }, [location.pathname, showAIChat]);
+  }, [location.pathname, showAIChat, isSwipeDashboard]);
+
+  const showAppChrome = !isAuthRoute && !isRadioRoute && !isCameraRoute && !showAIChat && (!isPublicPreview || !!user);
 
   const handleFilterClick = () => {
     const role = userRole === 'admin' ? 'admin' : activeMode;
@@ -148,8 +153,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         <NotificationSystem />
       </Suspense>
   
-      {!isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && (!isPublicPreview || !!user) && (
-        <SentientHud side="top" className="fixed top-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container">
+      {showAppChrome && (
+        <SentientHud side="top" className="fixed top-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container" alwaysVisible={isSwipeDashboard}>
           <TopBar
             userRole={userRole}
             onMessageActivationsClick={handleMessageActivationsClick}
@@ -196,8 +201,8 @@ export function AppLayout({ children }: AppLayoutProps) {
 
 
 
-      {!isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && (!isPublicPreview || !!user) && (
-        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[9999]" scrollTargetSelector="#dashboard-scroll-container">
+      {showAppChrome && (
+        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[9999]" scrollTargetSelector="#dashboard-scroll-container" alwaysVisible={isSwipeDashboard}>
           <BottomNavigation
             userRole={userRole}
             onFilterClick={handleFilterClick}
