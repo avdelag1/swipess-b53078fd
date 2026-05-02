@@ -729,20 +729,26 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
             </div>
           )}
 
-          {/* In-Card Navigation Buttons — consistent contrast across themes.
-              Share = primary action (white solid). Report = ghost with red accent. */}
-          <div className="absolute top-[calc(var(--safe-top,0px)+80px)] left-4 right-4 z-40 flex justify-between pointer-events-none">
+          {/* In-Card Utility Buttons — bottom-right, out of the stamp zone */}
+          <motion.div
+            className="absolute bottom-[calc(var(--bottom-nav-height,72px)+110px)] right-4 z-30 flex flex-col gap-2 pointer-events-none"
+            style={{
+              opacity: useTransform(
+                [likeOpacity, passOpacity] as any,
+                ([l, p]: number[]) => 1 - Math.max(l, p)
+              ),
+            }}
+          >
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 triggerHaptic('light');
                 onShare?.();
               }}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full backdrop-blur-md active:scale-95 transition-all pointer-events-auto shadow-lg bg-white text-black border border-black/10"
+              className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/80 active:scale-90 transition-all pointer-events-auto"
               title="Share Profile"
             >
-              <Share2 className="w-4 h-4" strokeWidth={2.2} />
-              <span className="text-[10px] font-black uppercase tracking-wider">Share</span>
+              <Share2 className="w-4 h-4" strokeWidth={1.8} />
             </button>
             <button
               onClick={(e) => {
@@ -750,18 +756,17 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
                 triggerHaptic('medium');
                 onReport?.();
               }}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full backdrop-blur-md active:scale-95 transition-all pointer-events-auto shadow-lg bg-black/55 text-red-300 border border-red-400/40"
+              className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/50 active:scale-90 transition-all pointer-events-auto"
               title="Report Profile"
             >
-              <Flag className="w-4 h-4" strokeWidth={2.2} />
-              <span className="text-[10px] font-black uppercase tracking-wider">Report</span>
+              <Flag className="w-4 h-4" strokeWidth={1.8} />
             </button>
-          </div>
+          </motion.div>
         </div>
 
         {/* LIKE stamp — shown top-right when swiping right */}
         <motion.div
-          className="absolute top-10 right-6 z-30 pointer-events-none"
+          className="absolute top-10 right-6 z-50 pointer-events-none"
           style={{ opacity: likeOpacity, willChange: 'opacity' }}
         >
           <div className="flex flex-col items-center gap-1.5" style={{ transform: 'rotate(15deg) translateZ(0)' }}>
@@ -794,7 +799,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
 
         {/* NOPE stamp — shown top-left when swiping left */}
         <motion.div
-          className="absolute top-10 left-6 z-30 pointer-events-none"
+          className="absolute top-10 left-6 z-50 pointer-events-none"
           style={{ opacity: passOpacity, willChange: 'opacity' }}
         >
           <div className="flex flex-col items-center gap-1.5" style={{ transform: 'rotate(-15deg) translateZ(0)' }}>

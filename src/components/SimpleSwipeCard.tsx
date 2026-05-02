@@ -569,18 +569,26 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
             </div>
           )}
 
-          {/* In-Card Navigation Buttons (Tinder Style) */}
-          <div className="absolute top-[calc(var(--safe-top,0px)+80px)] left-6 right-6 z-40 flex justify-between pointer-events-none">
+          {/* In-Card Utility Buttons — bottom-right, out of the stamp zone */}
+          <motion.div
+            className="absolute bottom-[calc(var(--bottom-nav-height,72px)+110px)] right-4 z-30 flex flex-col gap-2 pointer-events-none"
+            style={{
+              opacity: useTransform(
+                [likeOpacity, passOpacity] as any,
+                ([l, p]: number[]) => 1 - Math.max(l, p)
+              ),
+            }}
+          >
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 triggerHaptic('light');
                 onShare?.();
               }}
-              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-90 transition-all pointer-events-auto"
+              className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/80 active:scale-90 transition-all pointer-events-auto"
               title="Share Listing"
             >
-              <Share2 className="w-5 h-5" strokeWidth={1.5} />
+              <Share2 className="w-4 h-4" strokeWidth={1.8} />
             </button>
             <button
               onClick={(e) => {
@@ -588,17 +596,17 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
                 triggerHaptic('medium');
                 onReport?.();
               }}
-              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/70 active:scale-90 transition-all pointer-events-auto"
+              className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/50 active:scale-90 transition-all pointer-events-auto"
               title="Report Listing"
             >
-              <Flag className="w-5 h-5" strokeWidth={1.5} />
+              <Flag className="w-4 h-4" strokeWidth={1.8} />
             </button>
-          </div>
+          </motion.div>
         </div>
 
         {/* LIKE stamp — shown top-right when swiping right */}
         <motion.div
-          className="absolute top-10 right-6 z-30 pointer-events-none"
+          className="absolute top-10 right-6 z-50 pointer-events-none"
           style={{
             opacity: likeOpacity,
             willChange: 'opacity',
@@ -640,7 +648,7 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
 
         {/* NOPE stamp — shown top-left when swiping left */}
         <motion.div
-          className="absolute top-10 left-6 z-30 pointer-events-none"
+          className="absolute top-10 left-6 z-50 pointer-events-none"
           style={{
             opacity: passOpacity,
             willChange: 'opacity',
