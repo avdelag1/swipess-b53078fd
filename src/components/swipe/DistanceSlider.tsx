@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useFilterStore } from '@/state/filterStore';
 import { MapPin, Navigation } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
+import useAppTheme from '@/hooks/useAppTheme';
 
 export interface DistanceSliderProps {
   radiusKm: number;
@@ -20,6 +21,7 @@ export interface DistanceSliderProps {
  * The store/parent is only updated on pointer release to avoid flooding Zustand.
  */
 export const DistanceSlider = ({ radiusKm, onRadiusChange, onDetectLocation, detecting, detected }: DistanceSliderProps) => {
+  const { isLight } = useAppTheme();
   const maxKm = 100;
   const clientType = useFilterStore(s => s.clientType);
   const activeCategory = useFilterStore(s => s.activeCategory);
