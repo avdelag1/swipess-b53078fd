@@ -43,13 +43,14 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
       : 'rgba(15, 25, 55, 0.55)',
     backdropFilter: 'blur(32px) saturate(210%)',
     WebkitBackdropFilter: 'blur(32px) saturate(210%)',
-    borderRadius: '1.5rem',
+    borderRadius: '3rem',
+    border: 'none',
     boxShadow: isLight
       ? '0 10px 30px -5px rgba(0,0,0,0.1)'
       : '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
   };
 
-  const halfBase = "w-8 h-8 flex items-center justify-center transition-all duration-200 relative rounded-xl";
+  const halfBase = "w-8 h-8 flex items-center justify-center transition-all duration-200 relative rounded-full";
 
   return (
     <div
@@ -60,7 +61,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
         whileTap={{ scale: 0.92 }}
         onClick={() => handleModeSwitch('client')}
         disabled={!canSwitchMode || isSwitching}
-        className={cn(halfBase, isClient && 'shadow-sm')}
+        className={cn(halfBase)}
         style={{
           background: isClient
             ? (isLight ? 'rgba(244, 63, 94, 0.12)' : 'rgba(244, 63, 94, 0.22)')
@@ -79,7 +80,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
         whileTap={{ scale: 0.92 }}
         onClick={() => handleModeSwitch('owner')}
         disabled={!canSwitchMode || isSwitching}
-        className={cn(halfBase, !isClient && 'shadow-sm')}
+        className={cn(halfBase)}
         style={{
           background: !isClient
             ? (isLight ? 'rgba(249, 115, 22, 0.14)' : 'rgba(249, 115, 22, 0.24)')
