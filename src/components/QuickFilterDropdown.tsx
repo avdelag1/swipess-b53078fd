@@ -343,7 +343,7 @@ function QuickFilterDropdownComponent({ userRole, className }: QuickFilterDropdo
               className={cn(
                 'w-full flex items-center justify-between px-5 sm:px-6 py-4 sm:py-5 text-base transition-all duration-200 touch-manipulation min-h-[64px]',
                 isAllActive
-                  ? 'bg-slate-700 text-black'
+                  ? isDark ? 'bg-white/15 text-white' : 'bg-black/8 text-black'
                   : isDark
                     ? 'text-foreground hover:bg-white/5'
                     : 'text-gray-700 hover:bg-black/[0.04]'

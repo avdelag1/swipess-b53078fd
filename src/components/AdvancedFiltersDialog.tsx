@@ -143,7 +143,7 @@ export function AdvancedFilters({ isOpen, onClose, userRole, onApplyFilters, cur
             <div className="flex items-center gap-4">
               <div className={cn(
                 "w-12 h-12 rounded-2xl flex items-center justify-center",
-                isDark ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]" : "bg-slate-900 text-white"
+                isDark ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]" : "bg-black text-white"
               )}>
                 <Sparkles className="w-6 h-6" />
               </div>
