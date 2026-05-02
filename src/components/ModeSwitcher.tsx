@@ -39,17 +39,17 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
   // control. Only the active half shows colored fill.
   const containerStyle: React.CSSProperties = {
     background: isLight
-      ? 'rgba(255, 255, 255, 0.92)'
-      : 'rgba(15, 25, 55, 0.55)',
-    backdropFilter: 'blur(32px) saturate(210%)',
-    WebkitBackdropFilter: 'blur(32px) saturate(210%)',
-    borderRadius: '1.5rem',
-    boxShadow: isLight
-      ? '0 10px 30px -5px rgba(0,0,0,0.1)'
-      : '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
+      ? 'rgba(255, 255, 255, 0.85)'
+      : 'rgba(10, 15, 35, 0.45)',
+    backdropFilter: 'blur(24px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+    borderRadius: '1.25rem',
+    border: isLight ? '1px solid rgba(0,0,0,0.04)' : '1px solid rgba(255,255,255,0.06)',
+    boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.03)' : '0 4px 16px rgba(0,0,0,0.2)',
+    height: '32px',
   };
 
-  const halfBase = "w-8 h-8 flex items-center justify-center transition-all duration-200 relative rounded-xl";
+  const halfBase = "w-7 h-7 flex items-center justify-center transition-all duration-200 relative rounded-[0.85rem]";
 
   return (
     <div
@@ -60,7 +60,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
         whileTap={{ scale: 0.92 }}
         onClick={() => handleModeSwitch('client')}
         disabled={!canSwitchMode || isSwitching}
-        className={cn(halfBase, isClient && 'shadow-sm')}
+        className={cn(halfBase)}
         style={{
           background: isClient
             ? (isLight ? 'rgba(244, 63, 94, 0.12)' : 'rgba(244, 63, 94, 0.22)')
@@ -79,7 +79,7 @@ function ModeSwitcherComponent({ className }: ModeSwitcherProps) {
         whileTap={{ scale: 0.92 }}
         onClick={() => handleModeSwitch('owner')}
         disabled={!canSwitchMode || isSwitching}
-        className={cn(halfBase, !isClient && 'shadow-sm')}
+        className={cn(halfBase)}
         style={{
           background: !isClient
             ? (isLight ? 'rgba(249, 115, 22, 0.14)' : 'rgba(249, 115, 22, 0.24)')

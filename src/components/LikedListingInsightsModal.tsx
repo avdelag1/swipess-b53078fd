@@ -676,10 +676,10 @@ function LikedListingInsightsModalComponent({ open, onOpenChange, listing }: Lik
           <ReportDialog
             open={showReportDialog}
             onOpenChange={setShowReportDialog}
-            targetId={listing.id}
-            targetType="listing"
+            reportedListingId={listing.id}
             reportedUserId={listing.owner_id}
-            targetName={listing.title}
+            reportedListingTitle={listing.title}
+            category="listing"
           />
           <ShareDialog
             open={showShareDialog}

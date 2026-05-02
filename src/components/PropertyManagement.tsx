@@ -11,7 +11,7 @@ import useAppTheme from '@/hooks/useAppTheme';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { Home, Plus, Edit, Trash2, Eye, MapPin, Search, Bike, Zap, Sparkles, ImageIcon, Share2, Briefcase, CheckCircle, ThumbsUp } from 'lucide-react';
+import { Home, Plus, Edit, Trash2, Eye, MapPin, Search, Bike, Zap, Sparkles, ImageIcon, Share2, Briefcase, CheckCircle, ThumbsUp, ChevronRight } from 'lucide-react';
 import { MotorcycleIcon } from '@/components/icons/MotorcycleIcon';
 import { ListingPreviewDialog } from '@/components/ListingPreviewDialog';
 import { UnifiedListingForm } from '@/components/UnifiedListingForm';
@@ -235,7 +235,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
   }
 
   return (
-    <div className={cn("w-full transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
+    <div className={cn("w-full transition-colors duration-500", "bg-background")}>
       
       {/* 🛸 CINEMATIC BACKGROUND GLOW */}
       <div className="fixed inset-0 pointer-events-none opacity-20 z-0">
@@ -292,22 +292,19 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
             </div>
             
             <div className="flex flex-col gap-4">
-                <div className={cn(
-                    "flex items-center gap-3 p-2.5 rounded-[2.5rem] overflow-x-auto no-scrollbar w-full",
-                    isLight ? 'bg-black/[0.03] border border-black/5' : 'bg-white/[0.03] border border-white/5'
-                )}>
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar w-full py-1">
                     {tabItems.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => { triggerHaptic('light'); setActiveTab(tab.id); }}
-                            className="flex-none flex items-center gap-3 px-6 h-14 rounded-[2rem] transition-all whitespace-nowrap font-black uppercase tracking-widest italic text-[11px]"
+                            className="flex-none flex items-center gap-2 px-5 h-11 rounded-[2rem] transition-all whitespace-nowrap font-black uppercase tracking-widest italic text-[11px]"
                             style={activeTab === tab.id ? {
                             backgroundColor: '#FF4D00',
                             color: 'white',
                             boxShadow: '0 8px 24px rgba(255,77,0,0.4)'
                             } : {
-                            color: isLight ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)',
-                            backgroundColor: isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.02)'
+                            color: isLight ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
+                            backgroundColor: 'transparent'
                             }}
                         >
                             <tab.icon className="w-4 h-4" />
@@ -523,8 +520,8 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className={cn(
-                "flex flex-col items-center justify-center py-32 text-center rounded-[4rem] border mx-6 backdrop-blur-3xl",
-                isLight ? "bg-black/[0.02] border-black/5" : "bg-white/[0.02] border-white/5"
+                "flex flex-col items-center justify-center py-32 text-center backdrop-blur-3xl",
+                isLight ? "bg-black/[0.01]" : "bg-white/[0.01]"
               )}
             >
               <div className={cn(

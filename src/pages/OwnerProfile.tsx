@@ -36,7 +36,7 @@ const OwnerProfile = () => {
   }
 
   return (
-    <div className={cn("w-full relative overflow-x-hidden min-h-screen", isLight ? "bg-white text-slate-900" : "bg-[#030308] text-white")}>
+    <div className={cn("w-full relative overflow-x-hidden min-h-screen bg-background")}>
 
       {/* Swipess Grid Background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -55,7 +55,7 @@ const OwnerProfile = () => {
         <div className={cn("absolute top-[40%] left-[30%] w-[40%] h-[40%] rounded-full blur-[100px]", isLight ? "bg-blue-600/[0.03]" : "bg-blue-600/5")} />
       </div>
 
-      <div className="w-full max-w-7xl mx-auto p-6 pt-4 pb-12 space-y-10 relative z-10">
+      <div className="w-full px-6 pt-10 pb-32 space-y-10 relative z-10">
 
         {/* SWIPESS OPERATOR BADGE */}
         <div className="flex items-center justify-center">
