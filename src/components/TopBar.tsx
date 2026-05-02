@@ -59,15 +59,19 @@ function TopBarComponent({
 
   const glassPillStyle: React.CSSProperties = {
     background: isLight
-      ? 'rgba(255, 255, 255, 0.98)'
-      : 'rgba(15, 25, 55, 0.55)',
-    backdropFilter: 'blur(32px) saturate(210%)',
-    WebkitBackdropFilter: 'blur(32px) saturate(210%)',
-    borderRadius: '3rem',
-    border: 'none',
-    boxShadow: 'none',
+      ? 'rgba(255, 255, 255, 0.85)'
+      : 'rgba(10, 15, 35, 0.45)',
+    backdropFilter: 'blur(24px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+    borderRadius: '1.25rem',
+    border: isLight ? '1px solid rgba(0,0,0,0.04)' : '1px solid rgba(255,255,255,0.06)',
+    boxShadow: isLight ? '0 4px 12px rgba(0,0,0,0.03)' : '0 4px 16px rgba(0,0,0,0.2)',
     pointerEvents: 'auto',
     color: isLight ? '#000000' : 'var(--hud-text)',
+    height: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 
   const { data: profile } = useQuery({
@@ -104,27 +108,27 @@ function TopBarComponent({
           {onBack ? (
             <motion.button
               transition={TAP_SPRING}
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => { haptics.tap(); onBack(); }}
-              className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full"
+              className="px-2.5 flex shrink-0 items-center justify-center rounded-[1rem]"
               style={glassPillStyle}
             >
-              <ChevronLeft className="w-5 h-5" style={{ color: isLight ? '#000000' : 'var(--hud-text)' }} />
+              <ChevronLeft className="w-4 h-4" style={{ color: isLight ? '#000000' : 'var(--hud-text)' }} />
             </motion.button>
           ) : (
             user && (
               <div className="flex items-center gap-2">
                 <motion.button
                   transition={TAP_SPRING}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={() => {
                     haptics.tap();
                     navigate(isOwner ? '/owner/profile' : '/client/profile');
                   }}
-                  className="flex shrink-0 items-center gap-2.5 px-2 py-1.5 pr-3.5 rounded-full"
+                  className="flex shrink-0 items-center gap-2 px-2.5 rounded-[1rem]"
                   style={glassPillStyle}
                 >
-                  <div className="w-7 h-7 rounded-[0.6rem] overflow-hidden shrink-0 flex items-center justify-center relative"
+                  <div className="w-6 h-6 rounded-[0.5rem] overflow-hidden shrink-0 flex items-center justify-center relative"
                     style={{
                       background: profile?.avatar_url ? 'transparent' : (isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.06)'),
                       border: 'none',
@@ -147,11 +151,11 @@ function TopBarComponent({
                       className="absolute inset-0 flex items-center justify-center"
                       style={{ display: profile?.avatar_url ? 'none' : 'flex' }}
                     >
-                      <UserCircle className="w-5 h-5" style={{ color: 'var(--hud-text)', opacity: 0.35 }} strokeWidth={1.5} />
+                      <UserCircle className="w-4 h-4" style={{ color: 'var(--hud-text)', opacity: 0.35 }} strokeWidth={1.5} />
                     </div>
                   </div>
                   {profile?.full_name && (
-                    <span className="text-[11px] font-black uppercase tracking-[0.15em] opacity-80" style={{ color: 'var(--hud-text)' }}>
+                    <span className="text-[10px] font-black uppercase tracking-[0.1em] opacity-80" style={{ color: 'var(--hud-text)' }}>
                       {profile.full_name.split(' ')[0]}
                     </span>
                   )}
@@ -183,25 +187,42 @@ function TopBarComponent({
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 pointer-events-auto">
           {!minimal && (
             <>
+              {/* DISCOVERY FILTERS — Quick access next to Tokens */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onFilterClick?.();
+                }}
+                className="w-8 flex items-center justify-center rounded-[1rem]"
+                style={glassPillStyle}
+                title="Filters"
+              >
+                <SlidersHorizontal 
+                  className={cn("h-4 w-4", isLight ? "text-black" : "text-primary")} 
+                  strokeWidth={2.5}
+                />
+              </motion.button>
+
               <motion.button
                 transition={TAP_SPRING}
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => { haptics.tap(); setModal('showTokensModal', true); }}
-                className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full relative overflow-hidden"
+                className="w-8 flex shrink-0 items-center justify-center rounded-[1rem] relative overflow-hidden"
                 style={{
                   ...glassPillStyle,
                   background: isLight
-                    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(79, 70, 229, 0.25))'
+                    ? 'rgba(0, 0, 0, 0.05)'
                     : 'linear-gradient(135deg, rgba(124, 58, 237, 0.42), rgba(79, 70, 229, 0.38))',
-                  boxShadow: 'none',
+                  border: isLight ? '1px solid rgba(0,0,0,0.04)' : '1px solid rgba(255,255,255,0.08)',
                 }}
                 aria-label="Tokens"
               >
                 <Ticket
-                  className="w-4 h-4"
+                  className="w-3.5 h-3.5"
                   style={{
-                    color: '#8b5cf6',
-                    filter: 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))',
+                    color: isLight ? '#000000' : '#8b5cf6',
+                    filter: isLight ? 'none' : 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))',
                   }}
                   strokeWidth={2.4}
                 />

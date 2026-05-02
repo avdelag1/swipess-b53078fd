@@ -149,7 +149,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className={cn(
       "w-full h-[100dvh] flex flex-col relative selection:bg-brand-primary/30 overflow-hidden", 
       "bg-background",
-      theme === 'Swipess-style' && "Swipess-style"
+      theme === 'Zenith-style' && "Zenith-style"
     )}>
       <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} triggered={triggered} />
       <SkipToMainContent />
@@ -159,7 +159,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       </Suspense>
   
       {showAppChrome && (
-        <SentientHud side="top" className="fixed top-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container" alwaysVisible={isSwipeDashboard}>
+        <SentientHud side="top" className="fixed top-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container" alwaysVisible={true}>
           <TopBar
             userRole={userRole}
             onMessageActivationsClick={handleMessageActivationsClick}
@@ -181,7 +181,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         className={cn(
           "w-full flex-1 relative z-0 flex flex-col",
           // Push content down below the fixed header
-          !isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && "pt-[var(--top-bar-height)]",
+          !isAuthRoute && !isFullScreen && !isRadioRoute && !isCameraRoute && !isInsideDashboard && "pt-[var(--top-bar-height)]",
           // Dashboard pages: overflow-hidden, DashboardLayout scrolls internally
           // Public/standalone pages: overflow-y-auto, scroll at this level
           (isInsideDashboard || isFullScreen) ? "overflow-hidden" : "overflow-y-auto scroll-area-momentum pb-[var(--bottom-nav-height)]"
@@ -200,7 +200,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
 
       {showAppChrome && (
-        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container" alwaysVisible={isSwipeDashboard}>
+        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container" alwaysVisible={true}>
           <BottomNavigation
             userRole={userRole}
             onFilterClick={handleFilterClick}

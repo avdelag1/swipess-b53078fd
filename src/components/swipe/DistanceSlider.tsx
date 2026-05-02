@@ -87,7 +87,7 @@ export const DistanceSlider = ({ radiusKm, onRadiusChange, onDetectLocation, det
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="px-2.5 py-1 rounded-md bg-muted/50 border border-border/50 shadow-inner">
+          <div className="px-2.5 py-1 rounded-full flex items-center justify-center">
             <span className={cn("text-sm font-black tracking-tight", isLight ? "text-black" : "text-primary")}>
               {localKm} <span className="text-[10px] opacity-60 italic">km</span>
             </span>

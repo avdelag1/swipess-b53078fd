@@ -244,7 +244,8 @@ export function NotificationPopover({ className, children, glassPillStyle }: Not
   const navigate = useNavigate();
   const themeContext = useContext(ThemeContext);
   const theme = themeContext?.theme ?? 'dark';
-  const isDark = theme === 'dark';
+  const isLight = theme === 'light';
+  const isDark = !isLight;
   
   const { 
     notifications, 
@@ -307,11 +308,11 @@ export function NotificationPopover({ className, children, glassPillStyle }: Not
       variant="ghost"
       size="icon"
       className={cn(
-        "relative h-9 w-9 shrink-0 transition-all duration-200",
-        "hover:scale-105 active:scale-95 group !rounded-full",
+        "relative h-8 w-8 shrink-0 transition-all duration-300",
+        "hover:opacity-90 active:scale-[0.96] group !rounded-[1rem]",
         "touch-manipulation overflow-hidden"
       )}
-      style={{ ...glassPillStyle, borderRadius: '9999px' }}
+      style={{ ...glassPillStyle }}
       onClick={(e) => {
         haptics.tap();
         setIsOpen(true);
@@ -320,10 +321,10 @@ export function NotificationPopover({ className, children, glassPillStyle }: Not
     >
       <div className="relative">
         <Bell
-          strokeWidth={1.5}
+          strokeWidth={1.8}
           className={cn(
-            "h-5 w-5 transition-colors duration-150",
-            "text-[var(--hud-text)]",
+            "h-4 w-4 transition-colors duration-150",
+            isLight ? "text-black" : "text-[var(--hud-text)]",
             "opacity-80 group-hover:opacity-100"
           )}
         />

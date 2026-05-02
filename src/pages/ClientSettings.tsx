@@ -289,7 +289,7 @@ const ClientSettings = () => {
             </div>
             <div className="text-center space-y-2">
                <div className="flex items-center justify-center gap-3">
-                  <span className={cn("text-2xl font-black italic tracking-tighter uppercase", isLight ? "text-black" : "text-white")}>Swipess</span>
+                  <span className={cn("text-2xl font-black italic tracking-tighter uppercase", isLight ? "text-black" : "text-white")}>SENTIENT</span>
                   <div className="bg-[#EB4898]/10 px-3 py-1 rounded-full border border-[#EB4898]/20">
                      <span className="text-[9px] font-black text-[#EB4898] uppercase tracking-widest font-mono">V3.3.1</span>
                   </div>

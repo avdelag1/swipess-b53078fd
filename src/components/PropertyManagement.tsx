@@ -235,7 +235,7 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
   }
 
   return (
-    <div className={cn("w-full transition-colors duration-500", isLight ? "bg-white" : "bg-black")}>
+    <div className={cn("w-full transition-colors duration-500", "bg-background")}>
       
       {/* 🛸 CINEMATIC BACKGROUND GLOW */}
       <div className="fixed inset-0 pointer-events-none opacity-20 z-0">
@@ -520,8 +520,8 @@ export const PropertyManagement = memo(({ initialCategory, initialMode }: Proper
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className={cn(
-                "flex flex-col items-center justify-center py-32 text-center rounded-[4rem] border mx-6 backdrop-blur-3xl",
-                isLight ? "bg-black/[0.02] border-black/5" : "bg-white/[0.02] border-white/5"
+                "flex flex-col items-center justify-center py-32 text-center backdrop-blur-3xl",
+                isLight ? "bg-black/[0.01]" : "bg-white/[0.01]"
               )}
             >
               <div className={cn(
