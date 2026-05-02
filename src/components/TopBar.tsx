@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useAppNavigate } from "@/hooks/useAppNavigate";
 import { motion } from 'framer-motion';
-import { ChevronLeft, UserCircle, Ticket, SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, UserCircle, Ticket, Radio, Ghost, Zap, SlidersHorizontal, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ import { ThemeToggle } from './ThemeToggle';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { useModalStore } from '@/state/modalStore';
 import { TAP_SPRING } from './BottomNavigation';
+import { AIListingTrigger } from './AIListingTrigger';
 
 interface TopBarProps {
   onNotificationsClick?: () => void;
@@ -190,32 +191,6 @@ function TopBarComponent({
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 pointer-events-auto">
           {!minimal && (
             <>
-              <motion.button
-                transition={TAP_SPRING}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => { haptics.tap(); setModal('showTokensModal', true); }}
-                className="w-9 h-9 flex shrink-0 items-center justify-center rounded-full relative overflow-hidden"
-                style={{
-                  ...glassPillStyle,
-                  background: isLight
-                    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(79, 70, 229, 0.18))'
-                    : 'linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(79, 70, 229, 0.28))',
-                  boxShadow: isLight
-                    ? '0 8px 24px -6px rgba(124, 58, 237, 0.4)'
-                    : '0 12px 32px -8px rgba(124, 58, 237, 0.5)',
-                }}
-                aria-label="Tokens"
-              >
-                <Ticket
-                  className="w-4 h-4"
-                  style={{
-                    color: '#8b5cf6',
-                    filter: 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.6))',
-                  }}
-                  strokeWidth={2.4}
-                />
-              </motion.button>
-
               {onFilterClick && (
                 <motion.button
                   transition={TAP_SPRING}
