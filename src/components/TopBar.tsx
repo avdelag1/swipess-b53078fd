@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { useAppNavigate } from "@/hooks/useAppNavigate";
 import { motion } from 'framer-motion';
-import { ChevronLeft, UserCircle, Ticket, Radio, Ghost, Zap, SlidersHorizontal, MessageCircle } from 'lucide-react';
+import { ChevronLeft, UserCircle, Ticket, SlidersHorizontal } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -15,7 +15,6 @@ import { ThemeToggle } from './ThemeToggle';
 import { useFilterStore, useFilterActions } from '@/state/filterStore';
 import { useModalStore } from '@/state/modalStore';
 import { TAP_SPRING } from './BottomNavigation';
-import { AIListingTrigger } from './AIListingTrigger';
 
 interface TopBarProps {
   onNotificationsClick?: () => void;
@@ -217,42 +216,6 @@ function TopBarComponent({
                 />
               </motion.button>
 
-              <motion.button
-                transition={TAP_SPRING}
-                whileTap={{ scale: 0.9 }}
-                onPointerDown={(e) => {
-                  e.preventDefault(); e.stopPropagation();
-                  haptics.tap();
-                  navigate('/radio');
-                }}
-                className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
-                style={glassPillStyle}
-                title="Radio"
-              >
-                <Radio 
-                  className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-orange-500" 
-                  strokeWidth={2.5} 
-                />
-              </motion.button>
-
-              <motion.button
-                transition={TAP_SPRING}
-                whileTap={{ scale: 0.9 }}
-                onPointerDown={(e) => {
-                  e.preventDefault(); e.stopPropagation();
-                  haptics.tap();
-                  navigate(isOwner ? '/owner/dashboard' : '/client/dashboard');
-                }}
-                className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
-                style={glassPillStyle}
-                title="Dashboard"
-              >
-                <Zap 
-                  className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-yellow-500" 
-                  strokeWidth={2.5} 
-                />
-              </motion.button>
-
               {onFilterClick && (
                 <motion.button
                   transition={TAP_SPRING}
@@ -272,28 +235,6 @@ function TopBarComponent({
                   />
                 </motion.button>
               )}
-
-              {onMessageActivationsClick && (
-                <motion.button
-                  transition={TAP_SPRING}
-                  whileTap={{ scale: 0.9 }}
-                  onPointerDown={(e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    haptics.tap();
-                    onMessageActivationsClick();
-                  }}
-                  className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center p-0.5 relative group overflow-hidden"
-                  style={glassPillStyle}
-                  title="Messages & Activations"
-                >
-                  <MessageCircle 
-                    className="w-5 h-5 text-[var(--hud-text)] transition-colors group-hover:text-indigo-500" 
-                    strokeWidth={2.5} 
-                  />
-                </motion.button>
-              )}
-
-              <AIListingTrigger glassPillStyle={glassPillStyle} />
 
               <ThemeToggle glassPillStyle={glassPillStyle} />
 
