@@ -187,7 +187,7 @@ const AuthView = memo(({ onBack, initialMode = 'login' }: { onBack: () => void, 
     try {
       const validated = forgotPasswordSchema.parse({ email });
       const { error } = await supabase.auth.resetPasswordForEmail(validated.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: 'https://swipess.app/reset-password',
       });
       if (error) throw error;
       toast({ title: 'Reset Link Sent', description: "Check your inbox for reset instructions." });
