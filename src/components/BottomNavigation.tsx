@@ -258,21 +258,16 @@ export const BottomNavigation = memo(({
           through, reinforcing the "floating above" feeling. */}
       <div
         className={cn(
-          "pointer-events-auto glass-pill-nav px-1.5 shadow-[0_30px_80px_rgba(0,0,0,0.5)]",
+          "pointer-events-auto glass-pill-nav px-1.5",
           isTablet ? "mx-auto w-fit max-w-full" : "w-full"
         )}
         style={{
-          background: isLight ? 'rgba(255, 255, 255, 0.92)' : 'rgba(10, 15, 30, 0.55)',
-          // Reduced from blur(40) — visually equivalent against a busy
-          // background, but ~3x cheaper per frame on the always-on bar.
-          backdropFilter: 'blur(22px) saturate(220%)',
-          WebkitBackdropFilter: 'blur(22px) saturate(220%)',
-          // Always a fully rounded pill — feels premium on every viewport.
+          background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(10, 15, 30, 0.55)',
+          backdropFilter: 'blur(32px) saturate(220%)',
+          WebkitBackdropFilter: 'blur(32px) saturate(220%)',
           borderRadius: '3rem',
           padding: '4px',
-          boxShadow: isLight
-            ? '0 15px 40px rgba(0,0,0,0.14)'
-            : '0 25px 60px -10px rgba(0,0,0,0.4)',
+          boxShadow: 'none',
           border: 'none',
         }}
 
@@ -387,7 +382,7 @@ export const BottomNavigation = memo(({
                       height: isTablet ? ICON_SIZE_TABLET : (isNarrow ? 16 : ICON_SIZE),
                       color: active
                         ? '#FF4D00'
-                        : (isLight ? 'rgba(0,0,0,0.62)' : 'rgba(255,255,255,0.7)'),
+                        : (isLight ? '#000000' : 'rgba(255,255,255,0.7)'),
                       fill: 'none',
                       strokeWidth: active ? 2.4 : 1.9,
                       transition: 'color 160ms ease-out, stroke-width 160ms ease-out',
@@ -405,7 +400,7 @@ export const BottomNavigation = memo(({
                       style={{
                         color: active
                           ? '#FF4D00'
-                          : (isLight ? 'rgba(0,0,0,0.62)' : 'rgba(255,255,255,0.7)'),
+                          : (isLight ? '#000000' : 'rgba(255,255,255,0.7)'),
                         transition: 'color 160ms ease-out',
                         zIndex: 1,
                       }}

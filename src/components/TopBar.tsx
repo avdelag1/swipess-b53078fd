@@ -59,15 +59,13 @@ function TopBarComponent({
 
   const glassPillStyle: React.CSSProperties = {
     background: isLight
-      ? 'rgba(255, 255, 255, 0.92)'
+      ? 'rgba(255, 255, 255, 0.98)'
       : 'rgba(15, 25, 55, 0.55)',
     backdropFilter: 'blur(32px) saturate(210%)',
     WebkitBackdropFilter: 'blur(32px) saturate(210%)',
     borderRadius: '3rem',
     border: 'none',
-    boxShadow: isLight
-      ? '0 10px 30px -5px rgba(0,0,0,0.1)'
-      : '0 20px 50px -12px rgba(0, 0, 0, 0.5)',
+    boxShadow: 'none',
     pointerEvents: 'auto',
     color: isLight ? '#000000' : 'var(--hud-text)',
   };
@@ -193,11 +191,9 @@ function TopBarComponent({
                 style={{
                   ...glassPillStyle,
                   background: isLight
-                    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(79, 70, 229, 0.18))'
-                    : 'linear-gradient(135deg, rgba(124, 58, 237, 0.32), rgba(79, 70, 229, 0.28))',
-                  boxShadow: isLight
-                    ? '0 8px 24px -6px rgba(124, 58, 237, 0.4)'
-                    : '0 12px 32px -8px rgba(124, 58, 237, 0.5)',
+                    ? 'linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(79, 70, 229, 0.25))'
+                    : 'linear-gradient(135deg, rgba(124, 58, 237, 0.42), rgba(79, 70, 229, 0.38))',
+                  boxShadow: 'none',
                 }}
                 aria-label="Tokens"
               >

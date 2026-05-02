@@ -175,13 +175,6 @@ export function AppLayout({ children }: AppLayoutProps) {
         </SentientHud>
       )}
 
-      {/* 🌑 ATMOSPHERIC VIGNETTE: Subtle edge darkening for focus depth */}
-      <div className="fixed inset-0 pointer-events-none z-[1] opacity-60 mix-blend-multiply" 
-        style={{ 
-          background: 'radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.15) 100%)' 
-        }} 
-      />
-
       {/* SHELL CONTAINER: Always fixed-height. DashboardLayout handles scrolling inside. */}
       <main
         id="main-content"
@@ -207,7 +200,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
 
       {showAppChrome && (
-        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[9999]" scrollTargetSelector="#dashboard-scroll-container" alwaysVisible={isSwipeDashboard}>
+        <SentientHud side="bottom" className="fixed bottom-0 left-0 right-0 z-[10005]" scrollTargetSelector="#dashboard-scroll-container" alwaysVisible={isSwipeDashboard}>
           <BottomNavigation
             userRole={userRole}
             onFilterClick={handleFilterClick}
