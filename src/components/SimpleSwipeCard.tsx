@@ -257,10 +257,12 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
   }, [listing.id, (listing as any).user_id, x, y]);
 
   // Magnifier hook for press-and-hold zoom
+  const [isZoomed, setIsZoomed] = useState(false);
   const { containerRef, pointerHandlers: magnifierPointerHandlers, isActive: isMagnifierActive } = useMagnifier({
     scale: 2.8, // Edge-to-edge zoom level
     holdDelay: 300,
     enabled: isTop,
+    onActiveChange: setIsZoomed,
   });
 
   // Fetch rating aggregate for this listing
@@ -278,6 +280,8 @@ const SimpleSwipeCardComponent = forwardRef<SimpleSwipeCardRef, SimpleSwipeCardP
   // Unified pointer move: decides between magnifier pan vs starting drag
   const handleUnifiedPointerMove = useCallback((e: React.PointerEvent) => {
     if (isMagnifierActive()) {
+      e.stopPropagation();
+      if (e.cancelable) e.preventDefault();
       magnifierPointerHandlers.onPointerMove(e);
       return;
     }
