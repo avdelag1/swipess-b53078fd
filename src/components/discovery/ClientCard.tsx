@@ -16,7 +16,7 @@ interface ClientCardProps {
 
 export const ClientCard = memo(({ client, onConnect, onViewProfile }: ClientCardProps) => {
   const imageUrl = client.avatar_url || (client as any).profile_images?.[0];
-  const optimizedImage = imageUrl ? getCardImageUrl(imageUrl, 600) : null;
+  const optimizedImage = imageUrl ? getCardImageUrl(imageUrl) : null;
 
   return (
     <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] rounded-[32px] overflow-hidden group shadow-2xl bg-black">
@@ -30,7 +30,7 @@ export const ClientCard = memo(({ client, onConnect, onViewProfile }: ClientCard
       ) : (
         <div className="absolute inset-0 w-full h-full bg-black flex flex-col items-center justify-center p-6 text-center">
           <div className="scale-75 opacity-40 mb-6">
-             <SwipessLogo isIcon={false} size="md" variant="white" />
+             <SwipessLogo size="md" variant="white" />
           </div>
           <p className="text-white/40 text-[10px] font-black uppercase tracking-widest leading-relaxed">
             Waiting for users to upload their photos
