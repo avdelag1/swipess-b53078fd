@@ -126,6 +126,7 @@ export function useMagnifier(config: MagnifierConfig = {}): UseMagnifierReturn {
     // bounds, which prevents the ghost square frame from appearing.
     savedOverflowsRef.current = [];
 
+    const img = imageRef.current;
     if (img) {
       img.style.transition = 'transform 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
     }
