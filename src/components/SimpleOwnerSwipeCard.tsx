@@ -745,7 +745,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
                 triggerHaptic('light');
                 onShare?.();
               }}
-              className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/80 active:scale-90 transition-all pointer-events-auto"
+              className="w-9 h-9 rounded-full bg-white/90 dark:bg-black/40 backdrop-blur-md border border-black/10 dark:border-white/15 flex items-center justify-center text-black/80 dark:text-white/80 active:scale-90 transition-all pointer-events-auto"
               title="Share Profile"
             >
               <Share2 className="w-4 h-4" strokeWidth={1.8} />
@@ -756,7 +756,7 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
                 triggerHaptic('medium');
                 onReport?.();
               }}
-              className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-md border border-white/15 flex items-center justify-center text-white/50 active:scale-90 transition-all pointer-events-auto"
+              className="w-9 h-9 rounded-full bg-white/90 dark:bg-black/40 backdrop-blur-md border border-black/10 dark:border-white/15 flex items-center justify-center text-black/50 dark:text-white/50 active:scale-90 transition-all pointer-events-auto"
               title="Report Profile"
             >
               <Flag className="w-4 h-4" strokeWidth={1.8} />

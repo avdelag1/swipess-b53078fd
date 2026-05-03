@@ -406,15 +406,18 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
   // ── Voice + Auto-Send Logic ────────────────────────────────────────────────
   const [isListening, setIsListening] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [autoSendEnabled, setAutoSendEnabled] = useState(true);
   const recognitionRef = useRef<any>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const inputValueRef = useRef('');          // always tracks latest input value
   const isListeningRef = useRef(false);      // stable ref for recognition callbacks
+  const autoSendEnabledRef = useRef(true);
   const SILENCE_SECONDS = 3;
 
-  // Keep inputValueRef in sync so the send callback never has a stale closure
+  // Keep refs in sync
   useEffect(() => { inputValueRef.current = input; }, [input]);
   useEffect(() => { isListeningRef.current = isListening; }, [isListening]);
+  useEffect(() => { autoSendEnabledRef.current = autoSendEnabled; }, [autoSendEnabled]);
 
   const speechSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
@@ -475,8 +478,8 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
       // Show interim text; overwrite with final when available
       if (finalText) {
         setInput(finalText);
-        // Final speech = silence is coming → arm countdown
-        armSilenceCountdown();
+        // Final speech = silence is coming → arm countdown if enabled
+        if (autoSendEnabledRef.current) armSilenceCountdown();
       } else {
         setInput(interim);
         // New interim speech = user is still talking → cancel any countdown
@@ -485,7 +488,9 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
     };
 
     // soundend fires when mic stops picking up any audio at all
-    recognition.onsoundend = () => { armSilenceCountdown(); };
+    recognition.onsoundend = () => { 
+      if (autoSendEnabledRef.current) armSilenceCountdown(); 
+    };
 
     // Restart recognition if it stops by itself (browser idle timeout)
     recognition.onend = () => {
@@ -762,6 +767,27 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                                      )}
                                   </button>
                                   
+                                  <button 
+                                    onClick={() => {
+                                      setAutoSendEnabled(!autoSendEnabled);
+                                      triggerHaptic('light');
+                                      if (autoSendEnabled) {
+                                        cancelCountdown(); // Disable countdown if turning off
+                                      } else if (isListening) {
+                                        armSilenceCountdown(); // Arm if turning on while listening
+                                      }
+                                    }}
+                                    title={autoSendEnabled ? "Auto-Send Enabled" : "Auto-Send Disabled"}
+                                    className={cn(
+                                      "w-12 h-12 flex items-center justify-center rounded-2xl transition-all",
+                                      autoSendEnabled 
+                                        ? "bg-[#FF3D00]/20 text-[#FF3D00]" 
+                                        : isLight && !isSwipess ? "bg-slate-200 text-slate-400 hover:text-slate-600" : "bg-white/5 text-white/40 hover:text-white/70"
+                                    )}
+                                  >
+                                     <Timer className="w-5 h-5" />
+                                  </button>
+
                                   <button 
                                     onClick={() => useModalStore.getState().openAIListing()}
                                     className={cn("w-12 h-12 flex items-center justify-center rounded-2xl transition-all", isLight && !isSwipess ? "bg-slate-200 text-primary/60 hover:text-primary" : "bg-white/5 text-primary/40 hover:text-primary")}
