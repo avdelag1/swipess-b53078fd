@@ -143,7 +143,7 @@ const OwnerSettings = () => {
         <div className="max-w-3xl mx-auto relative z-10">
           <PageHeader title={t('settings.security')} subtitle={t('settings.securityDesc')} showBack={true} onBack={() => setActiveSection(null)} />
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={fastSpring} className="space-y-6 pt-10">
-            <div className="rounded-[2.5rem] overflow-hidden bg-card/40 backdrop-blur-2xl border border-border shadow-2xl">
+            <div className="rounded-[2.5rem] overflow-hidden bg-background border border-border shadow-2xl">
               <CardContent className="p-8">
                 <AccountSecurity userRole="owner" />
               </CardContent>
@@ -222,8 +222,8 @@ const OwnerSettings = () => {
 
               {/* Group card - Moscow style matte container */}
               <div className={cn(
-                "rounded-[2.8rem] overflow-hidden backdrop-blur-3xl border shadow-3xl",
-                isLight ? "bg-black/5 border-black/5" : "bg-white/[0.04] border-white/5"
+                "rounded-[2.8rem] overflow-hidden border shadow-2xl",
+                isLight ? "bg-white border-black/5" : "bg-[#0a0a0c] border-white/5"
               )}>
                 {group.items.map((item, idx) => (
                   <div key={item.label}>
@@ -282,7 +282,7 @@ const OwnerSettings = () => {
                <div className="flex items-center justify-center gap-3">
                   <span className={cn("text-2xl font-black italic tracking-tighter uppercase", isLight ? "text-black" : "text-white")}>SWIPESS PRO</span>
                   <div className="bg-purple-600/10 px-3 py-1 rounded-full border border-purple-600/20">
-                     <span className="text-[9px] font-black text-purple-600 uppercase tracking-widest font-mono">V3.3.1</span>
+                     <span className="text-[9px] font-black text-purple-600 uppercase tracking-widest font-mono">V4.0.0</span>
                   </div>
                </div>
                <p className={cn("text-[9px] font-black uppercase tracking-[0.4em] italic opacity-30", isLight ? "text-black" : "text-white")}>{t('settings.propertyAuthority')}</p>

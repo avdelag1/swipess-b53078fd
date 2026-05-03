@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Send, AlertCircle, Zap, ChevronLeft, Info, Star, Smile, Sparkles, MoreVertical, ShieldAlert, Ban } from 'lucide-react';
+import { Send, AlertCircle, Zap, ChevronLeft, Info, Star, Smile, Sparkles, MoreVertical, ShieldAlert, Ban, Mic, MicOff, Timer, X } from 'lucide-react';
 import { useConversationMessages, useSendMessage } from '@/hooks/useConversations';
 import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 import { useMarkMessagesAsRead } from '@/hooks/useMarkMessagesAsRead';
@@ -20,6 +20,8 @@ import { usePrefetchManager } from '@/hooks/usePrefetchManager';
 import { RatingSubmissionDialog } from '@/components/RatingSubmissionDialog';
 import useAppTheme from '@/hooks/useAppTheme';
 import { cn } from '@/lib/utils';
+import { triggerHaptic } from '@/utils/haptics';
+import { uiSounds } from '@/utils/uiSounds';
 import { usePresence } from '@/hooks/usePresence';
 import { useBlockUser } from '@/hooks/useBlocking';
 import {
@@ -124,6 +126,103 @@ export const MessagingInterface = memo(({ conversationId, otherUser, listing, cu
     return scrollHeight - scrollTop - clientHeight < 100;
   }, []);
 
+  // ── Voice + Auto-Send Logic ────────────────────────────────────────────────
+  const [isListening, setIsListening] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [autoSendEnabled, setAutoSendEnabled] = useState(true);
+  const recognitionRef = useRef<any>(null);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const inputValueRef = useRef('');
+  const isListeningRef = useRef(false);
+  const autoSendEnabledRef = useRef(true);
+  const SILENCE_SECONDS = 3;
+
+  useEffect(() => { inputValueRef.current = newMessage; }, [newMessage]);
+  useEffect(() => { isListeningRef.current = isListening; }, [isListening]);
+  useEffect(() => { autoSendEnabledRef.current = autoSendEnabled; }, [autoSendEnabled]);
+
+  const speechSupported = typeof window !== 'undefined' &&
+    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+  const cancelCountdown = useCallback(() => {
+    if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
+    setCountdown(null);
+    triggerHaptic('light');
+  }, []);
+
+  const armSilenceCountdown = useCallback(() => {
+    if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
+    setCountdown(SILENCE_SECONDS);
+    countdownRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev !== null && prev <= 1) {
+          clearInterval(countdownRef.current!);
+          countdownRef.current = null;
+          const text = inputValueRef.current.trim();
+          if (text) {
+            handleSendMessage({ preventDefault: () => {} } as any);
+            triggerHaptic('heavy');
+            uiSounds.playTap();
+          }
+          return null;
+        }
+        return prev !== null ? prev - 1 : null;
+      });
+    }, 1000);
+  }, [sendMessage]);
+
+  const startListening = useCallback(() => {
+    if (!speechSupported) return;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      triggerHaptic('medium');
+      uiSounds.playMicOn();
+    };
+
+    recognition.onresult = (e: any) => {
+      let interim = '';
+      let finalText = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
+        else interim += e.results[i][0].transcript;
+      }
+      if (finalText) {
+        setNewMessage(finalText);
+        if (autoSendEnabledRef.current) armSilenceCountdown();
+      } else {
+        setNewMessage(interim);
+        cancelCountdown();
+      }
+    };
+
+    recognition.onsoundend = () => { 
+      if (autoSendEnabledRef.current) armSilenceCountdown(); 
+    };
+
+    recognition.onend = () => {
+      if (isListeningRef.current) {
+        try { recognition.start(); } catch { /* ignore */ }
+      }
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  }, [speechSupported, armSilenceCountdown, cancelCountdown]);
+
+  const stopListening = useCallback(() => {
+    isListeningRef.current = false;
+    setIsListening(false);
+    recognitionRef.current?.stop();
+    cancelCountdown();
+    uiSounds.playMicOff();
+  }, [cancelCountdown]);
+
   useEffect(() => {
     const messageCountIncreased = messages.length > previousMessageCountRef.current;
     previousMessageCountRef.current = messages.length;
@@ -175,15 +274,15 @@ export const MessagingInterface = memo(({ conversationId, otherUser, listing, cu
 
       <div className={cn(
         "flex-1 flex flex-col h-full overflow-hidden transition-colors duration-500",
-        isThemeLight ? "bg-[#f5f5f7]" : "bg-[#0a0a0f]"
+        isThemeLight ? "bg-[#ffffff]" : "bg-[#000000]"
       )}>
 
         {/* NEXUS HUD HEADER */}
         <div className={cn(
-            "shrink-0 px-5 py-4 z-20 backdrop-blur-3xl border-b transition-all",
+            "shrink-0 px-5 py-4 z-20 border-b transition-all",
             isThemeLight
-              ? "bg-white/90 border-black/[0.06] shadow-sm"
-              : "bg-[#0d0d14]/90 border-white/[0.06] shadow-[0_1px_0_rgba(255,255,255,0.04)]"
+              ? "bg-white border-black/[0.06] shadow-sm"
+              : "bg-[#050505] border-white/[0.06] shadow-[0_1px_0_rgba(255,255,255,0.04)]"
         )}>
           <div className="flex items-center gap-3">
             <button
@@ -390,19 +489,48 @@ export const MessagingInterface = memo(({ conversationId, otherUser, listing, cu
               <Smile className="w-5 h-5" />
             </button>
 
-            <div className="flex-1 relative">
+            <div className="flex-1 relative flex items-center">
               <input
                 value={newMessage}
                 onChange={(e) => { setNewMessage(e.target.value); if (e.target.value.trim()) startTyping(); else stopTyping(); }}
-                placeholder={isAtLimit ? "LIMIT REACHED" : "Message..."}
+                onFocus={() => { if (isListening) stopListening(); }}
+                placeholder={isAtLimit ? "LIMIT REACHED" : (isListening ? "Listening..." : "Message...")}
                 className={cn(
-                  "w-full h-12 pl-5 pr-5 rounded-2xl text-[14px] font-medium outline-none transition-all border focus:ring-2 focus:ring-[#EB4898]/20",
+                  "w-full h-12 pl-5 pr-12 rounded-2xl text-[14px] font-medium outline-none transition-all border focus:ring-4 focus:ring-[#EB4898]/5",
                   isThemeLight
-                    ? "bg-[#f0f0f5] border-black/[0.07] text-black placeholder:text-black/30 focus:border-[#EB4898]/30 focus:bg-white"
-                    : "bg-white/[0.05] border-white/[0.07] text-white placeholder:text-white/20 focus:border-[#EB4898]/30 focus:bg-white/[0.07]"
+                    ? "bg-white border-black/10 text-black placeholder:text-black/30 focus:border-[#EB4898]/30"
+                    : "bg-[#0d0d14] border-white/10 text-white placeholder:text-white/20 focus:border-[#EB4898]/30 focus:bg-[#12121a]"
                 )}
                 disabled={sendMessage.isPending || isAtLimit}
               />
+              
+              {/* Mic / Voice Controls */}
+              <div className="absolute right-2 flex items-center gap-1">
+                {countdown !== null && (
+                  <motion.button
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    onClick={cancelCountdown}
+                    className="w-8 h-8 rounded-full bg-[#EB4898] text-white flex items-center justify-center text-[10px] font-black shadow-lg"
+                  >
+                    {countdown}s
+                  </motion.button>
+                )}
+                
+                <button
+                  type="button"
+                  onClick={isListening ? stopListening : startListening}
+                  className={cn(
+                    "w-9 h-9 rounded-xl flex items-center justify-center transition-all",
+                    isListening 
+                      ? "bg-[#EB4898] text-white shadow-[0_0_20px_rgba(235,72,152,0.5)] animate-pulse" 
+                      : (isThemeLight ? "text-black hover:text-black/80" : "text-white/30 hover:text-white/60")
+                  )}
+                >
+                  {isListening ? <MicOff className="w-4.5 h-4.5" /> : <Mic className="w-4.5 h-4.5" />}
+                </button>
+              </div>
             </div>
 
             <motion.button

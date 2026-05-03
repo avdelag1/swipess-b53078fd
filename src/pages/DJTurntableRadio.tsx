@@ -8,7 +8,7 @@ import { StationDrawer } from '@/components/radio/retro/StationDrawer';
 import { triggerHaptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
-import { ArrowLeft, Heart, SkipBack, SkipForward, Play, Pause, Volume2, ListMusic } from 'lucide-react';
+import { ArrowLeft, Heart, SkipBack, SkipForward, Play, Pause, Volume2, ListMusic, Star } from 'lucide-react';
 
 export default function DJTurntableRadio() {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ export default function DJTurntableRadio() {
   const { isDark } = useAppTheme();
 
   const [showDrawer, setShowDrawer] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<'all' | 'favorites'>('all');
 
   const hasInitRef = useRef(false);
   useEffect(() => {
@@ -93,7 +94,7 @@ export default function DJTurntableRadio() {
         </button>
 
         <button
-          onClick={() => { setShowDrawer(true); triggerHaptic('medium'); }}
+          onClick={() => { triggerHaptic('medium'); navigate('/radio/directory'); }}
           className="w-11 h-11 rounded-full flex items-center justify-center active:scale-90 transition-transform"
           style={{ background: btnBg, border: `1px solid ${btnBorder}`, color: textPrimary }}
         >
@@ -232,8 +233,14 @@ export default function DJTurntableRadio() {
             <SkipForward size={22} fill="currentColor" />
           </button>
 
-          {/* Placeholder to balance layout */}
-          <div className="w-12 h-12" />
+          {/* Favorites */}
+          <button
+            onClick={() => { setDrawerMode('favorites'); setShowDrawer(true); triggerHaptic('medium'); }}
+            className="w-12 h-12 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+            style={{ background: btnBg, border: `1px solid ${btnBorder}`, color: textPrimary }}
+          >
+            <Star size={18} fill="currentColor" />
+          </button>
         </div>
 
         {/* Volume */}
@@ -284,7 +291,7 @@ export default function DJTurntableRadio() {
       <StationDrawer
         isOpen={showDrawer}
         onClose={() => setShowDrawer(false)}
-        isFavoritesView={false}
+        isFavoritesView={drawerMode === 'favorites'}
         currentCity={state.currentCity}
         currentStation={state.currentStation}
         isPlaying={state.isPlaying}

@@ -922,7 +922,7 @@ const ClientSwipeContainerComponent = ({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 1.1, y: -20 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-0 w-full h-[100dvh] sm:h-full sm:max-w-[480px] sm:mx-auto"
+                className="absolute inset-0 w-full h-[100dvh] sm:h-full p-1 pt-[calc(var(--safe-top,0px)+68px)] pb-[calc(var(--bottom-nav-height,72px)+12px)] md:max-w-3xl lg:max-w-5xl mx-auto"
               >
 
 

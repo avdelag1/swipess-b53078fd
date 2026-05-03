@@ -78,7 +78,7 @@ const OwnerProfile = () => {
               }}
             >
               <div
-                className={cn("w-full h-full overflow-hidden cursor-pointer flex items-center justify-center border", isLight ? "bg-slate-50 border-slate-200" : "bg-[#080C14] border-white/5")}
+                className={cn("w-full h-full overflow-hidden cursor-pointer flex items-center justify-center border", isLight ? "bg-white border-black/10" : "bg-[#080C14] border-white/5")}
                 style={{ borderRadius: '1.85rem' }}
                 onClick={() => { triggerHaptic('light'); setShowEditDialog(true); }}
               >
@@ -125,7 +125,7 @@ const OwnerProfile = () => {
             <motion.div
               key={i}
               whileTap={{ scale: 0.95 }}
-              className={cn("flex flex-col items-center justify-center text-center p-5 rounded-3xl border", isLight ? "border-slate-200 bg-slate-50" : "bg-white/[0.02]")}
+              className={cn("flex flex-col items-center justify-center text-center p-5 rounded-3xl border shadow-sm", isLight ? "border-black/10 bg-white" : "bg-white/[0.02]")}
               style={{ borderColor: isLight ? undefined : `rgba(255,255,255,0.06)`, boxShadow: `inset 0 0 30px ${stat.glow}` }}
             >
               <stat.icon className={cn("w-5 h-5 mb-3", stat.color)} />
@@ -141,7 +141,7 @@ const OwnerProfile = () => {
         <motion.div
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          className={cn("flex items-center justify-between p-6 rounded-3xl cursor-pointer border", isLight ? "border-slate-200 bg-slate-50" : "border-white/[0.06] bg-white/[0.02]")}
+          className={cn("flex items-center justify-between p-6 rounded-3xl cursor-pointer border shadow-sm", isLight ? "border-black/10 bg-white" : "border-white/[0.06] bg-white/[0.02]")}
           style={{ boxShadow: 'inset 0 0 40px rgba(0,212,255,0.06)' }}
           onClick={() => { triggerHaptic('light'); navigate('/subscription/packages'); }}
         >
@@ -190,7 +190,7 @@ const OwnerProfile = () => {
 
           <Button
             onClick={() => { triggerHaptic('medium'); navigate('/client/advertise'); }}
-            className={cn("w-full h-16 rounded-2xl transition-all active:scale-95 border", isLight ? "border-slate-200 bg-slate-50 hover:bg-slate-100" : "border-violet-500/20 hover:border-violet-500/35")}
+            className={cn("w-full h-16 rounded-2xl transition-all active:scale-95 border shadow-sm", isLight ? "border-black/10 bg-white hover:bg-black/[0.02]" : "border-violet-500/20 hover:border-violet-500/35")}
           style={!isLight ? { background: 'rgba(124,58,237,0.05)' } : undefined}
           >
             <Megaphone className="w-6 h-6 text-violet-400 mr-3" />
@@ -210,10 +210,10 @@ const OwnerProfile = () => {
               key={i}
               whileTap={{ scale: 0.97 }}
               onClick={() => { triggerHaptic('light'); navigate(nav.path); }}
-              className={cn("rounded-3xl p-7 flex flex-col gap-5 text-left border transition-all", isLight ? "border-slate-200 bg-slate-50 hover:bg-slate-100" : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]")}
+              className={cn("rounded-3xl p-7 flex flex-col gap-5 text-left border transition-all shadow-sm", isLight ? "border-black/10 bg-white hover:bg-black/[0.02]" : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]")}
               style={{ boxShadow: `inset 0 0 30px ${nav.glow}` }}
             >
-              <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border", isLight ? "border-slate-200 bg-white" : "border-white/[0.08] bg-white/[0.04]")}>
+              <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border", isLight ? "border-black/10 bg-white" : "border-white/[0.08] bg-white/[0.04]")}>
                 <nav.icon className={cn("w-6 h-6", nav.color)} />
               </div>
               <div>
@@ -278,8 +278,8 @@ const OwnerProfile = () => {
                   btn.urgent
                     ? "bg-red-500/10 border-red-500/20 text-red-400"
                     : isLight
-                      ? "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                      : "bg-white/[0.03] border-white/[0.06] text-white/70 hover:bg-white/[0.05]"
+                      ? "bg-white border-black/10 text-slate-700 hover:bg-black/[0.02] shadow-sm"
+                      : "bg-[#0d0d14] border-white/[0.06] text-white/70 hover:bg-white/[0.05]"
                 )}
               >
                 <btn.icon className={cn("w-5 h-5", btn.urgent ? "text-red-400" : isLight ? "text-slate-500" : "text-white/25")} />

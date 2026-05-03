@@ -108,7 +108,7 @@ export function ShareDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-sm p-0 overflow-hidden rounded-[32px] border border-white/10 bg-black/40 backdrop-blur-2xl shadow-2xl"
+        className="max-w-sm p-0 overflow-hidden rounded-[32px] border border-white/10 bg-[#121212] shadow-2xl"
       >
         {/* Animated Background Gradients */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -119,7 +119,7 @@ export function ShareDialog({
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="w-16 h-16 rounded-[24px] bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center mb-4 shadow-lg backdrop-blur-md"
+            className="w-16 h-16 rounded-[24px] bg-[#1e1e1e] border border-white/10 flex items-center justify-center mb-4 shadow-lg shadow-purple-500/10"
           >
             <Share2 className="w-8 h-8 text-white" strokeWidth={1.5} />
           </motion.div>
@@ -140,7 +140,7 @@ export function ShareDialog({
                 <Input 
                   value={shareUrl} 
                   readOnly 
-                  className="w-full h-12 pl-9 rounded-[20px] border-white/10 bg-black/20 text-white text-xs font-mono backdrop-blur-md focus-visible:ring-1 focus-visible:ring-purple-500/50" 
+                  className="w-full h-12 pl-9 rounded-[20px] border-white/10 bg-[#1e1e1e] text-white text-xs font-mono focus-visible:ring-1 focus-visible:ring-purple-500/50" 
                 />
               </div>
               <Button
@@ -168,7 +168,7 @@ export function ShareDialog({
             {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
               <button
                 onClick={handleNativeShare}
-                className="flex flex-col items-center justify-center gap-2 h-20 rounded-[20px] bg-white/5 border border-white/5 hover:bg-white/10 transition-colors active:scale-95"
+                className="flex flex-col items-center justify-center gap-2 h-20 rounded-[20px] bg-[#1e1e1e] border border-white/5 hover:bg-[#2a2a2a] transition-colors active:scale-95"
               >
                 <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center shadow-lg">
                   <Smartphone className="w-4 h-4" />
@@ -178,7 +178,7 @@ export function ShareDialog({
             )}
             <button
               onClick={() => handleSocialShare('whatsapp', () => shareViaWhatsApp(shareUrl, shareText))}
-              className="flex flex-col items-center justify-center gap-2 h-20 rounded-[20px] bg-white/5 border border-white/5 hover:bg-[#25D366]/20 hover:border-[#25D366]/30 transition-colors active:scale-95 group"
+              className="flex flex-col items-center justify-center gap-2 h-20 rounded-[20px] bg-[#1e1e1e] border border-white/5 hover:bg-[#25D366]/20 hover:border-[#25D366]/30 transition-colors active:scale-95 group"
             >
               <div className="w-8 h-8 rounded-full bg-[#25D366]/10 text-[#25D366] group-hover:bg-[#25D366] group-hover:text-white flex items-center justify-center transition-colors">
                 <MessageCircle className="w-4 h-4" />
@@ -187,7 +187,7 @@ export function ShareDialog({
             </button>
             <button
               onClick={() => handleSocialShare('twitter', () => shareViaTwitter(shareUrl, shareText))}
-              className="flex flex-col items-center justify-center gap-2 h-20 rounded-[20px] bg-white/5 border border-white/5 hover:bg-[#1DA1F2]/20 hover:border-[#1DA1F2]/30 transition-colors active:scale-95 group"
+              className="flex flex-col items-center justify-center gap-2 h-20 rounded-[20px] bg-[#1e1e1e] border border-white/5 hover:bg-[#1DA1F2]/20 hover:border-[#1DA1F2]/30 transition-colors active:scale-95 group"
             >
               <div className="w-8 h-8 rounded-full bg-[#1DA1F2]/10 text-[#1DA1F2] group-hover:bg-[#1DA1F2] group-hover:text-white flex items-center justify-center transition-colors">
                 <Twitter className="w-4 h-4" />
@@ -196,7 +196,7 @@ export function ShareDialog({
             </button>
             <button
               onClick={() => handleSocialShare('sms', () => shareViaSMS(shareUrl, shareText))}
-              className="flex flex-col items-center justify-center gap-2 h-20 rounded-[20px] bg-white/5 border border-white/5 hover:bg-purple-500/20 hover:border-purple-500/30 transition-colors active:scale-95 group"
+              className="flex flex-col items-center justify-center gap-2 h-20 rounded-[20px] bg-[#1e1e1e] border border-white/5 hover:bg-purple-500/20 hover:border-purple-500/30 transition-colors active:scale-95 group"
             >
               <div className="w-8 h-8 rounded-full bg-purple-500/10 text-purple-400 group-hover:bg-purple-500 group-hover:text-white flex items-center justify-center transition-colors">
                 <Send className="w-4 h-4" />
@@ -217,13 +217,13 @@ export function ShareDialog({
                   placeholder="Enter email to send"
                   value={recipientEmail}
                   onChange={(e) => setRecipientEmail(e.target.value)}
-                  className="w-full h-12 pl-9 rounded-[20px] border-white/10 bg-black/20 text-white text-xs backdrop-blur-md focus-visible:ring-1 focus-visible:ring-purple-500/50"
+                  className="w-full h-12 pl-9 rounded-[20px] border-white/10 bg-[#1e1e1e] text-white text-xs focus-visible:ring-1 focus-visible:ring-purple-500/50"
                 />
               </div>
               <Button
                 onClick={handleEmailShare}
                 disabled={!recipientEmail}
-                className="h-12 w-12 rounded-[20px] p-0 bg-white/10 text-white hover:bg-white/20 border border-white/10 active:scale-95 transition-all"
+                className="h-12 w-12 rounded-[20px] p-0 bg-[#1e1e1e] text-white hover:bg-[#2a2a2a] border border-white/10 active:scale-95 transition-all"
               >
                 <Send className="w-4 h-4" />
               </Button>

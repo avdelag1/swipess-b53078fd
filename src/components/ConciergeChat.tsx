@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Send, Mic, MicOff, Sparkles, Plus, 
   Trash2, Menu, Check, Zap, Flame, Sun, Crown, Moon, 
-  Globe, Copy, Languages, Timer, ArrowRight, RefreshCw, ChevronLeft, ChevronDown
+  Globe, Copy, Languages, Timer, ArrowRight, RefreshCw, ChevronLeft, ChevronDown, Volume2, VolumeX
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -17,6 +17,7 @@ import { useVoiceTranscribe } from '@/hooks/useVoiceTranscribe';
 import { uiSounds } from '@/utils/uiSounds';
 import { useAppNavigate } from '@/hooks/useAppNavigate';
 import useAppTheme from '@/hooks/useAppTheme';
+import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { SwipessLogo } from '@/components/SwipessLogo';
 import { toast } from 'sonner';
 import { useModalStore } from '@/state/modalStore';
@@ -120,10 +121,11 @@ const ConciergePrivacyPortal = memo(({ onAccept, isSwipess }: { onAccept: () => 
 ConciergePrivacyPortal.displayName = 'ConciergePrivacyPortal';
 
 /* ─── Message Bubble ─── */
-const MessageBubble = memo(({ message, isUser, isSwipess, onCopy, onDelete, onTranslate, onResend, onNavigate }: { 
+const MessageBubble = memo(({ message, isUser, isSwipess, onCopy, onDelete, onTranslate, onResend, onNavigate, onSpeak, speakingMsgId, isSpeaking }: { 
   message: ChatMessage, isUser: boolean, isSwipess: boolean,
   onCopy: () => void, onDelete: () => void, onTranslate?: (l:string)=>void,
-  onResend?: () => void, onNavigate?: (p:string)=>void 
+  onResend?: () => void, onNavigate?: (p:string)=>void,
+  onSpeak?: (id: string, text: string) => void, speakingMsgId: string | null, isSpeaking: boolean
 }) => {
   const [showActions, setShowActions] = useState(false);
   const { cleanContent, navPaths } = useMemo(
@@ -153,6 +155,19 @@ const MessageBubble = memo(({ message, isUser, isSwipess, onCopy, onDelete, onTr
           <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0.5">
             <ReactMarkdown>{cleanContent}</ReactMarkdown>
           </div>
+        )}
+        {!isUser && onSpeak && (
+           <button 
+             onClick={(e) => { e.stopPropagation(); onSpeak(message.id, cleanContent); }}
+             className={cn(
+               "absolute bottom-2 right-2 w-7 h-7 rounded-lg flex items-center justify-center transition-all border",
+               speakingMsgId === message.id && isSpeaking 
+                 ? "bg-cyan-500 border-cyan-400 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)]" 
+                 : isSwipess ? "bg-white/5 border-white/10 text-white/40 hover:text-white" : "bg-muted border-border text-muted-foreground hover:text-primary"
+             )}
+           >
+             {speakingMsgId === message.id && isSpeaking ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+           </button>
         )}
       </div>
 
@@ -362,6 +377,20 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const [characterPanelOpen, setCharacterPanelOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  
+  const { speak, stop: stopSpeaking, isSpeaking } = useSpeechSynthesis();
+  const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
+
+  const handleSpeak = (msgId: string, text: string) => {
+    if (speakingMsgId === msgId && isSpeaking) {
+      stopSpeaking();
+      setSpeakingMsgId(null);
+    } else {
+      triggerHaptic('light');
+      setSpeakingMsgId(msgId);
+      speak(text);
+    }
+  };
 
   // Character definitions
   const CHARACTER_OPTIONS: { key: AiCharacter; label: string; subtitle: string; icon: typeof Sparkles; color: string; bgColor: string; }[] = [
@@ -542,13 +571,13 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-0 md:p-6 lg:p-12 overflow-hidden">
+        <div className={cn("fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-6 transition-all duration-500", isLight && !isSwipess ? "bg-black/10 backdrop-blur-md" : "bg-black/40 backdrop-blur-xl")}>
           <motion.div 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            className="absolute inset-0"
           />
           
           <motion.div
@@ -557,8 +586,8 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 40 }}
             className={cn(
-               "relative w-full h-full md:max-w-3xl md:h-[90vh] md:rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden transition-all duration-700 border",
-               isSwipess ? "bg-[#050505] border-[#FF3D00]/20 shadow-[0_0_50px_rgba(255,61,0,0.1)]" : "bg-white border-white/5"
+               "relative w-full max-w-4xl h-[100dvh] sm:h-[85vh] flex flex-col sm:rounded-[3rem] overflow-hidden border shadow-[0_40px_120px_rgba(0,0,0,0.8)]",
+               isLight && !isSwipess ? "bg-white border-black/10" : "bg-[#050505] border-white/10"
              )}
           >
             {/* Ambient Background Glow */}
@@ -566,8 +595,6 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
               <div className="absolute inset-0 pointer-events-none z-0">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#FF3D00]/10 blur-[120px] rounded-full animate-pulse" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full" />
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-                  style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '100% 4px' }} />
               </div>
             )}
 
@@ -594,7 +621,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
             ) : (
               <div className="flex-1 flex flex-col relative z-10 overflow-hidden">
                 {/* Header */}
-                <header className={cn("h-20 shrink-0 flex items-center justify-between px-6 border-b backdrop-blur-3xl", isLight && !isSwipess ? "border-slate-200 bg-white/80" : "border-white/5 bg-black/40")}>
+                <header className={cn("h-20 shrink-0 flex items-center justify-between px-6 border-b", isLight && !isSwipess ? "border-slate-200 bg-white" : "border-white/5 bg-[#0A0A0A]")}>
                   <div className="flex items-center gap-4">
                     <button 
                       onClick={() => { triggerHaptic('light'); setSidebarOpen(true); }}
@@ -603,7 +630,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                       <Menu className={cn("w-5 h-5", isLight && !isSwipess ? "text-slate-600" : "text-white/60")} />
                     </button>
                     <div className="flex flex-col relative">
-                       <span className={cn("text-[13px] font-black uppercase tracking-[0.4em] italic", isSwipess ? "text-[#FF3D00] brand-glow drop-shadow-[0_0_10px_rgba(255,61,0,0.5)]" : isLight ? "text-primary" : "text-[#FF3D00]")}>INTEL INTERFACE</span>
+                       <span className={cn("text-[13px] font-black uppercase tracking-[0.4em] italic", isSwipess ? "text-[#FF3D00] brand-glow" : isLight ? "text-primary" : "text-[#FF3D00]")}>INTEL INTERFACE</span>
                        <div className="flex items-center gap-1.5">
                           <div className={cn("w-1 h-1 rounded-full animate-pulse", isSwipess ? "bg-[#FF3D00]" : "bg-primary")} />
                           <span className={cn("text-[9px] font-bold tracking-widest uppercase", isLight && !isSwipess ? "text-slate-400" : "text-white/60")}>System: Operational</span>
@@ -667,24 +694,24 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                   </div>
                 </header>
 
-                <div className={cn("flex-1 overflow-hidden relative flex flex-col", isLight && !isSwipess ? "bg-slate-50" : "bg-black/20")}>
+                <div className={cn("flex-1 overflow-hidden relative flex flex-col", isLight && !isSwipess ? "bg-white" : "bg-[#050505]")}>
                    <div 
                      ref={scrollRef}
-                     className="flex-1 overflow-y-auto Swipess-scroll p-6 space-y-2 relative"
+                     className="flex-1 overflow-y-auto Swipess-scroll p-6 space-y-4 relative"
                    >
                      {messages.length === 0 ? (
                        <div className="h-full flex flex-col items-center justify-center p-12 text-center space-y-8">
                          <motion.div 
                            animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
                            transition={{ duration: 5, repeat: Infinity }}
-                           className="w-24 h-24 rounded-[3rem] border border-primary/10 flex items-center justify-center bg-primary/5 shadow-[0_0_50px_rgba(var(--color-brand-primary-rgb),0.1)]"
+                           className="w-24 h-24 rounded-[3rem] border border-primary/10 flex items-center justify-center bg-primary/5 shadow-xl"
                          >
                            <Sparkles className="w-10 h-10 text-primary opacity-60" />
                          </motion.div>
                          <div className="space-y-1.5">
                            <h3 className={cn(
                               "text-[15px] font-black uppercase tracking-[0.4em] italic",
-                              isLight ? "text-black" : "text-white brand-glow drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                              isLight ? "text-black" : "text-white"
                             )}>
                               {isSwipess ? "INTEL CORE ACTIVE" : "Ready to Help"}
                             </h3>
@@ -701,10 +728,10 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                                key={s} 
                                onClick={() => setInput(s)}
                                className={cn(
-                                 "px-6 py-5 rounded-[2rem] border text-[11px] font-black uppercase tracking-widest transition-all text-left flex justify-between items-center group shadow-xl backdrop-blur-md",
+                                 "px-6 py-5 rounded-[2rem] border text-[11px] font-black uppercase tracking-widest transition-all text-left flex justify-between items-center group shadow-md",
                                  isLight && !isSwipess
-                                   ? "bg-white border-slate-200 text-slate-700 hover:bg-primary/5 hover:border-primary/30 hover:text-slate-900 shadow-sm"
-                                   : "bg-white/[0.03] border-white/10 text-white/70 hover:bg-[#FF3D00]/10 hover:border-[#FF3D00]/30 hover:text-white shadow-2xl"
+                                   ? "bg-slate-50 border-slate-200 text-slate-700 hover:bg-primary/5 hover:border-primary/30"
+                                   : "bg-[#0A0A0A] border-white/10 text-white/70 hover:bg-[#FF3D00]/10 hover:border-[#FF3D00]/30"
                                )}
                              >
                                {s}
@@ -725,6 +752,9 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                            onTranslate={m.role === 'assistant' ? handleTranslate : undefined}
                            onResend={m.role === 'user' ? () => resendMessage(m.id) : undefined}
                            onNavigate={handleNavigate}
+                           onSpeak={m.role === 'assistant' ? handleSpeak : undefined}
+                           speakingMsgId={speakingMsgId}
+                           isSpeaking={isSpeaking}
                          />
                        ))
                      )}
@@ -732,19 +762,24 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                    </div>
 
                    {/* Input Bar */}
-                   <div className={cn("p-6 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] backdrop-blur-3xl border-t", isLight && !isSwipess ? "bg-white/80 border-slate-200" : "bg-black/60 border-white/5")}>
+                   <div className={cn("p-6 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] border-t", isLight && !isSwipess ? "bg-white border-slate-200" : "bg-[#0A0A0A] border-white/5")}>
                       <div className="relative group">
                          <div className={cn(
-                           "p-1.5 rounded-[2.2rem] border transition-all duration-500",
-                            isListening ? "neon-orange-glow bg-[#FF3D00]/5 border-[#FF3D00]/50" : isLight && !isSwipess ? "border-slate-200 bg-slate-100 group-hover:bg-slate-200" : "border-white/5 bg-white/5 group-hover:bg-white/10"
-                         )}>
+                          "flex-1 flex items-center rounded-3xl border transition-all duration-500 relative group overflow-hidden shadow-inner",
+                          isLight && !isSwipess 
+                            ? "bg-slate-100 border-black/10 focus-within:border-black focus-within:bg-white" 
+                            : "bg-[#0A0A0A] border-white/10 focus-within:border-cyan-500/50 focus-within:bg-black focus-within:shadow-[0_0_40px_rgba(34,211,238,0.1)]"
+                        )}>
                             <textarea
                               ref={inputRef}
                               value={input}
                               onChange={(e) => setInput(e.target.value)}
                               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
                               placeholder={isListening ? "Listening for command..." : "Transmitting Directive..."}
-                              className={cn("w-full bg-transparent border-none focus:ring-0 text-sm py-4 px-6 resize-none max-h-48 min-h-[64px] font-medium", isLight && !isSwipess ? "text-slate-900 placeholder:text-slate-400" : "text-white placeholder:text-white/20")}
+                              className={cn(
+                                "w-full bg-transparent border-none focus:ring-0 focus:outline-none text-sm py-4 px-6 resize-none max-h-48 min-h-[64px] font-medium outline-none",
+                                isLight && !isSwipess ? "text-slate-900 placeholder:text-slate-400" : "text-white placeholder:text-white/20"
+                              )}
                               rows={1}
                             />
                             
@@ -754,7 +789,11 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                                     onClick={isListening ? stopListening : startListening}
                                     className={cn(
                                       "w-12 h-12 flex items-center justify-center rounded-2xl transition-all relative overflow-hidden",
-                                       isListening ? "bg-red-500 text-white" : isLight && !isSwipess ? "bg-slate-200 text-slate-500 hover:text-slate-800" : "bg-white/5 text-white/70 hover:text-white"
+                                     isListening 
+                                       ? "bg-[#FF3D00] text-white" 
+                                        : isLight && !isSwipess 
+                                          ? "bg-slate-200 text-black hover:bg-slate-300 shadow-sm" 
+                                          : "bg-white/5 text-white/70 hover:text-white"
                                     )}
                                   >
                                      <Mic className={cn("w-5 h-5", isListening && "animate-pulse")} />
@@ -788,12 +827,7 @@ export function ConciergeChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
                                      <Timer className="w-5 h-5" />
                                   </button>
 
-                                  <button 
-                                    onClick={() => useModalStore.getState().openAIListing()}
-                                    className={cn("w-12 h-12 flex items-center justify-center rounded-2xl transition-all", isLight && !isSwipess ? "bg-slate-200 text-primary/60 hover:text-primary" : "bg-white/5 text-primary/40 hover:text-primary")}
-                                  >
-                                     <Sparkles className="w-5 h-5" />
-                                  </button>
+
 
                                   <AnimatePresence>
                                      {countdown !== null && (

@@ -100,7 +100,7 @@ const ClientProfile = () => {
               }}
             >
               <div
-                className={cn("w-full h-full overflow-hidden cursor-pointer flex items-center justify-center border", isLight ? "bg-slate-50 border-slate-200" : "bg-[#080C14] border-white/5")}
+                className={cn("w-full h-full overflow-hidden cursor-pointer flex items-center justify-center border", isLight ? "bg-white border-black/10" : "bg-[#080C14] border-white/5")}
                 style={{ borderRadius: '3.4rem' }}
                 onClick={() => { triggerHaptic('light'); if (profile?.profile_images?.length) { handlePhotoClick(0); } else { setShowEditDialog(true); } }}
               >
@@ -149,7 +149,7 @@ const ClientProfile = () => {
             <motion.div
               key={i}
               whileTap={{ scale: 0.95 }}
-              className={cn("flex flex-col items-center justify-center p-5 text-center rounded-3xl border", isLight ? "border-slate-200 bg-slate-50" : "border-white/[0.06] bg-white/[0.02]")}
+              className={cn("flex flex-col items-center justify-center p-5 text-center rounded-3xl border shadow-sm", isLight ? "border-black/10 bg-white" : "border-white/[0.06] bg-[#0d0d14]")}
               style={{ boxShadow: `inset 0 0 30px ${stat.glow}` }}
             >
               <stat.icon className={cn("w-5 h-5 mb-3", stat.color)} />
@@ -177,7 +177,7 @@ const ClientProfile = () => {
 
           <Button
             onClick={() => { triggerHaptic('medium'); navigate('/client/advertise'); }}
-            className={cn("w-full h-16 rounded-2xl border transition-all active:scale-95", isLight ? "border-slate-200 bg-slate-50 hover:bg-slate-100" : "border-violet-500/20 hover:border-violet-500/35")}
+            className={cn("w-full h-16 rounded-2xl border transition-all active:scale-95 shadow-sm", isLight ? "border-black/10 bg-white hover:bg-black/[0.02]" : "border-violet-500/20 hover:border-violet-500/35")}
             style={!isLight ? { background: 'rgba(124,58,237,0.05)' } : undefined}
           >
             <Megaphone className="w-6 h-6 text-violet-400 mr-3" />
@@ -214,7 +214,7 @@ const ClientProfile = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className={cn("rounded-3xl p-7 space-y-5 border", isLight ? "border-slate-200 bg-slate-50" : "border-white/[0.06] bg-white/[0.02]")}
+              className={cn("rounded-3xl p-7 space-y-5 border shadow-sm", isLight ? "border-black/10 bg-white" : "border-white/[0.06] bg-[#0d0d14]")}
               style={{ boxShadow: 'inset 0 0 40px rgba(124,58,237,0.06)' }}
             >
               <div className="flex items-center justify-between px-1">
@@ -225,7 +225,7 @@ const ClientProfile = () => {
                 <span className={cn("text-2xl font-black italic tracking-tighter", isLight ? "text-slate-900" : "text-white")}>{completionPercent}%</span>
               </div>
 
-              <div className={cn("h-3 w-full rounded-full overflow-hidden border", isLight ? "bg-slate-200 border-slate-200" : "bg-white/[0.04] border-white/[0.06]")}>
+              <div className={cn("h-3 w-full rounded-full overflow-hidden border", isLight ? "bg-black/5 border-black/5" : "bg-white/[0.04] border-white/[0.06]")}>
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${completionPercent}%` }}
@@ -296,8 +296,8 @@ const ClientProfile = () => {
                   btn.urgent
                     ? "bg-red-500/10 border-red-500/20 text-red-400"
                     : isLight
-                      ? "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
-                      : "bg-white/[0.03] border-white/[0.06] text-white/70 hover:bg-white/[0.05]"
+                      ? "bg-white border-black/10 text-slate-700 hover:bg-black/[0.02] shadow-sm"
+                      : "bg-[#0d0d14] border-white/[0.06] text-white/70 hover:bg-white/[0.05]"
                 )}
               >
                 <btn.icon className={cn("w-5 h-5", btn.urgent ? "text-red-400" : isLight ? "text-slate-500" : "text-white/25")} />

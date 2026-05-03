@@ -94,7 +94,7 @@ function NotificationItem({ notification, onClick, onDismiss, index }: Notificat
           "group cursor-pointer transition-all duration-200 border overflow-hidden",
           !notification.read
             ? 'bg-card border-border/60 shadow-sm'
-            : 'bg-card/50 border-border/20',
+            : 'bg-card/90 border-border/20',
           "relative z-10" // Ensure card is above indicator
         )}
         onClick={onClick}
@@ -372,7 +372,7 @@ export function NotificationPopover({ className, children, glassPillStyle }: Not
             <DialogTitle className="sr-only">Notifications</DialogTitle>
 
             {/* Header */}
-            <div className="px-4 pt-4 pb-3 border-b border-border/40 backdrop-blur-sm bg-background/80">
+            <div className="px-4 pt-4 pb-3 border-b border-border/40 bg-background">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-primary/10">

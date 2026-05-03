@@ -1,14 +1,14 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useRadio } from '@/contexts/RadioContext';
-import { Play, Pause, SkipBack, SkipForward, X, Radio, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, X, Radio, Volume2, VolumeX, Heart, Star } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { triggerHaptic } from '@/utils/haptics';
 import { cn } from '@/lib/utils';
 import useAppTheme from '@/hooks/useAppTheme';
 
 function RadioMiniPlayerInner() {
-  const { state, togglePlayPause, changeStation, pause, setMiniPlayerMode, setVolume } = useRadio();
+  const { state, togglePlayPause, changeStation, pause, setMiniPlayerMode, setVolume, toggleFavorite, isStationFavorite } = useRadio();
   const { isLight } = useAppTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -176,9 +176,16 @@ function RadioMiniPlayerInner() {
 
             {/* Controls */}
             <div className="flex items-center justify-between px-4 pb-5 pt-1">
-              <button onClick={handleMute} className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90", isLight ? "text-slate-400" : "text-white/60")}>
-                {state.volume > 0 ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              <button 
+                onClick={(e) => { e.stopPropagation(); toggleFavorite(station.id); triggerHaptic('light'); }} 
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center active:scale-90", 
+                  isStationFavorite(station.id) ? "text-rose-500" : (isLight ? "text-slate-400" : "text-white/40")
+                )}
+              >
+                <Heart className={cn("w-5 h-5", isStationFavorite(station.id) && "fill-current")} />
               </button>
+              
               <div className="flex items-center gap-2">
                 <button onClick={handlePrev} className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90", isLight ? "text-slate-400" : "text-white/70")}>
                   <SkipBack className="w-5 h-5 fill-current" />
@@ -193,7 +200,22 @@ function RadioMiniPlayerInner() {
                   <SkipForward className="w-5 h-5 fill-current" />
                 </button>
               </div>
-              <div className="w-10" />
+
+              <button 
+                onClick={(e) => { e.stopPropagation(); navigate('/radio/directory?filter=favorites'); triggerHaptic('medium'); }} 
+                className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90", isLight ? "text-slate-400" : "text-white/40")}
+                title="Liked Stations"
+              >
+                <Star className="w-5 h-5" />
+              </button>
+
+              <button 
+                onClick={(e) => { e.stopPropagation(); navigate('/radio/directory'); triggerHaptic('medium'); }} 
+                className={cn("w-10 h-10 rounded-full flex items-center justify-center active:scale-90", isLight ? "text-slate-400" : "text-white/40")}
+                title="All Stations"
+              >
+                <Radio className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </m.div>

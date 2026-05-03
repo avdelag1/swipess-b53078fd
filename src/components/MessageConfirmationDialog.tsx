@@ -50,7 +50,7 @@ export function MessageConfirmationDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         hideCloseButton
-        className="max-w-[400px] p-0 overflow-hidden rounded-[32px] border border-white/10 bg-black/40 backdrop-blur-2xl shadow-2xl"
+        className="max-w-[400px] p-0 overflow-hidden rounded-[32px] border border-white/10 bg-[#121212] shadow-2xl"
       >
         {/* Animated Background Gradients */}
         <div className="absolute top-0 left-0 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -60,7 +60,7 @@ export function MessageConfirmationDialog({
         <div className="relative px-6 py-6 border-b border-white/5">
           <button 
             onClick={handleCancel}
-            className="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all z-10"
+            className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#1e1e1e] border border-white/10 flex items-center justify-center text-white/50 hover:bg-[#2a2a2a] hover:text-white transition-all z-10"
           >
             <X className="w-4 h-4" />
           </button>
@@ -68,7 +68,7 @@ export function MessageConfirmationDialog({
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-white/10 flex items-center justify-center mb-4 shadow-lg backdrop-blur-md"
+            className="w-14 h-14 rounded-2xl bg-[#1e1e1e] border border-white/10 flex items-center justify-center mb-4 shadow-lg shadow-cyan-500/10"
           >
             <MessageCircle className="w-7 h-7 text-cyan-400" strokeWidth={1.5} />
           </motion.div>
@@ -77,12 +77,12 @@ export function MessageConfirmationDialog({
           
           {/* Quota info */}
           {quotaLoading ? (
-            <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+            <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#1e1e1e] border border-white/10">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-500/50 border-t-cyan-400" />
               <span className="text-xs text-white/60">Checking quota...</span>
             </div>
           ) : !canStartNewConversation ? (
-            <div className="flex items-start gap-3 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 backdrop-blur-sm">
+            <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#1e1e1e] border border-amber-500/20">
               <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">Message limit reached</span>
@@ -92,7 +92,7 @@ export function MessageConfirmationDialog({
               </div>
             </div>
           ) : (
-            <div className="flex items-start gap-3 p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-sm">
+            <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#1e1e1e] border border-cyan-500/20">
               <Sparkles className="w-5 h-5 text-cyan-400 shrink-0" />
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">
@@ -118,10 +118,10 @@ export function MessageConfirmationDialog({
               <Textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="min-h-[140px] resize-none rounded-[20px] border-white/10 bg-black/20 text-white text-sm backdrop-blur-md focus-visible:ring-1 focus-visible:ring-cyan-500/50 p-4"
+                className="min-h-[140px] resize-none rounded-[20px] border-white/10 bg-[#1e1e1e] text-white text-sm focus-visible:ring-1 focus-visible:ring-cyan-500/50 p-4"
                 disabled={!canStartNewConversation || isLoading}
               />
-              <div className="absolute bottom-3 right-4 text-[10px] font-bold text-white/40 bg-black/40 px-2 py-1 rounded-md backdrop-blur-sm">
+              <div className="absolute bottom-3 right-4 text-[10px] font-bold text-white/40 bg-[#121212] px-2 py-1 rounded-md">
                 {message.length}/500
               </div>
             </div>
@@ -133,7 +133,7 @@ export function MessageConfirmationDialog({
               variant="outline"
               onClick={handleCancel}
               disabled={isLoading}
-              className="flex-1 h-12 rounded-[20px] bg-white/5 border-white/10 text-white hover:bg-white/10 active:scale-95 transition-all"
+              className="flex-1 h-12 rounded-[20px] bg-[#1e1e1e] border-white/10 text-white hover:bg-[#2a2a2a] active:scale-95 transition-all"
             >
               Cancel
             </Button>

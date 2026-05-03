@@ -62,18 +62,14 @@ export const StationDrawer = ({
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
             className={cn(
-               "fixed inset-0 z-[10100] overflow-hidden flex flex-col",
-               "modal-liquid-glass p-6",
+               "fixed inset-0 z-[10100] w-screen h-[100dvh] overflow-hidden flex flex-col bg-background p-6 pt-[calc(env(safe-area-inset-top)+1.5rem)]",
             )}
             style={{ 
               '--accent-dynamic': accentColor,
               '--accent-dynamic-alpha': `${accentColor}20`
             } as React.CSSProperties}
           >
-            {/* Liquid Shine Overlay */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-70">
-               <div className="liquid-glass-highlight--animated absolute inset-0" />
-            </div>
+
 
             {/* Header */}
             <div className="flex items-center justify-between mb-8">

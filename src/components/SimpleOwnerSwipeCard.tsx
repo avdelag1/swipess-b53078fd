@@ -690,20 +690,20 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
             fullScreen={true}
           />
 
-          {/* Cinema Top Fade */}
+          {/* Cinema Top Fade — 🚀 NEXUS POLISH: Deeper fade for header button contrast */}
           <div
             className="absolute top-0 left-0 right-0 pointer-events-none z-20"
             style={{
-              height: '22%',
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.25) 55%, transparent 100%)',
+              height: '42%',
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 30%, rgba(0,0,0,0.2) 65%, transparent 100%)',
             }}
           />
-          {/* Cinema Bottom Fade */}
+          {/* Cinema Bottom Fade — ensures buttons + info float above photo */}
           <div
             className="absolute bottom-0 left-0 right-0 pointer-events-none z-20"
             style={{
-              height: '52%',
-              background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.2) 60%, transparent 100%)',
+              height: '65%',
+              background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.8) 20%, rgba(0,0,0,0.4) 55%, transparent 100%)',
             }}
           />
 
@@ -790,8 +790,8 @@ const SimpleOwnerSwipeCardComponent = forwardRef<SimpleOwnerSwipeCardRef, Simple
                 boxShadow: '0 0 18px rgba(16,185,129,0.4)',
               }}
             >
-              <span className="font-black text-xl tracking-[0.18em] uppercase text-emerald-400" style={{ textShadow: '0 0 14px rgba(16,185,129,0.9)' }}>
-                LIKE
+              <span className="font-black text-xl tracking-[0.18em] uppercase bg-gradient-to-br from-orange-400 to-red-500 bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 0 10px rgba(255,87,34,0.6))' }}>
+                FIRE
               </span>
             </div>
           </div>

@@ -17,8 +17,9 @@ import { toast } from 'sonner';
 import { uploadPhotoBatch } from '@/utils/photoUpload';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { UnifiedListingForm } from './UnifiedListingForm';
 import { useTranslation } from 'react-i18next';
+import { useVoiceTranscribe } from '@/hooks/useVoiceTranscribe';
+import { refineWithKimi } from '@/lib/kimi';
 
 type WizardStep = 'category' | 'photos' | 'details' | 'processing' | 'review';
 
@@ -66,6 +67,8 @@ export function AIListingWizard() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [aiResult, setAiResult] = useState<any>(null);
   const [showFinalForm, setShowFinalForm] = useState(false);
+  const { isRecording, isTranscribing, start: startVoice, stop: stopVoice } = useVoiceTranscribe();
+  const [isRefining, setIsRefining] = useState(false);
 
   useEffect(() => {
     if (aiListingCategory) {
@@ -106,6 +109,67 @@ export function AIListingWizard() {
       setImageFiles(prev => [...prev, ...files]);
     };
     input.click();
+  };
+
+  const handleVoiceToggle = async () => {
+    if (isRecording) {
+      triggerHaptic('medium');
+      const text = await stopVoice();
+      if (text) {
+        setPrompt(prev => prev ? `${prev} ${text}` : text);
+        toast.success('Intel Received', { description: 'Speech synthesized to text.' });
+      }
+    } else {
+      const success = await startVoice();
+      if (success) triggerHaptic('light');
+    }
+  };
+
+  const handleRefinePrompt = async () => {
+    if (!prompt.trim()) return;
+    setIsRefining(true);
+    triggerHaptic('medium');
+    try {
+      // Priority: Use Kimi if key is available, otherwise fallback to existing AI URL
+      const refined = await refineWithKimi(prompt);
+      
+      if (refined !== prompt) {
+        setPrompt(refined);
+        toast.success('Intel Refined', { description: 'Description optimized by Kimi Intelligence.' });
+      } else {
+        // Fallback to existing AI logic if Kimi failed or no key
+        const AI_URL = 'https://vplgtcguxujxwrgguxqq.supabase.co/functions/v1/ai-concierge';
+        const AUTH_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwbGd0Y2d1eHVqeHdyZ2d1eHFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMDI5MDIsImV4cCI6MjA2MzU3ODkwMn0.-TzSQ-nDho4J6TftVF4RNjbhr5cKbknQxxUT-AaSIJU';
+        
+        const resp = await fetch(AI_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${AUTH_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: [
+              { 
+                role: 'system', 
+                content: 'You are a professional listing copywriter. Rewrite the following raw spoken input into a professional, high-converting listing description. Keep it concise but persuasive. Do not add placeholders, keep the facts.' 
+              },
+              { role: 'user', content: prompt }
+            ],
+          }),
+        });
+
+        const data = await resp.json();
+        const fallbackRefined = data.choices?.[0]?.message?.content || data.reply || prompt;
+        setPrompt(fallbackRefined);
+        toast.success('Intel Refined', { description: 'Description optimized by flagship intelligence.' });
+      }
+      triggerHaptic('success');
+    } catch (error) {
+      console.error('Refinement Error:', error);
+      toast.error('Could not refine text at this moment.');
+    } finally {
+      setIsRefining(false);
+    }
   };
 
   const handleProcess = async () => {
@@ -461,16 +525,50 @@ export function AIListingWizard() {
                            )}
                         </div>
 
-                        <div className="space-y-3">
-                          <label className={cn("text-[10px] font-black uppercase tracking-[0.2em] ml-2", textMuted)}>Deployment Narrative</label>
+                         <div className="space-y-3">
+                          <div className="flex items-center justify-between ml-2">
+                             <label className={cn("text-[10px] font-black uppercase tracking-[0.2em]", textMuted)}>Deployment Narrative</label>
+                             <div className="flex gap-2">
+                               {prompt.trim().length > 10 && (
+                                 <button 
+                                   onClick={handleRefinePrompt}
+                                   disabled={isRefining}
+                                   className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[9px] font-black uppercase tracking-widest text-cyan-400 hover:bg-cyan-500/20 transition-all disabled:opacity-50"
+                                 >
+                                   {isRefining ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+                                   Refine
+                                 </button>
+                               )}
+                               <button 
+                                 onClick={handleVoiceToggle}
+                                 className={cn(
+                                   "flex items-center gap-1.5 px-3 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest transition-all",
+                                   isRecording 
+                                     ? "bg-red-500 border-red-400 text-white animate-pulse" 
+                                     : isLight ? "bg-black/5 border-black/10 text-black/60" : "bg-white/5 border-white/10 text-white/60"
+                                 )}
+                               >
+                                 <Mic className={cn("w-3 h-3", isRecording && "animate-bounce")} />
+                                 {isRecording ? 'Listening' : 'Voice'}
+                               </button>
+                             </div>
+                          </div>
                           <div className="relative">
                              <Search className="absolute left-5 top-5 w-4 h-4 text-cyan-400 opacity-60" />
                              <textarea
                                value={prompt}
                                onChange={(e) => setPrompt(e.target.value)}
-                               placeholder="Voice your description... E.g. 'Stunning ocean view property with private pool' or 'Professional web developer with 5 years experience in React'..."
-                               className={cn("w-full h-40 p-5 pl-14 rounded-[2rem] transition-all text-sm leading-relaxed resize-none italic", inputCls)}
+                               placeholder={isRecording ? "Listening to your intel..." : "Voice your description... E.g. 'Stunning ocean view property with private pool'..."}
+                               className={cn("w-full h-40 p-5 pl-14 rounded-[2rem] transition-all text-sm leading-relaxed resize-none italic outline-none focus:ring-1 focus:ring-cyan-500/30", inputCls)}
                              />
+                             {isTranscribing && (
+                               <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm rounded-[2rem]">
+                                 <div className="flex items-center gap-3 px-4 py-2 bg-black rounded-full border border-cyan-500/30 shadow-2xl">
+                                   <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />
+                                   <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">Synthesizing...</span>
+                                 </div>
+                               </div>
+                             )}
                           </div>
                         </div>
                       </div>

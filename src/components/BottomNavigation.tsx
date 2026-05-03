@@ -344,8 +344,26 @@ export const BottomNavigation = memo(({
                   transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               >
-                {/* No per-button frame — the bar is already a pill. Active
-                    state is communicated by the icon color alone. */}
+                {/* Active Pill Background */}
+                <AnimatePresence>
+                  {active && (
+                    <motion.div
+                      layoutId="bottomNavActivePill"
+                      className="absolute inset-0 rounded-full z-0 pointer-events-none"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                      style={{
+                        background: `${activeColor}20`,
+                        boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.2)',
+                        border: '1px solid rgba(255, 77, 0, 0.3)',
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-tr from-[#ff4d00]/20 to-[#a855f7]/20 rounded-full blur-[2px]" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <div
                   className="relative z-10"
@@ -381,7 +399,11 @@ export const BottomNavigation = memo(({
                       width: isTablet ? ICON_SIZE_TABLET : (isNarrow ? 16 : ICON_SIZE),
                       height: isTablet ? ICON_SIZE_TABLET : (isNarrow ? 16 : ICON_SIZE),
                       color: active
-                        ? '#FF4D00'
+                        ? (item.id === 'likes' ? '#FF8C00' : 
+                           item.id === 'ai' ? '#BF00FF' : 
+                           item.id === 'discover' || item.id === 'dashboard' ? '#00D2FF' : 
+                           item.id === 'messages' ? '#00FFF2' : 
+                           item.id === 'settings' || item.id === 'profile' ? '#FF007F' : '#FF4D00')
                         : (isLight ? '#000000' : 'rgba(255,255,255,0.7)'),
                       fill: 'none',
                       strokeWidth: active ? 2.4 : 1.9,
@@ -399,7 +421,11 @@ export const BottomNavigation = memo(({
                       )}
                       style={{
                         color: active
-                          ? '#FF4D00'
+                          ? (item.id === 'likes' ? '#FF8C00' : 
+                             item.id === 'ai' ? '#BF00FF' : 
+                             item.id === 'discover' || item.id === 'dashboard' ? '#00D2FF' : 
+                             item.id === 'messages' ? '#00FFF2' : 
+                             item.id === 'settings' || item.id === 'profile' ? '#FF007F' : '#FF4D00')
                           : (isLight ? '#000000' : 'rgba(255,255,255,0.7)'),
                         transition: 'color 160ms ease-out',
                         zIndex: 1,

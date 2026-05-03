@@ -46,7 +46,7 @@ const GAP_CSS = 'clamp(6px, 1.5vw, 12px)';
 const TAP_SCALE = 0.92;
 
 // ── VARIANT CONFIGS ───────────────────────────────────────────────────────────
-type Variant = 'default' | 'like' | 'dislike' | 'amber' | 'cyan' | 'purple' | 'gold';
+type Variant = 'default' | 'like' | 'dislike' | 'amber' | 'blue' | 'purple' | 'gold' | 'green';
 
 interface VariantCfg {
   iconColor: string;
@@ -59,11 +59,11 @@ interface VariantCfg {
 
 const VARIANTS: Record<Variant, VariantCfg> = {
   like: {
-    iconColor: '#ff6b35',
-    glow: '0 0 20px rgba(255, 107, 53, 0.4)',
-    glowIntense: '0 0 40px rgba(255, 107, 53, 0.5)',
+    iconColor: '#ff5722', // Deeper fire orange
+    glow: '0 0 24px rgba(255, 87, 34, 0.45)',
+    glowIntense: '0 0 45px rgba(255, 87, 34, 0.6)',
     dropShadow: 'var(--shadow-cinematic-primary)',
-    circleBg: 'rgba(255, 107, 53, 0.35)', // Increased opacity
+    circleBg: 'rgba(255, 87, 34, 0.35)',
     circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
   dislike: {
@@ -71,7 +71,7 @@ const VARIANTS: Record<Variant, VariantCfg> = {
     glow: '0 0 20px rgba(239, 68, 68, 0.4)',
     glowIntense: '0 0 40px rgba(239, 68, 68, 0.5)',
     dropShadow: '0 12px 24px -6px rgba(239, 68, 68, 0.45)',
-    circleBg: 'rgba(239, 68, 68, 0.35)', // Increased opacity
+    circleBg: 'rgba(239, 68, 68, 0.35)',
     circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
   amber: {
@@ -79,15 +79,23 @@ const VARIANTS: Record<Variant, VariantCfg> = {
     glow: '0 0 16px rgba(245, 158, 11, 0.35)',
     glowIntense: '0 0 32px rgba(245, 158, 11, 0.45)',
     dropShadow: '0 8px 16px -4px rgba(245, 158, 11, 0.4)',
-    circleBg: 'rgba(245, 158, 11, 0.35)', // Increased opacity
+    circleBg: 'rgba(245, 158, 11, 0.35)',
     circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
-  cyan: {
-    iconColor: '#06b6d4',
-    glow: '0 0 16px rgba(6, 182, 212, 0.35)',
-    glowIntense: '0 0 32px rgba(6, 182, 212, 0.45)',
-    dropShadow: '0 8px 16px -4px rgba(6, 182, 212, 0.4)',
-    circleBg: 'rgba(6, 182, 212, 0.35)', // Increased opacity
+  green: {
+    iconColor: '#10b981', // Cool green
+    glow: '0 0 16px rgba(16, 185, 129, 0.35)',
+    glowIntense: '0 0 32px rgba(16, 185, 129, 0.45)',
+    dropShadow: '0 8px 16px -4px rgba(16, 185, 129, 0.4)',
+    circleBg: 'rgba(16, 185, 129, 0.35)',
+    circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
+  },
+  blue: {
+    iconColor: '#3b82f6', // Beautiful blue
+    glow: '0 0 16px rgba(59, 130, 246, 0.35)',
+    glowIntense: '0 0 32px rgba(59, 130, 246, 0.45)',
+    dropShadow: '0 8px 16px -4px rgba(59, 130, 246, 0.4)',
+    circleBg: 'rgba(59, 130, 246, 0.35)',
     circleBorder: '1px solid rgba(255, 255, 255, 0.4)',
   },
   purple: {
@@ -258,7 +266,6 @@ function SwipeActionButtonBarComponent({
         zIndex: 100,
       }}
     >
-      {/* No glass tray — clean frameless layout */}
       <div
         className="relative flex items-center justify-center"
         style={{ gap: GAP_CSS }}
@@ -267,8 +274,8 @@ function SwipeActionButtonBarComponent({
           onClick={onUndo || (() => {})}
           disabled={disabled || !canUndo}
           size="small"
-          variant="amber"
-          ariaLabel="Undo last swipe"
+          variant="green"
+          ariaLabel="Undo"
           index={0}
         >
           <RotateCcw className="w-full h-full" strokeWidth={1.5} />
@@ -285,16 +292,16 @@ function SwipeActionButtonBarComponent({
           <ThumbsDown className="w-full h-full" strokeWidth={1.8} />
         </ActionButton>
 
-        {onMessage && (
+        {onInsights && (
           <ActionButton
-            onClick={onMessage}
+            onClick={onInsights}
             disabled={disabled}
             size="small"
-            variant="cyan"
-            ariaLabel="Message"
+            variant="purple"
+            ariaLabel="Insights"
             index={2}
           >
-            <MessageCircle className="w-full h-full" strokeWidth={1.5} />
+            <Info className="w-full h-full" strokeWidth={1.5} />
           </ActionButton>
         )}
 
@@ -309,16 +316,16 @@ function SwipeActionButtonBarComponent({
           <Flame className="w-full h-full" strokeWidth={1.8} />
         </ActionButton>
 
-        {onInsights && (
+        {onMessage && (
           <ActionButton
-            onClick={onInsights}
+            onClick={onMessage}
             disabled={disabled}
             size="small"
-            variant="cyan"
-            ariaLabel="Insights"
+            variant="blue"
+            ariaLabel="Message"
             index={4}
           >
-            <Smartphone className="w-full h-full" strokeWidth={1.5} />
+            <MessageCircle className="w-full h-full" strokeWidth={1.5} />
           </ActionButton>
         )}
       </div>

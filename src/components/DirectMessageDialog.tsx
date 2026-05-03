@@ -56,7 +56,7 @@ export function DirectMessageDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
         hideCloseButton
-        className="max-w-[400px] p-0 overflow-hidden rounded-[32px] border border-white/10 bg-black/40 backdrop-blur-2xl shadow-2xl"
+        className="max-w-[400px] p-0 overflow-hidden rounded-[32px] border border-white/5 bg-[#050505] shadow-[0_32px_80px_rgba(0,0,0,0.8)]"
       >
         {/* Animated Background Gradients */}
         <div className="absolute top-0 left-0 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -104,10 +104,10 @@ export function DirectMessageDialog({
               <Textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="min-h-[140px] resize-none rounded-[20px] border-white/10 bg-black/20 text-white text-sm backdrop-blur-md focus-visible:ring-1 focus-visible:ring-cyan-500/50 p-4"
+                className="min-h-[140px] resize-none rounded-[20px] border-white/10 bg-black text-white text-sm focus-visible:ring-1 focus-visible:ring-cyan-500/50 p-4"
                 disabled={isLoading}
               />
-              <div className="absolute bottom-3 right-4 text-[10px] font-bold text-white/40 bg-black/40 px-2 py-1 rounded-md backdrop-blur-sm">
+              <div className="absolute bottom-3 right-4 text-[10px] font-bold text-white/40 bg-black px-2 py-1 rounded-md">
                 {message.length}/500
               </div>
             </div>

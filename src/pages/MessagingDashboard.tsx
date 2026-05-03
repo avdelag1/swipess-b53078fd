@@ -211,7 +211,7 @@ export function MessagingDashboard() {
   }
 
   return (
-    <div className={cn("w-full transition-colors duration-500 relative", isLight ? "bg-white" : "bg-black")}>
+    <div className={cn("w-full min-h-[100dvh] transition-colors duration-500 relative", isLight ? "bg-[#ffffff]" : "bg-[#000000]")}>
       <AtmosphericLayer variant="rose" />
 
       <MessageActivationBanner isVisible={showActivationBanner} onClose={() => setShowActivationBanner(false)} userRole={userRole} variant="conversation-limit" />
@@ -235,7 +235,7 @@ export function MessagingDashboard() {
               placeholder="SEARCH NAMES..." 
               className={cn(
                 "w-full pl-14 pr-14 h-16 rounded-[2.2rem] text-[14px] outline-none transition-all font-black uppercase tracking-widest border",
-                isLight ? "bg-black/5 border-black/5 text-black placeholder:text-black/20" : "bg-white/[0.04] border-white/5 text-white placeholder:text-white/20 focus:border-white/10"
+                isLight ? "bg-white border-black/5 text-black placeholder:text-black/30 shadow-sm" : "bg-[#0d0d14] border-white/5 text-white placeholder:text-white/20 focus:border-white/10"
               )}
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)} 
@@ -295,10 +295,10 @@ export function MessagingDashboard() {
                 >
                   <button 
                     className={cn(
-                      "w-full flex items-center gap-5 p-5 rounded-[2.2rem] text-left transition-all border group relative overflow-hidden",
+                      "w-full flex items-center gap-5 p-6 rounded-[2.2rem] text-left transition-all border group relative overflow-hidden",
                       isUnread 
-                        ? (isLight ? "bg-black/5 border-black/10 shadow-lg" : "bg-white/[0.04] border-white/10 shadow-2xl") 
-                        : (isLight ? "bg-transparent border-black/5 hover:bg-black/[0.02]" : "bg-transparent border-white/[0.03] hover:bg-white/[0.02] hover:border-white/5")
+                        ? (isLight ? "bg-white border-black/10 shadow-[0_15px_40px_rgba(0,0,0,0.08)]" : "bg-[#0d0d14] border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.5)]") 
+                        : (isLight ? "bg-white border-black/[0.04] hover:bg-black/[0.01]" : "bg-[#08080c] border-white/[0.04] hover:bg-white/[0.01]")
                     )} 
                     onClick={() => { triggerHaptic('medium'); setSelectedConversationId(conversation.id); }}
                   >
@@ -375,8 +375,8 @@ export function MessagingDashboard() {
                initial={{ opacity: 0 }} 
                animate={{ opacity: 1 }}
                className={cn(
-                 "py-32 flex flex-col items-center justify-center rounded-[3.5rem] border",
-                 isLight ? "bg-black/5 border-black/5" : "bg-white/[0.02] border-white/[0.05]"
+                 "py-32 flex flex-col items-center justify-center rounded-[3.5rem] border shadow-sm",
+                 isLight ? "bg-white/40 border-black/5 backdrop-blur-md" : "bg-white/[0.02] border-white/[0.05]"
                )}
             >
               <div className="w-20 h-20 rounded-[1.8rem] bg-indigo-500/10 flex items-center justify-center mb-10 border border-indigo-500/20">
